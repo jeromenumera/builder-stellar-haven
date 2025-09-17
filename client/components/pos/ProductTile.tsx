@@ -25,7 +25,7 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
     <Card
       role="button"
       onClick={onAdd}
-      className="relative overflow-hidden select-none bg-card transition-transform transform hover:scale-[1.01] active:scale-[0.98] touch-manipulation rounded-xl shadow-md border border-transparent hover:border-primary/40"
+      className="relative overflow-hidden select-none bg-card transition-transform transform hover:scale-[1.01] active:scale-[0.98] touch-manipulation rounded-xl shadow-md border border-transparent hover:border-primary/40 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
       style={{ minHeight: 160 }}
     >
       <div className="flex h-full">
