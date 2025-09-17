@@ -120,6 +120,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (id: string) => dispatch({ type: "addToCart", id });
   const removeFromCart = (id: string) => dispatch({ type: "removeFromCart", id });
+  const removeItem = (id: string) => dispatch({ type: "removeItem", id });
   const clearCart = () => dispatch({ type: "clearCart" });
   const selectEvent = (id: string | null) => dispatch({ type: "selectEvent", id });
 
