@@ -127,36 +127,32 @@ export const createSale: RequestHandler = async (req, res) => {
       ) / 100;
     const tva_totale = Math.round((total_ttc - total_ht) * 100) / 100;
 
-    // Insert sale record
-    const { data: venteData, error: venteError } = await supabase
-      .from("ventes")
-      .insert({
-        evenement_id,
-        mode_paiement,
-        total_ttc,
-        total_ht,
-        tva_totale,
-      })
-      .select()
-      .single();
+    const vente = await withTransaction(async (client) => {
+      const inserted = await client.query(
+        `INSERT INTO ventes (evenement_id, mode_paiement, total_ttc, total_ht, tva_totale)
+         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+        [evenement_id, mode_paiement, total_ttc, total_ht, tva_totale]
+      );
+      const vd = inserted.rows[0];
 
-    if (venteError) throw venteError;
+      if (lignesData.length > 0) {
+        const values: any[] = [];
+        const params: string[] = [];
+        lignesData.forEach((l, i) => {
+          const base = i * 6;
+          params.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6})`);
+          values.push(vd.id, l.produit_id, l.quantite, l.prix_unitaire_ttc, l.sous_total_ttc, l.tva_taux);
+        });
+        await client.query(
+          `INSERT INTO lignes_ventes (vente_id, produit_id, quantite, prix_unitaire_ttc, sous_total_ttc, tva_taux)
+           VALUES ${params.join(',')}`,
+          values
+        );
+      }
+      return vd;
+    });
 
-    // Insert sale lines
-    const lignesToInsert = lignesData.map((l: any) => ({
-      ...l,
-      vente_id: venteData.id,
-    }));
-
-    const { data: lignesInserted, error: lignesError } = await supabase
-      .from("lignes_ventes")
-      .insert(lignesToInsert)
-      .select();
-
-    if (lignesError) throw lignesError;
-
-    const sale = convertVenteFromDb(venteData, lignesInserted);
-    res.json(sale);
+    res.json(convertVenteFromDb(vente, lignesData));
   } catch (error: any) {
     console.error("Error creating sale:", error);
     const msg = error?.message || String(error);
