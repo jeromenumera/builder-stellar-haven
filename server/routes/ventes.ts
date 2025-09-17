@@ -35,65 +35,60 @@ export const createSale: RequestHandler = async (req, res) => {
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
-    const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = body || {};
+    // Accept snake_case and camelCase
+    const evenement_id = body?.evenement_id ?? body?.eventId ?? body?.event_id;
+    let mode_paiement: any = body?.mode_paiement ?? body?.paymentMethod ?? body?.modePaiement;
+    if (mode_paiement === 'card') mode_paiement = 'carte';
+    const lignesInput = body?.lignes ?? body?.lines;
 
     // Basic request logging for diagnostics
-    console.log('createSale payload', {
-      has_evenement_id: Boolean(evenement_id),
-      mode_paiement,
-      total_ttc,
-      total_ht,
-      tva_totale,
-      lignes_count: Array.isArray(lignes) ? lignes.length : 0,
-    });
+    console.log('createSale payload keys', Object.keys(body || {}));
 
-    // Validate required fields
+    // Validate minimal fields
     const missing: string[] = [];
     if (!evenement_id) missing.push('evenement_id');
     if (!mode_paiement) missing.push('mode_paiement');
-    if (total_ttc === undefined) missing.push('total_ttc');
-    if (total_ht === undefined) missing.push('total_ht');
-    if (tva_totale === undefined) missing.push('tva_totale');
+    if (!Array.isArray(lignesInput) || lignesInput.length === 0) missing.push('lignes');
     if (missing.length > 0) {
       const keys = body ? Object.keys(body) : [];
-      return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}`, missing, keys });
+      return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}`, missing, keys, received: body });
     }
 
-    if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
-      return res.status(400).json({ error: 'Missing or empty lignes array', missing: ['lignes'] });
-    }
+    const toPct = (v: any) => {
+      const n = parseFloat(v);
+      if (!Number.isFinite(n)) return 0;
+      return n <= 1 ? n * 100 : n;
+    };
 
-    // Validate numeric values
-    const n_total_ttc = parseFloat(total_ttc);
-    const n_total_ht = parseFloat(total_ht);
-    const n_tva_totale = parseFloat(tva_totale);
-    const invalids: string[] = [];
-    if (!Number.isFinite(n_total_ttc)) invalids.push('total_ttc');
-    if (!Number.isFinite(n_total_ht)) invalids.push('total_ht');
-    if (!Number.isFinite(n_tva_totale)) invalids.push('tva_totale');
-
-    const lignesData = lignes.map((ligne: any, idx: number) => {
-      const q = parseInt(ligne.quantite, 10);
-      const puttc = parseFloat(ligne.prix_unitaire_ttc);
-      const st = parseFloat(ligne.sous_total_ttc);
-      const tva = parseFloat(ligne.tva_taux);
-      if (!Number.isFinite(q) || q <= 0) invalids.push(`lignes[${idx}].quantite`);
-      if (!Number.isFinite(puttc)) invalids.push(`lignes[${idx}].prix_unitaire_ttc`);
-      if (!Number.isFinite(st)) invalids.push(`lignes[${idx}].sous_total_ttc`);
-      if (!Number.isFinite(tva)) invalids.push(`lignes[${idx}].tva_taux`);
-      return {
-        vente_id: undefined,
-        produit_id: ligne.produit_id,
-        quantite: q,
-        prix_unitaire_ttc: puttc,
-        sous_total_ttc: st,
-        tva_taux: tva,
-      };
+    const lignesData = (lignesInput as any[]).map((ligne: any, idx: number) => {
+      const produit_id = ligne.produit_id ?? ligne.productId ?? ligne.produitId;
+      const quantite = Number.parseInt(String(ligne.quantite ?? ligne.quantity), 10);
+      const prix_unitaire_ttc = parseFloat(ligne.prix_unitaire_ttc ?? ligne.unitPriceTTC);
+      const tva_taux = toPct(ligne.tva_taux ?? ligne.taxRate ?? 0);
+      const sous_total_ttc = Number.isFinite(prix_unitaire_ttc) && Number.isFinite(quantite)
+        ? Math.round(prix_unitaire_ttc * quantite * 100) / 100
+        : NaN;
+      return { produit_id, quantite, prix_unitaire_ttc, sous_total_ttc, tva_taux };
     });
 
-    if (invalids.length > 0) {
-      return res.status(400).json({ error: `Invalid numeric values: ${invalids.join(', ')}`, fields: invalids });
+    // Validate lines
+    const invalids: string[] = [];
+    for (let i = 0; i < lignesData.length; i++) {
+      const l = lignesData[i];
+      if (!l.produit_id) invalids.push(`lignes[${i}].produit_id`);
+      if (!Number.isFinite(l.quantite) || l.quantite <= 0) invalids.push(`lignes[${i}].quantite`);
+      if (!Number.isFinite(l.prix_unitaire_ttc)) invalids.push(`lignes[${i}].prix_unitaire_ttc`);
+      if (!Number.isFinite(l.sous_total_ttc)) invalids.push(`lignes[${i}].sous_total_ttc`);
+      if (!Number.isFinite(l.tva_taux)) invalids.push(`lignes[${i}].tva_taux`);
     }
+    if (invalids.length > 0) {
+      return res.status(400).json({ error: `Invalid numeric values: ${invalids.join(', ')}`, fields: invalids, received: body });
+    }
+
+    // Compute totals server-side
+    const total_ttc = Math.round(lignesData.reduce((s, l) => s + l.sous_total_ttc, 0) * 100) / 100;
+    const total_ht = Math.round(lignesData.reduce((s, l) => s + (l.sous_total_ttc / (1 + (l.tva_taux || 0) / 100)), 0) * 100) / 100;
+    const tva_totale = Math.round((total_ttc - total_ht) * 100) / 100;
 
     // Insert sale record
     const { data: venteData, error: venteError } = await supabase
@@ -101,9 +96,9 @@ export const createSale: RequestHandler = async (req, res) => {
       .insert({
         evenement_id,
         mode_paiement,
-        total_ttc: n_total_ttc,
-        total_ht: n_total_ht,
-        tva_totale: n_tva_totale,
+        total_ttc,
+        total_ht,
+        tva_totale,
       })
       .select()
       .single();
