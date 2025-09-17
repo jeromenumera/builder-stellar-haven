@@ -25,16 +25,24 @@ export const createProduct: RequestHandler = async (req, res) => {
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
-    const { nom, prix_ttc, tva, image_url, sku } = body || {};
+    const nom = body?.nom ?? body?.name;
+    const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
+    const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
+    const image_url = body?.image_url ?? body?.imageUrl ?? null;
+    const sku = body?.sku ?? null;
+
+    if (!nom || !Number.isFinite(prix_ttc)) {
+      return res.status(400).json({ error: 'Missing required fields: nom, prix_ttc', received: body });
+    }
 
     const { data, error } = await supabase
       .from('produits')
       .insert({
         nom,
-        prix_ttc: parseFloat(prix_ttc),
-        tva: parseFloat(tva),
-        image_url: image_url || null,
-        sku: sku || null,
+        prix_ttc,
+        tva,
+        image_url,
+        sku,
         actif: true,
       })
       .select()
@@ -57,16 +65,20 @@ export const updateProduct: RequestHandler = async (req, res) => {
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
-    const { nom, prix_ttc, tva, image_url, sku } = body || {};
+    const nom = body?.nom ?? body?.name;
+    const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
+    const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
+    const image_url = body?.image_url ?? body?.imageUrl ?? null;
+    const sku = body?.sku ?? null;
 
     const { data, error } = await supabase
       .from('produits')
       .update({
         nom,
-        prix_ttc: parseFloat(prix_ttc),
-        tva: parseFloat(tva),
-        image_url: image_url || null,
-        sku: sku || null,
+        prix_ttc,
+        tva,
+        image_url,
+        sku,
       })
       .eq('id', id)
       .select()
