@@ -81,22 +81,13 @@ export const updateEvent: RequestHandler = async (req, res) => {
           : "archivé"
         : undefined);
 
-    const { data, error } = await supabase
-      .from("evenements")
-      .update({
-        nom,
-        date_debut,
-        date_fin,
-        lieu,
-        statut,
-      })
-      .eq("id", id)
-      .select()
-      .single();
+    const { rows } = await query(
+      `UPDATE evenements SET nom=$2, date_debut=$3, date_fin=$4, lieu=$5, statut=COALESCE($6, statut)
+       WHERE id=$1 RETURNING *`,
+      [id, nom, date_debut, date_fin, lieu, statut]
+    );
 
-    if (error) throw error;
-
-    const event = convertEvenementFromDb(data);
+    const event = convertEvenementFromDb(rows[0]);
     res.json(event);
   } catch (error: any) {
     console.error("Error updating event:", error);
