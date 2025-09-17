@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { usePos } from "@/context/PosStore";
 import { toast } from "sonner";
