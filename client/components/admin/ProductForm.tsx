@@ -14,19 +14,20 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
       id: uid("prod"),
       nom: "",
       prix_ttc: 0,
-      tva: 7.7,
-      image_url: "/public/placeholder.svg",
+      tva: 8.1,
+      image_url: "",
       sku: "",
     },
   );
 
   useEffect(() => {
-    if (initial) setForm(initial);
+    if (initial) setForm({ ...initial, tva: 8.1 });
   }, [initial]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: Number(form.tva) });
+    // enforce TVA fixed at 8.1
+    saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: 8.1 });
     onDone?.();
   };
 
@@ -50,22 +51,11 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
         </div>
         <div>
           <Label>TVA (%)</Label>
-          <Input
-            type="number"
-            min={0}
-            step="0.1"
-            value={form.tva}
-            onChange={(e) => setForm({ ...form, tva: Number(e.target.value) })}
-            required
-          />
+          <Input value={8.1} disabled />
         </div>
         <div>
           <Label>SKU (optionnel)</Label>
           <Input value={form.sku || ""} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
-        </div>
-        <div className="md:col-span-2">
-          <Label>Image URL</Label>
-          <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
         </div>
         <div className="md:col-span-2 flex justify-end gap-2">
           <Button type="submit">Enregistrer</Button>
