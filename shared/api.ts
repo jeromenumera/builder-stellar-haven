@@ -131,3 +131,8 @@ export function computeKPI(
 
   return { ca_total, nombre_ventes, ticket_moyen, par_mode_paiement, par_produit };
 }
+
+// keep DemoResponse for legacy demo route
+export interface DemoResponse {
+  message: string;
+}
