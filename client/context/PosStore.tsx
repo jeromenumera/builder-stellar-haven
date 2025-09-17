@@ -199,6 +199,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       state,
       addToCart,
       removeFromCart,
+      removeItem,
       clearCart,
       selectEvent,
       saveProduit,
