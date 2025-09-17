@@ -49,7 +49,6 @@ export const createSale: RequestHandler = async (req, res) => {
     if (venteError) throw venteError;
 
     // Insert sale lines
-    console.log('Processing lignes:', lignes);
     const lignesData = lignes.map((ligne: any) => ({
       vente_id: venteData.id,
       produit_id: ligne.produit_id,
@@ -59,19 +58,12 @@ export const createSale: RequestHandler = async (req, res) => {
       tva_taux: parseFloat(ligne.tva_taux),
     }));
 
-    console.log('Inserting lignes_ventes with data:', lignesData);
-
     const { data: lignesInserted, error: lignesError } = await supabase
       .from('lignes_ventes')
       .insert(lignesData)
       .select();
 
-    if (lignesError) {
-      console.error('Lignes_ventes insert error:', lignesError);
-      throw lignesError;
-    }
-
-    console.log('Lignes inserted successfully:', lignesInserted);
+    if (lignesError) throw lignesError;
 
     const sale = convertVenteFromDb(venteData, lignesInserted);
     res.json(sale);
