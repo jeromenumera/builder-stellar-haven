@@ -28,6 +28,29 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === "Enter" || e.key === " ") onAdd();
       }}
+      onPointerDown={(e) => {
+        const target = e.currentTarget as HTMLDivElement;
+        // start long press timer
+        (target as any)._lp = window.setTimeout(() => {
+          // long press => remove one
+          removeFromCart(produit.id);
+          feedback();
+        }, 600);
+      }}
+      onPointerUp={(e) => {
+        const target = e.currentTarget as HTMLDivElement;
+        if ((target as any)._lp) {
+          clearTimeout((target as any)._lp);
+          (target as any)._lp = null;
+        }
+      }}
+      onPointerLeave={(e) => {
+        const target = e.currentTarget as HTMLDivElement;
+        if ((target as any)._lp) {
+          clearTimeout((target as any)._lp);
+          (target as any)._lp = null;
+        }
+      }}
       className="relative overflow-hidden select-none transition-transform touch-manipulation rounded-[14px] border border-[#2A2A2A] cursor-pointer"
       style={{
         minHeight: 140,
