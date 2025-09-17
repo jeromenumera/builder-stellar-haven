@@ -28,16 +28,36 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
       onKeyDown={(e: React.KeyboardEvent) => {
         if (e.key === "Enter" || e.key === " ") onAdd();
       }}
-      className="relative overflow-hidden select-none bg-card transition-all transform hover:scale-[1.01] active:scale-95 touch-manipulation rounded-lg shadow-sm border border-[#2A2A2A] hover:border-[#3a82f6]/40 hover:bg-[rgba(58,130,246,0.04)] focus:outline-none focus:ring-2 focus:ring-primary/40 cursor-pointer"
-      style={{ minHeight: 140 }}
+      className="relative overflow-hidden select-none transition-transform touch-manipulation rounded-[14px] border border-[#2A2A2A] cursor-pointer"
+      style={{
+        minHeight: 140,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12))",
+        backgroundColor: "rgba(44,44,46,0.8)",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        WebkitBackdropFilter: "blur(6px)",
+        backdropFilter: "blur(6px)",
+        transition: "transform 120ms ease, background-color 120ms ease",
+      }}
+      onMouseDown={(e) => {
+        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#3A3A3C";
+        (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
+      }}
+      onMouseUp={(e) => {
+        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+      }}
     >
-      <div className="flex items-center h-full px-3 py-2">
-        <div className="flex-shrink-0 mr-4 w-16 h-16 flex items-center justify-center">
+      <div className="flex items-center h-full px-3 py-3">
+        <div className="flex-shrink-0 mr-4 w-10 h-10 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imgSrc}
             alt={produit.nom}
-            className="h-12 w-12 object-cover rounded-md bg-center"
+            className="h-8 w-8 object-cover rounded-md bg-center"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = iconSrc;
             }}
@@ -45,8 +65,8 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="text-lg font-bold text-white leading-tight line-clamp-2">{produit.nom}</div>
-          <div className="text-green-400 text-sm font-semibold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
+          <div className="text-[18px] font-bold text-white leading-tight line-clamp-2">{produit.nom}</div>
+          <div className="text-[#34C759] text-[16px] font-semibold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
         </div>
 
         {qty > 0 && (
