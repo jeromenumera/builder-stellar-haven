@@ -174,6 +174,16 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     return { ok: true };
   };
 
+  const deleteVente = (id: string) => {
+    const ventes = state.ventes.filter((v) => v.id !== id);
+    dispatch({ type: "setVentes", ventes });
+  };
+
+  const updateVente = (updated: Vente) => {
+    const ventes = state.ventes.map((v) => (v.id === updated.id ? updated : v));
+    dispatch({ type: "setVentes", ventes });
+  };
+
   const value = useMemo(
     () => ({
       state,
@@ -186,6 +196,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       saveEvenement,
       deleteEvenement,
       checkout,
+      deleteVente,
+      updateVente,
     }),
     [state],
   );
