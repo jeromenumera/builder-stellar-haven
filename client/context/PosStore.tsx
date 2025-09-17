@@ -54,14 +54,15 @@ const PosContext = createContext<{
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   selectEvent: (id: string | null) => void;
-  saveProduit: (p: Produit) => void;
-  deleteProduit: (id: string) => void;
-  saveEvenement: (e: Evenement) => void;
-  deleteEvenement: (id: string) => void;
-  checkout: (mode: ModePaiement) => { ok: boolean; error?: string };
-  deleteVente: (id: string) => void;
-  updateVente: (v: Vente) => void;
+  saveProduit: (p: Produit) => Promise<void>;
+  deleteProduit: (id: string) => Promise<void>;
+  saveEvenement: (e: Evenement) => Promise<void>;
+  deleteEvenement: (id: string) => Promise<void>;
+  checkout: (mode: ModePaiement) => Promise<{ ok: boolean; error?: string }>;
+  deleteVente: (id: string) => Promise<void>;
+  updateVente: (v: Vente) => Promise<void>;
   removeItem: (id: string) => void;
+  refreshData: () => Promise<void>;
 } | null>(null);
 
 const initial: State = {
