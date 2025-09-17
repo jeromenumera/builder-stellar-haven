@@ -297,6 +297,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       checkout,
       deleteVente,
       updateVente,
+      refreshData,
     }),
     [state],
   );
