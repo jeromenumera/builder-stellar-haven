@@ -31,10 +31,10 @@ export function CartSummary() {
         ) : (
           <ul className="space-y-3">
             {items.map(({ produit, qty }) => {
-              const icon = categoryIconDataUrl(produit.nom, 64);
+              const thumb = produit.image_url && produit.image_url.length > 0 ? produit.image_url : '/public/placeholder.svg';
               return (
                 <li key={produit.id} className="flex items-center gap-3 py-2">
-                  <img src={icon} alt={produit.nom} className="h-10 w-10 object-contain rounded bg-muted" />
+                  <img src={thumb} alt={produit.nom} className="h-10 w-10 object-cover rounded bg-muted" />
                   <div className="flex-1">
                     <div className="font-medium leading-tight text-white">{produit.nom}</div>
                     <div className="text-xs text-muted-foreground">
