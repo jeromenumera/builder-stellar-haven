@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
-import { supabase, convertProduitFromDb } from "../services/supabase";
+import { query } from "../services/db";
+import { convertProduitFromDb } from "../services/converters";
 
 export const getProducts: RequestHandler = async (_req, res) => {
   try {
