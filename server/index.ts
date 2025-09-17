@@ -6,7 +6,6 @@ import { handleDbPing, handleDbInfo } from "./routes/neon";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "./routes/produits";
 import { getEvents, createEvent, updateEvent, deleteEvent } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
-import { debugVente } from "./routes/debug";
 
 export function createServer() {
   const app = express();
