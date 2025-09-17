@@ -86,11 +86,19 @@ export default function Historique() {
                   </ul>
                 </TableCell>
                 <TableCell className="flex gap-2 justify-end">
-                  <Button variant="secondary" onClick={() => openEdit(v)}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => openEdit(v)}
+                    disabled={deleting === v.id}
+                  >
                     Modifier
                   </Button>
-                  <Button variant="destructive" onClick={() => onDelete(v.id)}>
-                    Supprimer
+                  <Button
+                    variant="destructive"
+                    onClick={() => onDelete(v.id)}
+                    disabled={deleting === v.id}
+                  >
+                    {deleting === v.id ? "..." : "Supprimer"}
                   </Button>
                 </TableCell>
               </TableRow>
