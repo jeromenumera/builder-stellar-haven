@@ -89,12 +89,7 @@ export const deleteProduct: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     // Soft delete by setting actif to false
-    const { error } = await supabase
-      .from("produits")
-      .update({ actif: false })
-      .eq("id", id);
-
-    if (error) throw error;
+    await query(`UPDATE produits SET actif=false WHERE id=$1`, [id]);
 
     res.json({ success: true });
   } catch (error: any) {
