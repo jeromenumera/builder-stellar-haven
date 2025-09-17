@@ -36,7 +36,14 @@ export default function Vente() {
         </aside>
 
         <section className="flex-1 order-1 md:order-2">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
+            style={{
+              gridAutoRows: '140px',
+              maxHeight: 'calc(100vh - 8rem)',
+              overflow: 'hidden',
+            }}
+          >
             {gridProducts.map((p) => (
               <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />)
             )}
