@@ -31,12 +31,21 @@ export function ProductForm({
   }, [initial]);
 
   const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // enforce TVA fixed at 8.1
-    saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: 8.1 });
-    onDone?.();
+    setSaving(true);
+    try {
+      // enforce TVA fixed at 8.1
+      await saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: 8.1 });
+      onDone?.();
+    } catch (error) {
+      console.error("Failed to save product:", error);
+      alert("Erreur lors de l'enregistrement du produit.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const onFileChange = async (f?: File) => {
