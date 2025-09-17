@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
-import { supabase, convertEvenementFromDb } from "../services/supabase";
+import { query } from "../services/db";
+import { convertEvenementFromDb } from "../services/converters";
 
 export const getEvents: RequestHandler = async (_req, res) => {
   try {
