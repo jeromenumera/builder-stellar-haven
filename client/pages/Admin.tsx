@@ -29,21 +29,24 @@ export default function Admin() {
               <h2 className="text-xl font-semibold mb-2">Liste (max 20)</h2>
               <Card className="p-2">
                 <ul className="divide-y">
-                  {state.produits.map((p) => (
-                    <li key={p.id} className="flex items-center gap-2 p-2">
-                      <img src={p.image_url} alt="" className="h-10 w-10 object-contain rounded bg-muted" />
-                      <div className="flex-1">
-                        <div className="font-medium">{p.nom}</div>
-                        <div className="text-xs text-muted-foreground">{p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%</div>
-                      </div>
-                      <Button variant="secondary" onClick={() => setEditingProductId(p.id)}>
-                        Éditer
-                      </Button>
-                      <Button variant="destructive" onClick={() => deleteProduit(p.id)}>
-                        Supprimer
-                      </Button>
-                    </li>
-                  ))}
+                  {state.produits.map((p) => {
+                    const icon = categoryIconDataUrl(p.nom, 64);
+                    return (
+                      <li key={p.id} className="flex items-center gap-2 p-2">
+                        <img src={icon} alt={p.nom} className="h-10 w-10 object-contain rounded bg-muted" />
+                        <div className="flex-1">
+                          <div className="font-medium">{p.nom}</div>
+                          <div className="text-xs text-muted-foreground">{p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%</div>
+                        </div>
+                        <Button variant="secondary" onClick={() => setEditingProductId(p.id)}>
+                          Éditer
+                        </Button>
+                        <Button variant="destructive" onClick={() => deleteProduit(p.id)}>
+                          Supprimer
+                        </Button>
+                      </li>
+                    );
+                  })}
                   {state.produits.length === 0 && (
                     <li className="p-4 text-muted-foreground">Aucun produit</li>
                   )}
