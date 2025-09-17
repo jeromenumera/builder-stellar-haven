@@ -11,11 +11,36 @@ export default function Admin() {
   const { state, deleteProduit, deleteEvenement, selectEvent } = usePos();
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const editingProduct =
     state.produits.find((p) => p.id === editingProductId) || null;
   const editingEvent =
     state.evenements.find((e) => e.id === editingEventId) || null;
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Confirmer la suppression de ce produit ?")) return;
+    setDeleting(id);
+    try {
+      await deleteProduit(id);
+    } catch (error) {
+      alert("Erreur lors de la suppression du produit.");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (!confirm("Confirmer la suppression de cet événement ?")) return;
+    setDeleting(id);
+    try {
+      await deleteEvenement(id);
+    } catch (error) {
+      alert("Erreur lors de la suppression de l'événement.");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
