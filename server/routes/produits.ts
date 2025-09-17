@@ -21,7 +21,11 @@ export const getProducts: RequestHandler = async (_req, res) => {
 
 export const createProduct: RequestHandler = async (req, res) => {
   try {
-    const { nom, prix_ttc, tva, image_url, sku } = req.body;
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { nom, prix_ttc, tva, image_url, sku } = body || {};
 
     const { data, error } = await supabase
       .from('produits')
@@ -49,7 +53,11 @@ export const createProduct: RequestHandler = async (req, res) => {
 export const updateProduct: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, prix_ttc, tva, image_url, sku } = req.body;
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { nom, prix_ttc, tva, image_url, sku } = body || {};
 
     const { data, error } = await supabase
       .from('produits')
