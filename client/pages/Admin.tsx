@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { EventForm } from "@/components/admin/EventForm";
+import { categoryIconDataUrl } from "@/lib/avatar";
 
 export default function Admin() {
   const { state, deleteProduit, deleteEvenement, selectEvent } = usePos();
