@@ -25,10 +25,10 @@ export function PaymentButtons() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
       <Button className="h-14 md:h-16 text-2xl w-full" onClick={() => pay("carte")} disabled={disabled}>
-        Carte
+        {processing ? "..." : "Carte"}
       </Button>
       <Button variant="secondary" className="h-14 md:h-16 text-2xl w-full" onClick={() => pay("cash")} disabled={disabled}>
-        Espèces
+        {processing ? "..." : "Espèces"}
       </Button>
     </div>
   );
