@@ -80,12 +80,12 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
       }}
     >
       <div className="flex items-center h-full px-3 py-3">
-        <div className="flex-shrink-0 mr-4 w-10 h-10 flex items-center justify-center">
+        <div className="flex-shrink-0 mr-4 w-20 h-20 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imgSrc}
             alt={produit.nom}
-            className="h-8 w-8 object-cover rounded-md bg-center"
+            className="h-20 w-20 object-cover rounded-[10px] bg-center"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = '/public/placeholder.svg';
             }}
