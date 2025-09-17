@@ -11,6 +11,8 @@ export default function Historique() {
   const { state, deleteVente, updateVente } = usePos();
   const [editing, setEditing] = useState<null | string>(null);
   const [draft, setDraft] = useState<any>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const ventes = useMemo(() => {
     return state.selectedEventId
@@ -18,9 +20,16 @@ export default function Historique() {
       : [];
   }, [state.ventes, state.selectedEventId]);
 
-  const onDelete = (id: string) => {
+  const onDelete = async (id: string) => {
     if (!confirm("Confirmer la suppression de cette vente ? Cette action est irréversible.")) return;
-    deleteVente(id);
+    setDeleting(id);
+    try {
+      await deleteVente(id);
+    } catch (error) {
+      alert("Erreur lors de la suppression de la vente.");
+    } finally {
+      setDeleting(null);
+    }
   };
 
   const openEdit = (v: any) => {
@@ -28,13 +37,20 @@ export default function Historique() {
     setEditing(v.id);
   };
 
-  const saveEdit = () => {
-    // recompute totals
-    const totals = computeTotals(draft.lignes);
-    const updated = { ...draft, total_ttc: totals.total_ttc, total_ht: totals.total_ht, tva_totale: totals.tva_totale };
-    updateVente(updated);
-    setEditing(null);
-    setDraft(null);
+  const saveEdit = async () => {
+    setSaving(true);
+    try {
+      // recompute totals
+      const totals = computeTotals(draft.lignes);
+      const updated = { ...draft, total_ttc: totals.total_ttc, total_ht: totals.total_ht, tva_totale: totals.tva_totale };
+      await updateVente(updated);
+      setEditing(null);
+      setDraft(null);
+    } catch (error) {
+      alert("Erreur lors de la modification de la vente.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
