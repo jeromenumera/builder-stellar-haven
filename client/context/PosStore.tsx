@@ -90,6 +90,11 @@ function reducer(state: State, action: Action): State {
       else next[action.id] = qty;
       return { ...state, cart: next };
     }
+    case "removeItem": {
+      const next = { ...state.cart };
+      delete next[action.id];
+      return { ...state, cart: next };
+    }
     case "clearCart":
       return { ...state, cart: {} };
     default:
