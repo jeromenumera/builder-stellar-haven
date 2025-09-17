@@ -4,14 +4,22 @@ import { toast } from "sonner";
 
 export function PaymentButtons() {
   const { checkout, state } = usePos();
+  const [processing, setProcessing] = useState(false);
 
-  const pay = (mode: "carte" | "cash") => {
-    const res = checkout(mode);
-    if (!res.ok) toast.error(res.error || "Erreur");
-    else toast.success(`Vente enregistrée (${mode})`);
+  const pay = async (mode: "carte" | "cash") => {
+    setProcessing(true);
+    try {
+      const res = await checkout(mode);
+      if (!res.ok) toast.error(res.error || "Erreur");
+      else toast.success(`Vente enregistrée (${mode})`);
+    } catch (error) {
+      toast.error("Erreur lors de l'enregistrement");
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  const disabled = Object.keys(state.cart).length === 0 || !state.selectedEventId;
+  const disabled = Object.keys(state.cart).length === 0 || !state.selectedEventId || processing;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
