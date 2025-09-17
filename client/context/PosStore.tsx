@@ -53,6 +53,7 @@ const PosContext = createContext<{
   checkout: (mode: ModePaiement) => { ok: boolean; error?: string };
   deleteVente: (id: string) => void;
   updateVente: (v: Vente) => void;
+  removeItem: (id: string) => void;
 } | null>(null);
 
 const initial: State = {
