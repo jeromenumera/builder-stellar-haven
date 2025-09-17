@@ -78,18 +78,12 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         </div>
 
         {qty > 0 && (
-          <div className="absolute bottom-3 right-3 flex items-center gap-3">
-            <Button variant="secondary" size="icon" className="h-12 w-12" onClick={onRemove}>
-              −
-            </Button>
-            <div className="px-3 py-1 rounded-md bg-primary text-primary-foreground font-bold text-lg min-w-10 text-center">
-              {qty}
-            </div>
-            <Button variant="secondary" size="icon" className="h-12 w-12" onClick={onAdd}>
-              +
-            </Button>
-          </div>
-        )}
+        <div className="absolute top-3 right-3">
+          <div className="bg-primary text-primary-foreground rounded-full px-3 py-1 font-bold text-sm">{qty}</div>
+        </div>
+      )}
+
+      {/* Long press to decrement quantity */}
       </div>
     </Card>
   );
