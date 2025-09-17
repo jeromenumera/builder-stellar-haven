@@ -175,45 +175,55 @@ export const updateSale: RequestHandler = async (req, res) => {
         body = {};
       }
     }
-    const { mode_paiement, total_ttc, total_ht, tva_totale, lignes } =
-      body || {};
+    const mode_paiement = body?.mode_paiement ?? body?.paymentMethod ?? body?.modePaiement;
+    const lignes = body?.lignes ?? body?.lines ?? [];
 
-    // Update sale record
-    const { data: venteData, error: venteError } = await supabase
-      .from("ventes")
-      .update({
-        mode_paiement,
-        total_ttc: parseFloat(total_ttc),
-        total_ht: parseFloat(total_ht),
-        tva_totale: parseFloat(tva_totale),
-      })
-      .eq("id", id)
-      .select()
-      .single();
+    const toPct = (v: any) => {
+      const n = parseFloat(v);
+      if (!Number.isFinite(n)) return 0;
+      return n <= 1 ? n * 100 : n;
+    };
 
-    if (venteError) throw venteError;
+    const lignesData = (lignes as any[]).map((ligne: any) => {
+      const produit_id = ligne.produit_id ?? ligne.productId ?? ligne.produitId;
+      const quantite = Number.parseInt(String(ligne.quantite ?? ligne.quantity), 10);
+      const prix_unitaire_ttc = parseFloat(ligne.prix_unitaire_ttc ?? ligne.unitPriceTTC);
+      const tva_taux = toPct(ligne.tva_taux ?? ligne.taxRate ?? 0);
+      const sous_total_ttc = Number.isFinite(prix_unitaire_ttc) && Number.isFinite(quantite)
+        ? Math.round(prix_unitaire_ttc * quantite * 100) / 100
+        : NaN;
+      return { produit_id, quantite, prix_unitaire_ttc, sous_total_ttc, tva_taux };
+    });
 
-    // Delete existing lines and insert new ones
-    await supabase.from("lignes_ventes").delete().eq("vente_id", id);
+    const total_ttc = Math.round(lignesData.reduce((s, l) => s + l.sous_total_ttc, 0) * 100) / 100;
+    const total_ht = Math.round(lignesData.reduce((s, l) => s + (l.sous_total_ttc / (1 + (l.tva_taux || 0) / 100)), 0) * 100) / 100;
+    const tva_totale = Math.round((total_ttc - total_ht) * 100) / 100;
 
-    const lignesData = lignes.map((ligne: any) => ({
-      vente_id: id,
-      produit_id: ligne.produit_id,
-      quantite: ligne.quantite,
-      prix_unitaire_ttc: parseFloat(ligne.prix_unitaire_ttc),
-      sous_total_ttc: parseFloat(ligne.sous_total_ttc),
-      tva_taux: parseFloat(ligne.tva_taux),
-    }));
+    const vente = await withTransaction(async (client) => {
+      const updated = await client.query(
+        `UPDATE ventes SET mode_paiement=$2, total_ttc=$3, total_ht=$4, tva_totale=$5 WHERE id=$1 RETURNING *`,
+        [id, mode_paiement, total_ttc, total_ht, tva_totale]
+      );
+      await client.query(`DELETE FROM lignes_ventes WHERE vente_id=$1`, [id]);
 
-    const { data: lignesInserted, error: lignesError } = await supabase
-      .from("lignes_ventes")
-      .insert(lignesData)
-      .select();
+      if (lignesData.length > 0) {
+        const values: any[] = [];
+        const params: string[] = [];
+        lignesData.forEach((l, i) => {
+          const base = i * 6;
+          params.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6})`);
+          values.push(id, l.produit_id, l.quantite, l.prix_unitaire_ttc, l.sous_total_ttc, l.tva_taux);
+        });
+        await client.query(
+          `INSERT INTO lignes_ventes (vente_id, produit_id, quantite, prix_unitaire_ttc, sous_total_ttc, tva_taux)
+           VALUES ${params.join(',')}`,
+          values
+        );
+      }
+      return updated.rows[0];
+    });
 
-    if (lignesError) throw lignesError;
-
-    const sale = convertVenteFromDb(venteData, lignesInserted);
-    res.json(sale);
+    res.json(convertVenteFromDb(vente, lignesData));
   } catch (error: any) {
     console.error("Error updating sale:", error);
     res.status(500).json({ error: error.message });
