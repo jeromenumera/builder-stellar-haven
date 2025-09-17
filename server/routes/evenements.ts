@@ -20,7 +20,11 @@ export const getEvents: RequestHandler = async (_req, res) => {
 
 export const createEvent: RequestHandler = async (req, res) => {
   try {
-    const { nom, date_debut, date_fin, lieu, statut } = req.body;
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { nom, date_debut, date_fin, lieu, statut } = body || {};
 
     const { data, error } = await supabase
       .from('evenements')
@@ -47,7 +51,11 @@ export const createEvent: RequestHandler = async (req, res) => {
 export const updateEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nom, date_debut, date_fin, lieu, statut } = req.body;
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { nom, date_debut, date_fin, lieu, statut } = body || {};
 
     const { data, error } = await supabase
       .from('evenements')
