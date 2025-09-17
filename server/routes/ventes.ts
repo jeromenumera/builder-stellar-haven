@@ -38,6 +38,10 @@ export const createSale: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
+      return res.status(400).json({ error: 'Missing or empty lignes array' });
+    }
+
     // Insert sale record
     const { data: venteData, error: venteError } = await supabase
       .from('ventes')
