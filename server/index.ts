@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { handleDbPing, handleDbInfo } from "./routes/neon";
 
 export function createServer() {
   const app = express();
@@ -18,6 +19,10 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Neon/Postgres readiness endpoints
+  app.get("/api/db/ping", handleDbPing);
+  app.get("/api/db/info", handleDbInfo);
 
   return app;
 }
