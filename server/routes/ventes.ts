@@ -234,13 +234,10 @@ export const deleteSale: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Delete sale lines first (foreign key constraint)
-    await supabase.from("lignes_ventes").delete().eq("vente_id", id);
-
-    // Delete sale record
-    const { error } = await supabase.from("ventes").delete().eq("id", id);
-
-    if (error) throw error;
+    await withTransaction(async (client) => {
+      await client.query(`DELETE FROM lignes_ventes WHERE vente_id=$1`, [id]);
+      await client.query(`DELETE FROM ventes WHERE id=$1`, [id]);
+    });
 
     res.json({ success: true });
   } catch (error: any) {
