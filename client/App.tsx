@@ -5,11 +5,30 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
+import Vente from "./pages/Vente";
+import Historique from "./pages/Historique";
+import Admin from "./pages/Admin";
+import { PosProvider } from "@/context/PosStore";
+import { Header } from "@/components/Header";
 
 const queryClient = new QueryClient();
+
+const AppShell = () => (
+  <PosProvider>
+    <Header />
+    <main className="min-h-[calc(100vh-4rem)]">
+      <Routes>
+        <Route path="/" element={<Navigate to="/vente" replace />} />
+        <Route path="/vente" element={<Vente />} />
+        <Route path="/historique" element={<Historique />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </main>
+  </PosProvider>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -17,11 +36,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppShell />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
