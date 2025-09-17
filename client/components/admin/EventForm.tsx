@@ -9,6 +9,7 @@ import { uid } from "@/services/id";
 
 export function EventForm({ initial, onDone }: { initial?: Evenement | null; onDone?: () => void }) {
   const { saveEvenement } = usePos();
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Evenement>(
     initial ?? {
       id: uid("evt"),
@@ -24,10 +25,18 @@ export function EventForm({ initial, onDone }: { initial?: Evenement | null; onD
     if (initial) setForm(initial);
   }, [initial]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    saveEvenement(form);
-    onDone?.();
+    setSaving(true);
+    try {
+      await saveEvenement(form);
+      onDone?.();
+    } catch (error) {
+      console.error("Failed to save event:", error);
+      alert("Erreur lors de l'enregistrement de l'événement.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
