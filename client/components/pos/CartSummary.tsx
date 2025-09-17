@@ -56,7 +56,7 @@ export function CartSummary() {
       <Separator className="my-3" />
       <div className="mt-auto">
         <div className="text-muted-foreground">TOTAL</div>
-        <div className="text-4xl md:text-5xl font-extrabold tabular-nums">{total.toFixed(2)} CHF</div>
+        <div className="text-5xl md:text-6xl font-extrabold tabular-nums text-green-400 drop-shadow-lg">{total.toFixed(2)} CHF</div>
       </div>
     </Card>
   );
