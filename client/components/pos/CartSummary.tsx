@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { usePos } from "@/context/PosStore";
 import { categoryIconDataUrl } from "@/lib/avatar";
 import { Trash } from "lucide-react";
-import { useMemo } from "react";
 
 export function CartSummary() {
   const { state, addToCart, removeFromCart, removeItem, clearCart } = usePos();
