@@ -50,6 +50,14 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
         (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
       }}
+      onTouchStart={(e) => {
+        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#3A3A3C";
+        (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
+      }}
+      onTouchEnd={(e) => {
+        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+      }}
     >
       <div className="flex items-center h-full px-3 py-3">
         <div className="flex-shrink-0 mr-4 w-10 h-10 flex items-center justify-center">
