@@ -31,11 +31,27 @@ export const getSales: RequestHandler = async (req, res) => {
 
 export const createSale: RequestHandler = async (req, res) => {
   try {
-    const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body;
+    const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body || {};
+
+    // Basic request logging for diagnostics
+    console.log('createSale payload', {
+      has_evenement_id: Boolean(evenement_id),
+      mode_paiement,
+      total_ttc,
+      total_ht,
+      tva_totale,
+      lignes_count: Array.isArray(lignes) ? lignes.length : 0,
+    });
 
     // Validate required fields
-    if (!evenement_id || !mode_paiement || total_ttc === undefined || total_ht === undefined || tva_totale === undefined) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const missing: string[] = [];
+    if (!evenement_id) missing.push('evenement_id');
+    if (!mode_paiement) missing.push('mode_paiement');
+    if (total_ttc === undefined) missing.push('total_ttc');
+    if (total_ht === undefined) missing.push('total_ht');
+    if (tva_totale === undefined) missing.push('tva_totale');
+    if (missing.length > 0) {
+      return res.status(400).json({ error: 'Missing required fields', missing });
     }
 
     if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
