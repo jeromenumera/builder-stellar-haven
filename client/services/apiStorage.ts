@@ -63,10 +63,13 @@ export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
     const url = isNew ? '/api/evenements' : `/api/evenements/${evenement.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
+    // Remove client-generated ID for new records
+    const payload = isNew ? { ...evenement, id: undefined } : evenement;
+
     const response = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(evenement),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) throw new Error('Failed to save event');
