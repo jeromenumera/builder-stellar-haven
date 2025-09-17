@@ -14,6 +14,8 @@ export function Header() {
   const activeClass = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`;
 
+  const selectedValue = state.selectedEventId ?? "";
+
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center gap-4">
@@ -36,8 +38,8 @@ export function Header() {
             Événement
           </div>
           <Select
-            value={state.selectedEventId ?? undefined}
-            onValueChange={(v) => selectEvent(v)}
+            value={selectedValue}
+            onValueChange={(v) => selectEvent(v || null)}
           >
             <SelectTrigger className="min-w-[220px]">
               <SelectValue placeholder="Sélectionner un événement" />
