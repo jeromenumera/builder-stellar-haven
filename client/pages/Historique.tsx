@@ -166,10 +166,12 @@ export default function Historique() {
 
               <div className="flex justify-end gap-2">
                 <DialogFooter>
-                  <Button variant="secondary" onClick={() => { setEditing(null); setDraft(null); }}>
+                  <Button variant="secondary" onClick={() => { setEditing(null); setDraft(null); }} disabled={saving}>
                     Annuler
                   </Button>
-                  <Button onClick={saveEdit}>Enregistrer</Button>
+                  <Button onClick={saveEdit} disabled={saving}>
+                    {saving ? "Enregistrement..." : "Enregistrer"}
+                  </Button>
                 </DialogFooter>
               </div>
             </div>
