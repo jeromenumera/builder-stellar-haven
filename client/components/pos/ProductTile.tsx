@@ -53,7 +53,7 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         minHeight: 140,
         background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12))",
         backgroundColor: "rgba(44,44,46,0.8)",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
         WebkitBackdropFilter: "blur(6px)",
         backdropFilter: "blur(6px)",
         transition: "transform 120ms ease, background-color 120ms ease",
