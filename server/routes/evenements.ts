@@ -4,14 +4,8 @@ import { convertEvenementFromDb } from "../services/converters";
 
 export const getEvents: RequestHandler = async (_req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("evenements")
-      .select("*")
-      .order("date_debut", { ascending: false });
-
-    if (error) throw error;
-
-    const events = data.map(convertEvenementFromDb);
+    const { rows } = await query(`SELECT * FROM evenements ORDER BY date_debut DESC`);
+    const events = rows.map(convertEvenementFromDb);
     res.json(events);
   } catch (error: any) {
     console.error("Error fetching events:", error);
