@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePos } from "@/context/PosStore";
 import { feedback } from "@/lib/feedback";
+import { avatarDataUrl } from "@/lib/avatar";
 
 export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: number }) {
   const { addToCart, removeFromCart } = usePos();
@@ -16,17 +17,20 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
     removeFromCart(produit.id);
   };
 
+  const useAvatar = !produit.image_url || produit.image_url.includes("placeholder.svg");
+  const imgSrc = useAvatar ? avatarDataUrl(produit.nom) : produit.image_url;
+
   return (
     <Card
       role="button"
       onClick={onAdd}
-      className="relative overflow-hidden select-none bg-card hover:ring-2 hover:ring-primary/60 transition h-full touch-manipulation"
+      className="relative overflow-hidden select-none bg-card hover:ring-2 hover:ring-primary/60 transition h-full touch-manipulation border-2 border-border/40"
       style={{ minHeight: 160 }}
     >
       <div className="flex h-full">
         <div className="w-28 shrink-0 bg-muted/30 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={produit.image_url} alt={produit.nom} className="h-24 w-24 object-contain" />
+          <img src={imgSrc} alt={produit.nom} className="h-24 w-24 object-contain rounded" />
         </div>
         <div className="flex-1 p-4">
           <div className="font-semibold leading-tight line-clamp-2 text-white text-base">{produit.nom}</div>
