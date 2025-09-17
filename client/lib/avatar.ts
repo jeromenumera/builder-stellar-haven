@@ -22,9 +22,35 @@ export function avatarDataUrl(name: string, size = 256) {
   const text = initials(name);
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
     <rect width='100%' height='100%' fill='${bg}' rx='20' />
-    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial' font-size='${Math.floor(
-      size / 2.8,
-    )}' font-weight='700'>${text}</text>
+    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" font-size='${Math.floor(
+    size / 2.8,
+  )}' font-weight='700'>${text}</text>
+  </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+export function categoryIconDataUrl(name: string, size = 256) {
+  const n = (name || "").toLowerCase();
+  let emoji = "📦";
+  if (/t-?shirt|tshirt|tee|casquette|cap|tote|bag|veste|hoodie|sweat/.test(n)) {
+    if (/casquette|cap/.test(n)) emoji = "🧢";
+    else if (/tote|bag/.test(n)) emoji = "👜";
+    else emoji = "👕";
+  } else if (/sticker|badge|pin|goodie|goodies|sticker pack/.test(n)) {
+    emoji = "🎟️";
+  } else if (/vinyl|cd|lp|record|musique|album/.test(n)) {
+    emoji = "💿";
+  } else if (/affiche|poster|print|a3|a4|poster|affiche/.test(n)) {
+    emoji = "🖼️";
+  }
+
+  const bg = "#111827"; // neutral dark bg
+  const fg = "#F3F4F6"; // light foreground
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
+    <rect width='100%' height='100%' fill='${bg}' rx='20' />
+    <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='${fg}' font-family='Segoe UI Emoji, Noto Color Emoji, Apple Color Emoji, system-ui' font-size='${Math.floor(
+    size / 2.2,
+  )}'>${emoji}</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
