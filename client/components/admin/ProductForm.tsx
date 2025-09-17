@@ -165,7 +165,9 @@ export function ProductForm({
         </div>
 
         <div className="md:col-span-2 flex justify-end gap-2">
-          <Button type="submit">Enregistrer</Button>
+          <Button type="submit" disabled={uploading || saving}>
+            {saving ? "Enregistrement..." : "Enregistrer"}
+          </Button>
         </div>
       </form>
     </Card>
