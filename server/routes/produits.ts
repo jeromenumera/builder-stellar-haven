@@ -70,22 +70,13 @@ export const updateProduct: RequestHandler = async (req, res) => {
     const image_url = body?.image_url ?? body?.imageUrl ?? null;
     const sku = body?.sku ?? null;
 
-    const { data, error } = await supabase
-      .from("produits")
-      .update({
-        nom,
-        prix_ttc,
-        tva,
-        image_url,
-        sku,
-      })
-      .eq("id", id)
-      .select()
-      .single();
+    const { rows } = await query(
+      `UPDATE produits SET nom=$2, prix_ttc=$3, tva=$4, image_url=$5, sku=$6
+       WHERE id=$1 RETURNING *`,
+      [id, nom, prix_ttc, tva, image_url, sku]
+    );
 
-    if (error) throw error;
-
-    const product = convertProduitFromDb(data);
+    const product = convertProduitFromDb(rows[0]);
     res.json(product);
   } catch (error: any) {
     console.error("Error updating product:", error);
