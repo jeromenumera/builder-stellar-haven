@@ -31,36 +31,22 @@ export const getSales: RequestHandler = async (req, res) => {
 
 export const createSale: RequestHandler = async (req, res) => {
   try {
-    console.log('=== CREATE SALE REQUEST ===');
-    console.log('Request body:', JSON.stringify(req.body, null, 2));
-
     const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body;
 
-    console.log('Extracted fields:', { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes_count: lignes?.length });
-
     // Insert sale record
-    const insertData = {
-      evenement_id,
-      mode_paiement,
-      total_ttc: parseFloat(total_ttc),
-      total_ht: parseFloat(total_ht),
-      tva_totale: parseFloat(tva_totale),
-    };
-
-    console.log('Inserting vente with data:', insertData);
-
     const { data: venteData, error: venteError } = await supabase
       .from('ventes')
-      .insert(insertData)
+      .insert({
+        evenement_id,
+        mode_paiement,
+        total_ttc: parseFloat(total_ttc),
+        total_ht: parseFloat(total_ht),
+        tva_totale: parseFloat(tva_totale),
+      })
       .select()
       .single();
 
-    if (venteError) {
-      console.error('Vente insert error:', venteError);
-      throw venteError;
-    }
-
-    console.log('Vente created successfully:', venteData);
+    if (venteError) throw venteError;
 
     // Insert sale lines
     console.log('Processing lignes:', lignes);
