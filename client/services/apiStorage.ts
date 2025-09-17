@@ -24,7 +24,7 @@ export async function saveProduit(produit: Produit): Promise<Produit> {
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload),
     });
 
@@ -68,7 +68,7 @@ export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload),
     });
 
@@ -118,7 +118,7 @@ export async function saveVente(vente: Vente): Promise<Vente> {
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload),
     });
 
