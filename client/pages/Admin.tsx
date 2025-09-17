@@ -129,9 +129,10 @@ export default function Admin() {
                       </Button>
                       <Button
                         variant="destructive"
-                        onClick={() => deleteEvenement(e.id)}
+                        onClick={() => handleDeleteEvent(e.id)}
+                        disabled={deleting === e.id}
                       >
-                        Supprimer
+                        {deleting === e.id ? "..." : "Supprimer"}
                       </Button>
                       <Button onClick={() => selectEvent(e.id)}>
                         Sélectionner
