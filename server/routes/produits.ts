@@ -38,22 +38,14 @@ export const createProduct: RequestHandler = async (req, res) => {
         });
     }
 
-    const { data, error } = await supabase
-      .from("produits")
-      .insert({
-        nom,
-        prix_ttc,
-        tva,
-        image_url,
-        sku,
-        actif: true,
-      })
-      .select()
-      .single();
+    const { rows } = await query(
+      `INSERT INTO produits (nom, prix_ttc, tva, image_url, sku, actif)
+       VALUES ($1, $2, $3, $4, $5, true)
+       RETURNING *`,
+      [nom, prix_ttc, tva, image_url, sku]
+    );
 
-    if (error) throw error;
-
-    const product = convertProduitFromDb(data);
+    const product = convertProduitFromDb(rows[0]);
     res.json(product);
   } catch (error: any) {
     console.error("Error creating product:", error);
