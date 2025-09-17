@@ -99,9 +99,7 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await supabase.from("evenements").delete().eq("id", id);
-
-    if (error) throw error;
+    await query(`DELETE FROM evenements WHERE id=$1`, [id]);
 
     res.json({ success: true });
   } catch (error: any) {
