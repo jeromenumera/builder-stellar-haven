@@ -20,29 +20,29 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
     <Card
       role="button"
       onClick={onAdd}
-      className="relative overflow-hidden select-none bg-card hover:ring-2 hover:ring-primary/40 transition h-full"
+      className="relative overflow-hidden select-none bg-card hover:ring-2 hover:ring-primary/60 transition h-full touch-manipulation"
       style={{ minHeight: 120 }}
     >
       <div className="flex h-full">
-        <div className="w-20 shrink-0 bg-muted/30 flex items-center justify-center">
+        <div className="w-24 shrink-0 bg-muted/30 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={produit.image_url} alt={produit.nom} className="h-16 w-16 object-contain" />
+          <img src={produit.image_url} alt={produit.nom} className="h-20 w-20 object-contain" />
         </div>
         <div className="flex-1 p-3">
-          <div className="font-semibold leading-tight line-clamp-2">{produit.nom}</div>
-          <div className="text-primary text-lg font-bold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
+          <div className="font-semibold leading-tight line-clamp-2 text-white">{produit.nom}</div>
+          <div className="text-green-300 text-lg font-extrabold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
         </div>
       </div>
 
       {qty > 0 && (
         <div className="absolute bottom-2 right-2 flex items-center gap-2">
-          <Button variant="secondary" size="icon" className="h-10 w-10" onClick={onRemove}>
+          <Button variant="secondary" size="icon" className="h-12 w-12" onClick={onRemove}>
             −
           </Button>
           <div className="px-3 py-1 rounded-md bg-primary text-primary-foreground font-bold text-lg min-w-10 text-center">
             {qty}
           </div>
-          <Button variant="secondary" size="icon" className="h-10 w-10" onClick={onAdd}>
+          <Button variant="secondary" size="icon" className="h-12 w-12" onClick={onAdd}>
             +
           </Button>
         </div>
