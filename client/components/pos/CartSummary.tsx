@@ -41,7 +41,7 @@ export function CartSummary() {
               const thumb =
                 produit.image_url && produit.image_url.length > 0
                   ? produit.image_url
-                  : "/public/placeholder.svg";
+                  : "/placeholder.svg";
               return (
                 <li key={produit.id} className="flex items-center gap-3 py-2">
                   <img
