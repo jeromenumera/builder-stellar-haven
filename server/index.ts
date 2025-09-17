@@ -7,6 +7,7 @@ import { getProducts, createProduct, updateProduct, deleteProduct } from "./rout
 import { getEvents, createEvent, updateEvent, deleteEvent } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
 import { testSupabase } from "./routes/test";
+import { echo } from "./routes/echo";
 
 export function createServer() {
   const app = express();
