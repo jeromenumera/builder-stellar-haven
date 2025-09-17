@@ -44,21 +44,13 @@ export const createEvent: RequestHandler = async (req, res) => {
         });
     }
 
-    const { data, error } = await supabase
-      .from("evenements")
-      .insert({
-        nom,
-        date_debut,
-        date_fin,
-        lieu,
-        statut,
-      })
-      .select()
-      .single();
+    const { rows } = await query(
+      `INSERT INTO evenements (nom, date_debut, date_fin, lieu, statut)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [nom, date_debut, date_fin, lieu, statut]
+    );
 
-    if (error) throw error;
-
-    const event = convertEvenementFromDb(data);
+    const event = convertEvenementFromDb(rows[0]);
     res.json(event);
   } catch (error: any) {
     console.error("Error creating event:", error);
