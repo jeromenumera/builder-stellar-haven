@@ -37,6 +37,7 @@ type Action =
   | { type: "setVentes"; ventes: Vente[] }
   | { type: "addToCart"; id: string }
   | { type: "removeFromCart"; id: string }
+  | { type: "removeItem"; id: string }
   | { type: "clearCart" };
 
 const PosContext = createContext<{
