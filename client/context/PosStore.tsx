@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import {
   Evenement,
   LigneVente,
@@ -42,7 +49,7 @@ type Action =
   | { type: "setProduits"; produits: Produit[] }
   | { type: "setEvenements"; evenements: Evenement[] }
   | { type: "setVentes"; ventes: Vente[] }
-  | { type: "setLoading"; key: keyof State['loading']; loading: boolean }
+  | { type: "setLoading"; key: keyof State["loading"]; loading: boolean }
   | { type: "addToCart"; id: string }
   | { type: "removeFromCart"; id: string }
   | { type: "removeItem"; id: string }
@@ -94,7 +101,7 @@ function reducer(state: State, action: Action): State {
     case "setLoading":
       return {
         ...state,
-        loading: { ...state.loading, [action.key]: action.loading }
+        loading: { ...state.loading, [action.key]: action.loading },
       };
     case "addToCart": {
       const qty = (state.cart[action.id] || 0) + 1;
@@ -128,11 +135,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "init", payload: { selectedEventId } });
 
     // Load all data in parallel
-    await Promise.all([
-      loadProduits(),
-      loadEvenements(),
-      loadVentes(),
-    ]);
+    await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
   };
 
   const loadProduits = async () => {
@@ -180,10 +183,12 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addToCart = (id: string) => dispatch({ type: "addToCart", id });
-  const removeFromCart = (id: string) => dispatch({ type: "removeFromCart", id });
+  const removeFromCart = (id: string) =>
+    dispatch({ type: "removeFromCart", id });
   const removeItem = (id: string) => dispatch({ type: "removeItem", id });
   const clearCart = () => dispatch({ type: "clearCart" });
-  const selectEvent = (id: string | null) => dispatch({ type: "selectEvent", id });
+  const selectEvent = (id: string | null) =>
+    dispatch({ type: "selectEvent", id });
 
   const saveProduit = async (p: Produit) => {
     try {
@@ -221,14 +226,17 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     try {
       await apiDeleteEvenement(id);
       await loadEvenements(); // Reload to get updated list
-      if (state.selectedEventId === id) dispatch({ type: "selectEvent", id: null });
+      if (state.selectedEventId === id)
+        dispatch({ type: "selectEvent", id: null });
     } catch (error) {
       console.error("Failed to delete event:", error);
       throw error;
     }
   };
 
-  const checkout = async (mode: ModePaiement): Promise<{ ok: boolean; error?: string }> => {
+  const checkout = async (
+    mode: ModePaiement,
+  ): Promise<{ ok: boolean; error?: string }> => {
     if (!state.selectedEventId) {
       return { ok: false, error: "Sélectionnez un événement avant la vente." };
     }
@@ -261,7 +269,10 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       return { ok: true };
     } catch (error) {
       console.error("Failed to save sale:", error);
-      return { ok: false, error: "Erreur lors de l'enregistrement de la vente." };
+      return {
+        ok: false,
+        error: "Erreur lors de l'enregistrement de la vente.",
+      };
     }
   };
 

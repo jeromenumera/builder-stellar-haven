@@ -1,10 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error("Missing Supabase environment variables");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -28,7 +28,7 @@ export interface DbEvenement {
   date_debut: string;
   date_fin: string;
   lieu: string;
-  statut: 'actif' | 'archivé';
+  statut: "actif" | "archivé";
   created_at: string;
   updated_at: string;
 }
@@ -37,7 +37,7 @@ export interface DbVente {
   id: string;
   horodatage: string;
   evenement_id: string;
-  mode_paiement: 'carte' | 'cash';
+  mode_paiement: "carte" | "cash";
   total_ttc: number;
   total_ht: number;
   tva_totale: number;

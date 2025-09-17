@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 // Prefer service role on the server (never expose to client). Fallback to anon key if not provided.
@@ -8,7 +8,7 @@ const supabaseKey =
   process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables on server');
+  throw new Error("Missing Supabase environment variables on server");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
@@ -22,8 +22,8 @@ export function convertProduitFromDb(dbProduit: any) {
     nom: dbProduit.nom,
     prix_ttc: Number.isFinite(prix) ? prix : 0,
     tva: Number.isFinite(tva) ? tva : 0,
-    image_url: dbProduit.image_url || '',
-    sku: dbProduit.sku || '',
+    image_url: dbProduit.image_url || "",
+    sku: dbProduit.sku || "",
   };
 }
 
@@ -47,7 +47,7 @@ export function convertVenteFromDb(dbVente: any, lignes: any[] = []) {
     total_ttc: parseFloat(dbVente.total_ttc),
     total_ht: parseFloat(dbVente.total_ht),
     tva_totale: parseFloat(dbVente.tva_totale),
-    lignes: lignes.map(ligne => ({
+    lignes: lignes.map((ligne) => ({
       id: ligne.id,
       vente_id: ligne.vente_id,
       produit_id: ligne.produit_id,

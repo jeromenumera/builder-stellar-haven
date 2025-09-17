@@ -3,8 +3,18 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleDbPing, handleDbInfo } from "./routes/neon";
-import { getProducts, createProduct, updateProduct, deleteProduct } from "./routes/produits";
-import { getEvents, createEvent, updateEvent, deleteEvent } from "./routes/evenements";
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "./routes/produits";
+import {
+  getEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
 import { testSupabase } from "./routes/test";
 import { echo } from "./routes/echo";

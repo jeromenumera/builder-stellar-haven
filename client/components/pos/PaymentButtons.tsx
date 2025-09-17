@@ -20,14 +20,26 @@ export function PaymentButtons() {
     }
   };
 
-  const disabled = Object.keys(state.cart).length === 0 || !state.selectedEventId || processing;
+  const disabled =
+    Object.keys(state.cart).length === 0 ||
+    !state.selectedEventId ||
+    processing;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-      <Button className="h-14 md:h-16 text-2xl w-full" onClick={() => pay("carte")} disabled={disabled}>
+      <Button
+        className="h-14 md:h-16 text-2xl w-full"
+        onClick={() => pay("carte")}
+        disabled={disabled}
+      >
         {processing ? "..." : "Carte"}
       </Button>
-      <Button variant="secondary" className="h-14 md:h-16 text-2xl w-full" onClick={() => pay("cash")} disabled={disabled}>
+      <Button
+        variant="secondary"
+        className="h-14 md:h-16 text-2xl w-full"
+        onClick={() => pay("cash")}
+        disabled={disabled}
+      >
         {processing ? "..." : "Espèces"}
       </Button>
     </div>

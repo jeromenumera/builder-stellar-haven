@@ -1,19 +1,19 @@
-import { RequestHandler } from 'express';
-import { supabase, convertEvenementFromDb } from '../services/supabase';
+import { RequestHandler } from "express";
+import { supabase, convertEvenementFromDb } from "../services/supabase";
 
 export const getEvents: RequestHandler = async (_req, res) => {
   try {
     const { data, error } = await supabase
-      .from('evenements')
-      .select('*')
-      .order('date_debut', { ascending: false });
+      .from("evenements")
+      .select("*")
+      .order("date_debut", { ascending: false });
 
     if (error) throw error;
 
     const events = data.map(convertEvenementFromDb);
     res.json(events);
   } catch (error: any) {
-    console.error('Error fetching events:', error);
+    console.error("Error fetching events:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -21,21 +21,36 @@ export const getEvents: RequestHandler = async (_req, res) => {
 export const createEvent: RequestHandler = async (req, res) => {
   try {
     let body: any = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { body = {}; }
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
     }
     const nom = body?.nom ?? body?.name;
     const date_debut = body?.date_debut ?? body?.startDate;
     const date_fin = body?.date_fin ?? body?.endDate ?? null;
     const lieu = body?.lieu ?? body?.location ?? null;
-    const statut = body?.statut ?? (typeof body?.active === 'boolean' ? (body.active ? 'actif' : 'archivé') : 'actif');
+    const statut =
+      body?.statut ??
+      (typeof body?.active === "boolean"
+        ? body.active
+          ? "actif"
+          : "archivé"
+        : "actif");
 
     if (!nom || !date_debut) {
-      return res.status(400).json({ error: 'Missing required fields: nom, date_debut', received: body });
+      return res
+        .status(400)
+        .json({
+          error: "Missing required fields: nom, date_debut",
+          received: body,
+        });
     }
 
     const { data, error } = await supabase
-      .from('evenements')
+      .from("evenements")
       .insert({
         nom,
         date_debut,
@@ -51,7 +66,7 @@ export const createEvent: RequestHandler = async (req, res) => {
     const event = convertEvenementFromDb(data);
     res.json(event);
   } catch (error: any) {
-    console.error('Error creating event:', error);
+    console.error("Error creating event:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -60,17 +75,27 @@ export const updateEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     let body: any = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { body = {}; }
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
     }
     const nom = body?.nom ?? body?.name;
     const date_debut = body?.date_debut ?? body?.startDate;
     const date_fin = body?.date_fin ?? body?.endDate ?? null;
     const lieu = body?.lieu ?? body?.location ?? null;
-    const statut = body?.statut ?? (typeof body?.active === 'boolean' ? (body.active ? 'actif' : 'archivé') : undefined);
+    const statut =
+      body?.statut ??
+      (typeof body?.active === "boolean"
+        ? body.active
+          ? "actif"
+          : "archivé"
+        : undefined);
 
     const { data, error } = await supabase
-      .from('evenements')
+      .from("evenements")
       .update({
         nom,
         date_debut,
@@ -78,7 +103,7 @@ export const updateEvent: RequestHandler = async (req, res) => {
         lieu,
         statut,
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -87,7 +112,7 @@ export const updateEvent: RequestHandler = async (req, res) => {
     const event = convertEvenementFromDb(data);
     res.json(event);
   } catch (error: any) {
-    console.error('Error updating event:', error);
+    console.error("Error updating event:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -96,16 +121,13 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await supabase
-      .from('evenements')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from("evenements").delete().eq("id", id);
 
     if (error) throw error;
 
     res.json({ success: true });
   } catch (error: any) {
-    console.error('Error deleting event:', error);
+    console.error("Error deleting event:", error);
     res.status(500).json({ error: error.message });
   }
 };

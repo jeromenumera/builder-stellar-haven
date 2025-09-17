@@ -1,20 +1,20 @@
-import { RequestHandler } from 'express';
-import { supabase, convertProduitFromDb } from '../services/supabase';
+import { RequestHandler } from "express";
+import { supabase, convertProduitFromDb } from "../services/supabase";
 
 export const getProducts: RequestHandler = async (_req, res) => {
   try {
     const { data, error } = await supabase
-      .from('produits')
-      .select('*')
-      .eq('actif', true)
-      .order('nom');
+      .from("produits")
+      .select("*")
+      .eq("actif", true)
+      .order("nom");
 
     if (error) throw error;
 
     const products = data.map(convertProduitFromDb);
     res.json(products);
   } catch (error: any) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -22,8 +22,12 @@ export const getProducts: RequestHandler = async (_req, res) => {
 export const createProduct: RequestHandler = async (req, res) => {
   try {
     let body: any = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { body = {}; }
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
     }
     const nom = body?.nom ?? body?.name;
     const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
@@ -32,11 +36,16 @@ export const createProduct: RequestHandler = async (req, res) => {
     const sku = body?.sku ?? null;
 
     if (!nom || !Number.isFinite(prix_ttc)) {
-      return res.status(400).json({ error: 'Missing required fields: nom, prix_ttc', received: body });
+      return res
+        .status(400)
+        .json({
+          error: "Missing required fields: nom, prix_ttc",
+          received: body,
+        });
     }
 
     const { data, error } = await supabase
-      .from('produits')
+      .from("produits")
       .insert({
         nom,
         prix_ttc,
@@ -53,7 +62,7 @@ export const createProduct: RequestHandler = async (req, res) => {
     const product = convertProduitFromDb(data);
     res.json(product);
   } catch (error: any) {
-    console.error('Error creating product:', error);
+    console.error("Error creating product:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -62,8 +71,12 @@ export const updateProduct: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     let body: any = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { body = {}; }
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
     }
     const nom = body?.nom ?? body?.name;
     const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
@@ -72,7 +85,7 @@ export const updateProduct: RequestHandler = async (req, res) => {
     const sku = body?.sku ?? null;
 
     const { data, error } = await supabase
-      .from('produits')
+      .from("produits")
       .update({
         nom,
         prix_ttc,
@@ -80,7 +93,7 @@ export const updateProduct: RequestHandler = async (req, res) => {
         image_url,
         sku,
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -89,7 +102,7 @@ export const updateProduct: RequestHandler = async (req, res) => {
     const product = convertProduitFromDb(data);
     res.json(product);
   } catch (error: any) {
-    console.error('Error updating product:', error);
+    console.error("Error updating product:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -100,15 +113,15 @@ export const deleteProduct: RequestHandler = async (req, res) => {
 
     // Soft delete by setting actif to false
     const { error } = await supabase
-      .from('produits')
+      .from("produits")
       .update({ actif: false })
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
 
     res.json({ success: true });
   } catch (error: any) {
-    console.error('Error deleting product:', error);
+    console.error("Error deleting product:", error);
     res.status(500).json({ error: error.message });
   }
 };

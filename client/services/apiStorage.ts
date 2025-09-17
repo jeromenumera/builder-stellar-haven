@@ -4,126 +4,143 @@ import { Evenement, Produit, Vente } from "@shared/api";
 
 export async function fetchProduits(): Promise<Produit[]> {
   try {
-    const response = await fetch('/api/produits');
-    if (!response.ok) throw new Error('Failed to fetch products');
+    const response = await fetch("/api/produits");
+    if (!response.ok) throw new Error("Failed to fetch products");
     return await response.json();
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     return [];
   }
 }
 
 export async function saveProduit(produit: Produit): Promise<Produit> {
   try {
-    const isNew = !produit.id || produit.id.startsWith('prod_');
-    const url = isNew ? '/api/produits' : `/api/produits/${produit.id}`;
-    const method = isNew ? 'POST' : 'PUT';
+    const isNew = !produit.id || produit.id.startsWith("prod_");
+    const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
+    const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated ID for new records
     const payload = isNew ? { ...produit, id: undefined } : produit;
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to save product');
+    if (!response.ok) throw new Error("Failed to save product");
     return await response.json();
   } catch (error) {
-    console.error('Error saving product:', error);
+    console.error("Error saving product:", error);
     throw error;
   }
 }
 
 export async function deleteProduit(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/produits/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Failed to delete product');
+    const response = await fetch(`/api/produits/${id}`, { method: "DELETE" });
+    if (!response.ok) throw new Error("Failed to delete product");
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error("Error deleting product:", error);
     throw error;
   }
 }
 
 export async function fetchEvenements(): Promise<Evenement[]> {
   try {
-    const response = await fetch('/api/evenements');
-    if (!response.ok) throw new Error('Failed to fetch events');
+    const response = await fetch("/api/evenements");
+    if (!response.ok) throw new Error("Failed to fetch events");
     return await response.json();
   } catch (error) {
-    console.error('Error fetching events:', error);
+    console.error("Error fetching events:", error);
     return [];
   }
 }
 
 export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
   try {
-    const isNew = !evenement.id || evenement.id.startsWith('evt_');
-    const url = isNew ? '/api/evenements' : `/api/evenements/${evenement.id}`;
-    const method = isNew ? 'POST' : 'PUT';
+    const isNew = !evenement.id || evenement.id.startsWith("evt_");
+    const url = isNew ? "/api/evenements" : `/api/evenements/${evenement.id}`;
+    const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated ID for new records
     const payload = isNew ? { ...evenement, id: undefined } : evenement;
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to save event');
+    if (!response.ok) throw new Error("Failed to save event");
     return await response.json();
   } catch (error) {
-    console.error('Error saving event:', error);
+    console.error("Error saving event:", error);
     throw error;
   }
 }
 
 export async function deleteEvenement(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/evenements/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Failed to delete event');
+    const response = await fetch(`/api/evenements/${id}`, { method: "DELETE" });
+    if (!response.ok) throw new Error("Failed to delete event");
   } catch (error) {
-    console.error('Error deleting event:', error);
+    console.error("Error deleting event:", error);
     throw error;
   }
 }
 
 export async function fetchVentes(evenementId?: string): Promise<Vente[]> {
   try {
-    const url = evenementId ? `/api/ventes?evenement_id=${evenementId}` : '/api/ventes';
+    const url = evenementId
+      ? `/api/ventes?evenement_id=${evenementId}`
+      : "/api/ventes";
     const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch sales');
+    if (!response.ok) throw new Error("Failed to fetch sales");
     return await response.json();
   } catch (error) {
-    console.error('Error fetching sales:', error);
+    console.error("Error fetching sales:", error);
     return [];
   }
 }
 
 export async function saveVente(vente: Vente): Promise<Vente> {
   try {
-    const isNew = !vente.id || vente.id.startsWith('vente_');
-    const url = isNew ? '/api/ventes' : `/api/ventes/${vente.id}`;
-    const method = isNew ? 'POST' : 'PUT';
+    const isNew = !vente.id || vente.id.startsWith("vente_");
+    const url = isNew ? "/api/ventes" : `/api/ventes/${vente.id}`;
+    const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated IDs and horodatage for new records (let Supabase handle timestamp)
-    const payload = isNew ? {
-      ...vente,
-      id: undefined,
-      horodatage: undefined,
-      lignes: vente.lignes.map(l => ({ ...l, id: undefined, vente_id: undefined }))
-    } : vente;
+    const payload = isNew
+      ? {
+          ...vente,
+          id: undefined,
+          horodatage: undefined,
+          lignes: vente.lignes.map((l) => ({
+            ...l,
+            id: undefined,
+            vente_id: undefined,
+          })),
+        }
+      : vente;
 
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      let detail = '';
+      let detail = "";
       try {
         const data = await response.json();
         detail = data?.error || JSON.stringify(data);
@@ -132,17 +149,17 @@ export async function saveVente(vente: Vente): Promise<Vente> {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error saving sale:', error);
+    console.error("Error saving sale:", error);
     throw error;
   }
 }
 
 export async function deleteVente(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/ventes/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Failed to delete sale');
+    const response = await fetch(`/api/ventes/${id}`, { method: "DELETE" });
+    if (!response.ok) throw new Error("Failed to delete sale");
   } catch (error) {
-    console.error('Error deleting sale:', error);
+    console.error("Error deleting sale:", error);
     throw error;
   }
 }

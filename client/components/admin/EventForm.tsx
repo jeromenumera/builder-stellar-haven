@@ -7,7 +7,13 @@ import { usePos } from "@/context/PosStore";
 import { Evenement } from "@shared/api";
 import { uid } from "@/services/id";
 
-export function EventForm({ initial, onDone }: { initial?: Evenement | null; onDone?: () => void }) {
+export function EventForm({
+  initial,
+  onDone,
+}: {
+  initial?: Evenement | null;
+  onDone?: () => void;
+}) {
   const { saveEvenement } = usePos();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Evenement>(
@@ -44,11 +50,19 @@ export function EventForm({ initial, onDone }: { initial?: Evenement | null; onD
       <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
           <Label>Nom</Label>
-          <Input value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} required />
+          <Input
+            value={form.nom}
+            onChange={(e) => setForm({ ...form, nom: e.target.value })}
+            required
+          />
         </div>
         <div>
           <Label>Lieu</Label>
-          <Input value={form.lieu} onChange={(e) => setForm({ ...form, lieu: e.target.value })} required />
+          <Input
+            value={form.lieu}
+            onChange={(e) => setForm({ ...form, lieu: e.target.value })}
+            required
+          />
         </div>
         <div>
           <Label>Début</Label>
@@ -61,14 +75,21 @@ export function EventForm({ initial, onDone }: { initial?: Evenement | null; onD
         </div>
         <div>
           <Label>Fin</Label>
-          <Input type="date" value={form.date_fin} onChange={(e) => setForm({ ...form, date_fin: e.target.value })} required />
+          <Input
+            type="date"
+            value={form.date_fin}
+            onChange={(e) => setForm({ ...form, date_fin: e.target.value })}
+            required
+          />
         </div>
         <div>
           <Label>Statut</Label>
           <select
             className="h-10 rounded-md border bg-background px-3"
             value={form.statut}
-            onChange={(e) => setForm({ ...form, statut: e.target.value as any })}
+            onChange={(e) =>
+              setForm({ ...form, statut: e.target.value as any })
+            }
           >
             <option value="actif">Actif</option>
             <option value="archivé">Archivé</option>
