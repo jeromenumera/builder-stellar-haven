@@ -82,9 +82,10 @@ export default function Admin() {
                         </Button>
                         <Button
                           variant="destructive"
-                          onClick={() => deleteProduit(p.id)}
+                          onClick={() => handleDeleteProduct(p.id)}
+                          disabled={deleting === p.id}
                         >
-                          Supprimer
+                          {deleting === p.id ? "..." : "Supprimer"}
                         </Button>
                       </li>
                     );
