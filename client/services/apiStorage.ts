@@ -108,10 +108,17 @@ export async function saveVente(vente: Vente): Promise<Vente> {
     const url = isNew ? '/api/ventes' : `/api/ventes/${vente.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
+    // Remove client-generated IDs for new records
+    const payload = isNew ? {
+      ...vente,
+      id: undefined,
+      lignes: vente.lignes.map(l => ({ ...l, id: undefined, vente_id: undefined }))
+    } : vente;
+
     const response = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(vente),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) throw new Error('Failed to save sale');
