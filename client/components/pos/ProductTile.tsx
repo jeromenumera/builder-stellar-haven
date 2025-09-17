@@ -21,21 +21,21 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
       role="button"
       onClick={onAdd}
       className="relative overflow-hidden select-none bg-card hover:ring-2 hover:ring-primary/60 transition h-full touch-manipulation"
-      style={{ minHeight: 120 }}
+      style={{ minHeight: 160 }}
     >
       <div className="flex h-full">
-        <div className="w-24 shrink-0 bg-muted/30 flex items-center justify-center">
+        <div className="w-28 shrink-0 bg-muted/30 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={produit.image_url} alt={produit.nom} className="h-20 w-20 object-contain" />
+          <img src={produit.image_url} alt={produit.nom} className="h-24 w-24 object-contain" />
         </div>
-        <div className="flex-1 p-3">
-          <div className="font-semibold leading-tight line-clamp-2 text-white">{produit.nom}</div>
-          <div className="text-green-300 text-lg font-extrabold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
+        <div className="flex-1 p-4">
+          <div className="font-semibold leading-tight line-clamp-2 text-white text-base">{produit.nom}</div>
+          <div className="text-green-300 text-xl font-extrabold mt-2">{produit.prix_ttc.toFixed(2)} CHF</div>
         </div>
       </div>
 
       {qty > 0 && (
-        <div className="absolute bottom-2 right-2 flex items-center gap-2">
+        <div className="absolute bottom-3 right-3 flex items-center gap-3">
           <Button variant="secondary" size="icon" className="h-12 w-12" onClick={onRemove}>
             −
           </Button>
