@@ -16,9 +16,7 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
     removeFromCart(produit.id);
   };
 
-  const useAvatar = !produit.image_url || produit.image_url.includes("placeholder.svg");
-  const iconSrc = categoryIconDataUrl(produit.nom);
-  const imgSrc = useAvatar ? iconSrc : produit.image_url;
+  const imgSrc = produit.image_url && produit.image_url.length > 0 ? produit.image_url : '/public/placeholder.svg';
 
   return (
     <Card
