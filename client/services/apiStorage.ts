@@ -19,10 +19,13 @@ export async function saveProduit(produit: Produit): Promise<Produit> {
     const url = isNew ? '/api/produits' : `/api/produits/${produit.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
+    // Remove client-generated ID for new records
+    const payload = isNew ? { ...produit, id: undefined } : produit;
+
     const response = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(produit),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) throw new Error('Failed to save product');
