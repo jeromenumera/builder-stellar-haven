@@ -11,7 +11,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center gap-4">
-        <div className="font-extrabold text-xl tracking-tight">Caisse Événementielle</div>
+        <div className="font-extrabold text-xl tracking-tight">SOS MEDITERRANEE</div>
         <nav className="hidden md:flex items-center gap-2">
           <NavLink to="/vente" className={activeClass}>
             Vente
