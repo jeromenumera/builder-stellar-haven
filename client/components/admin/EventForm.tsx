@@ -75,7 +75,9 @@ export function EventForm({ initial, onDone }: { initial?: Evenement | null; onD
           </select>
         </div>
         <div className="md:col-span-3 flex justify-end gap-2">
-          <Button type="submit">Enregistrer</Button>
+          <Button type="submit" disabled={saving}>
+            {saving ? "Enregistrement..." : "Enregistrer"}
+          </Button>
         </div>
       </form>
     </Card>
