@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import {
   Evenement,
   LigneVente,
@@ -9,16 +9,18 @@ import {
   computeTotals,
 } from "@shared/api";
 import {
-  getEvenements,
-  getProduits,
+  fetchEvenements,
+  fetchProduits,
   getSelectedEventId,
-  getVentes,
-  seedIfEmpty,
-  setEvenements,
-  setProduits,
+  fetchVentes,
   setSelectedEventId,
-  setVentes,
-} from "@/services/storage";
+  saveProduit as apiSaveProduit,
+  deleteProduit as apiDeleteProduit,
+  saveEvenement as apiSaveEvenement,
+  deleteEvenement as apiDeleteEvenement,
+  saveVente as apiSaveVente,
+  deleteVente as apiDeleteVente,
+} from "@/services/apiStorage";
 import { uid } from "@/services/id";
 
 interface State {
