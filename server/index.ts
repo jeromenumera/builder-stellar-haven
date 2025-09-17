@@ -49,6 +49,7 @@ export function createServer() {
 
   // Test API
   app.get("/api/test", testSupabase);
+  app.all("/api/echo", echo);
 
   return app;
 }
