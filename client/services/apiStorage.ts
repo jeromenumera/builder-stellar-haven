@@ -108,10 +108,11 @@ export async function saveVente(vente: Vente): Promise<Vente> {
     const url = isNew ? '/api/ventes' : `/api/ventes/${vente.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
-    // Remove client-generated IDs for new records
+    // Remove client-generated IDs and horodatage for new records (let Supabase handle timestamp)
     const payload = isNew ? {
       ...vente,
       id: undefined,
+      horodatage: undefined,
       lignes: vente.lignes.map(l => ({ ...l, id: undefined, vente_id: undefined }))
     } : vente;
 
