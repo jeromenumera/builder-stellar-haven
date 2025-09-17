@@ -46,5 +46,8 @@ export function createServer() {
   app.put("/api/ventes/:id", updateSale);
   app.delete("/api/ventes/:id", deleteSale);
 
+  // Test API
+  app.get("/api/test", testSupabase);
+
   return app;
 }
