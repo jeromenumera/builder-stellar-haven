@@ -24,7 +24,15 @@ export const createEvent: RequestHandler = async (req, res) => {
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
-    const { nom, date_debut, date_fin, lieu, statut } = body || {};
+    const nom = body?.nom ?? body?.name;
+    const date_debut = body?.date_debut ?? body?.startDate;
+    const date_fin = body?.date_fin ?? body?.endDate ?? null;
+    const lieu = body?.lieu ?? body?.location ?? null;
+    const statut = body?.statut ?? (typeof body?.active === 'boolean' ? (body.active ? 'actif' : 'archivé') : 'actif');
+
+    if (!nom || !date_debut) {
+      return res.status(400).json({ error: 'Missing required fields: nom, date_debut', received: body });
+    }
 
     const { data, error } = await supabase
       .from('evenements')
@@ -33,7 +41,7 @@ export const createEvent: RequestHandler = async (req, res) => {
         date_debut,
         date_fin,
         lieu,
-        statut: statut || 'actif',
+        statut,
       })
       .select()
       .single();
@@ -55,7 +63,11 @@ export const updateEvent: RequestHandler = async (req, res) => {
     if (typeof body === 'string') {
       try { body = JSON.parse(body); } catch { body = {}; }
     }
-    const { nom, date_debut, date_fin, lieu, statut } = body || {};
+    const nom = body?.nom ?? body?.name;
+    const date_debut = body?.date_debut ?? body?.startDate;
+    const date_fin = body?.date_fin ?? body?.endDate ?? null;
+    const lieu = body?.lieu ?? body?.location ?? null;
+    const statut = body?.statut ?? (typeof body?.active === 'boolean' ? (body.active ? 'actif' : 'archivé') : undefined);
 
     const { data, error } = await supabase
       .from('evenements')
