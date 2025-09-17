@@ -90,8 +90,13 @@ export const createSale: RequestHandler = async (req, res) => {
     const sale = convertVenteFromDb(venteData, lignesInserted);
     res.json(sale);
   } catch (error: any) {
-    console.error('Error creating sale:', error);
-    res.status(500).json({ error: error.message });
+    console.error('=== ERROR CREATING SALE ===');
+    console.error('Error type:', typeof error);
+    console.error('Error object:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('Full error details:', JSON.stringify(error, null, 2));
+    res.status(500).json({ error: error.message || 'Unknown error occurred' });
   }
 };
 
