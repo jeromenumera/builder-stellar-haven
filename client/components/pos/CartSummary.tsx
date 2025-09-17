@@ -31,20 +31,28 @@ export function CartSummary() {
           <div className="text-muted-foreground">Aucun article</div>
         ) : (
           <ul className="space-y-3">
-            {items.map(({ produit, qty }) => (
-              <li key={produit.id} className="flex items-center gap-3 py-2">
-                <img src={produit.image_url} alt="" className="h-12 w-12 object-contain rounded bg-muted" />
-                <div className="flex-1">
-                  <div className="font-medium leading-tight text-white">{produit.nom}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {qty} × {produit.prix_ttc.toFixed(2)} CHF
+            {items.map(({ produit, qty }) => {
+              const icon = categoryIconDataUrl(produit.nom, 64);
+              return (
+                <li key={produit.id} className="flex items-center gap-3 py-2">
+                  <img src={icon} alt={produit.nom} className="h-10 w-10 object-contain rounded bg-muted" />
+                  <div className="flex-1">
+                    <div className="font-medium leading-tight text-white">{produit.nom}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {qty} × {produit.prix_ttc.toFixed(2)} CHF
+                    </div>
                   </div>
-                </div>
-                <div className="font-semibold tabular-nums text-white">
-                  {(produit.prix_ttc * qty).toFixed(2)} CHF
-                </div>
-              </li>
-            ))}
+
+                  <div className="font-semibold tabular-nums text-white mr-2">
+                    {(produit.prix_ttc * qty).toFixed(2)} CHF
+                  </div>
+
+                  <Button variant="destructive" size="icon" onClick={() => removeItem(produit.id)}>
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
