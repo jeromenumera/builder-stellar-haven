@@ -122,7 +122,14 @@ export async function saveVente(vente: Vente): Promise<Vente> {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to save sale');
+    if (!response.ok) {
+      let detail = '';
+      try {
+        const data = await response.json();
+        detail = data?.error || JSON.stringify(data);
+      } catch {}
+      throw new Error(detail || `Failed to save sale (${response.status})`);
+    }
     return await response.json();
   } catch (error) {
     console.error('Error saving sale:', error);
