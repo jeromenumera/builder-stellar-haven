@@ -116,12 +116,6 @@ export async function saveVente(vente: Vente): Promise<Vente> {
       lignes: vente.lignes.map(l => ({ ...l, id: undefined, vente_id: undefined }))
     } : vente;
 
-    console.log('=== CLIENT VENTE PAYLOAD DEBUG ===');
-    console.log('Original vente:', vente);
-    console.log('Processed payload:', payload);
-    console.log('JSON payload:', JSON.stringify(payload));
-    console.log('JSON payload size:', JSON.stringify(payload).length);
-
     const response = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
