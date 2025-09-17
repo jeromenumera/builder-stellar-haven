@@ -51,11 +51,11 @@ export const createSale: RequestHandler = async (req, res) => {
     if (total_ht === undefined) missing.push('total_ht');
     if (tva_totale === undefined) missing.push('tva_totale');
     if (missing.length > 0) {
-      return res.status(400).json({ error: 'Missing required fields', missing });
+      return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}`, missing });
     }
 
     if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
-      return res.status(400).json({ error: 'Missing or empty lignes array' });
+      return res.status(400).json({ error: 'Missing or empty lignes array', missing: ['lignes'] });
     }
 
     // Validate numeric values
@@ -87,7 +87,7 @@ export const createSale: RequestHandler = async (req, res) => {
     });
 
     if (invalids.length > 0) {
-      return res.status(400).json({ error: 'Invalid numeric values', fields: invalids });
+      return res.status(400).json({ error: `Invalid numeric values: ${invalids.join(', ')}`, fields: invalids });
     }
 
     // Insert sale record
