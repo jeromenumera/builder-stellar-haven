@@ -31,41 +31,27 @@ export const getSales: RequestHandler = async (req, res) => {
 
 export const createSale: RequestHandler = async (req, res) => {
   try {
-    console.log('=== VENTE REQUEST DEBUG ===');
-    console.log('Raw request body:', JSON.stringify(req.body, null, 2));
-
     const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body;
 
-    const insertData = {
-      evenement_id,
-      mode_paiement,
-      total_ttc: parseFloat(total_ttc),
-      total_ht: parseFloat(total_ht),
-      tva_totale: parseFloat(tva_totale),
-    };
-
-    console.log('Supabase insert data:', JSON.stringify(insertData, null, 2));
-    console.log('Data types:', {
-      evenement_id: typeof evenement_id,
-      mode_paiement: typeof mode_paiement,
-      total_ttc: typeof parseFloat(total_ttc),
-      total_ht: typeof parseFloat(total_ht),
-      tva_totale: typeof parseFloat(tva_totale),
-    });
+    // Validate required fields
+    if (!evenement_id || !mode_paiement || total_ttc === undefined || total_ht === undefined || tva_totale === undefined) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     // Insert sale record
     const { data: venteData, error: venteError } = await supabase
       .from('ventes')
-      .insert(insertData)
+      .insert({
+        evenement_id,
+        mode_paiement,
+        total_ttc: parseFloat(total_ttc),
+        total_ht: parseFloat(total_ht),
+        tva_totale: parseFloat(tva_totale),
+      })
       .select()
       .single();
 
-    if (venteError) {
-      console.error('Supabase vente error details:', JSON.stringify(venteError, null, 2));
-      throw venteError;
-    }
-
-    console.log('Vente created successfully:', venteData);
+    if (venteError) throw venteError;
 
     // Insert sale lines
     const lignesData = lignes.map((ligne: any) => ({
