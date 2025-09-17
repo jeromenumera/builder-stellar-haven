@@ -55,7 +55,8 @@ export const createSale: RequestHandler = async (req, res) => {
     if (total_ht === undefined) missing.push('total_ht');
     if (tva_totale === undefined) missing.push('tva_totale');
     if (missing.length > 0) {
-      return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}`, missing });
+      const keys = body ? Object.keys(body) : [];
+      return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}`, missing, keys });
     }
 
     if (!lignes || !Array.isArray(lignes) || lignes.length === 0) {
