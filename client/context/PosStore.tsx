@@ -42,6 +42,7 @@ type Action =
   | { type: "setProduits"; produits: Produit[] }
   | { type: "setEvenements"; evenements: Evenement[] }
   | { type: "setVentes"; ventes: Vente[] }
+  | { type: "setLoading"; key: keyof State['loading']; loading: boolean }
   | { type: "addToCart"; id: string }
   | { type: "removeFromCart"; id: string }
   | { type: "removeItem"; id: string }
