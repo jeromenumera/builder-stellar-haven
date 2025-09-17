@@ -29,6 +29,11 @@ interface State {
   ventes: Vente[];
   selectedEventId: string | null;
   cart: Record<string, number>; // produit_id -> qty
+  loading: {
+    produits: boolean;
+    evenements: boolean;
+    ventes: boolean;
+  };
 }
 
 type Action =
