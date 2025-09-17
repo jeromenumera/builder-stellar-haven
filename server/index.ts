@@ -16,7 +16,6 @@ import {
   deleteEvent,
 } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
-import { testSupabase } from "./routes/test";
 import { echo } from "./routes/echo";
 
 export function createServer() {
@@ -58,7 +57,6 @@ export function createServer() {
   app.delete("/api/ventes/:id", deleteSale);
 
   // Test API
-  app.get("/api/test", testSupabase);
   app.all("/api/echo", echo);
 
   return app;
