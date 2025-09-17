@@ -30,10 +30,10 @@ export default function Admin() {
               <Card className="p-2">
                 <ul className="divide-y">
                   {state.produits.map((p) => {
-                    const icon = categoryIconDataUrl(p.nom, 64);
+                    const thumb = p.image_url && p.image_url.length > 0 ? p.image_url : '/public/placeholder.svg';
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
-                        <img src={icon} alt={p.nom} className="h-10 w-10 object-contain rounded bg-muted" />
+                        <img src={thumb} alt={p.nom} className="h-10 w-10 object-cover rounded bg-muted" />
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">{p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%</div>
