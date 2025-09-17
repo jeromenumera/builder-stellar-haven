@@ -4,29 +4,19 @@ import { convertVenteFromDb } from "../services/converters";
 
 export const getSales: RequestHandler = async (req, res) => {
   try {
-    const { evenement_id } = req.query;
-
-    let query = supabase
-      .from("ventes")
-      .select(
-        `
-        *,
-        lignes_ventes (*)
-      `,
-      )
-      .order("horodatage", { ascending: false });
-
-    if (evenement_id) {
-      query = query.eq("evenement_id", evenement_id);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    const sales = data.map((vente) =>
-      convertVenteFromDb(vente, vente.lignes_ventes),
+    const { evenement_id } = req.query as { evenement_id?: string };
+    const where = evenement_id ? 'WHERE v.evenement_id = $1' : '';
+    const params: any[] = evenement_id ? [evenement_id] : [];
+    const { rows } = await query(
+      `SELECT v.*, COALESCE(json_agg(l.*) FILTER (WHERE l.id IS NOT NULL), '[]') AS lignes
+       FROM ventes v
+       LEFT JOIN lignes_ventes l ON l.vente_id = v.id
+       ${where}
+       GROUP BY v.id
+       ORDER BY v.horodatage DESC`,
+      params
     );
+    const sales = rows.map((r: any) => convertVenteFromDb(r, r.lignes || []));
     res.json(sales);
   } catch (error: any) {
     console.error("Error fetching sales:", error);
