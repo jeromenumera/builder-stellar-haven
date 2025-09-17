@@ -4,15 +4,8 @@ import { convertProduitFromDb } from "../services/converters";
 
 export const getProducts: RequestHandler = async (_req, res) => {
   try {
-    const { data, error } = await supabase
-      .from("produits")
-      .select("*")
-      .eq("actif", true)
-      .order("nom");
-
-    if (error) throw error;
-
-    const products = data.map(convertProduitFromDb);
+    const { rows } = await query(`SELECT * FROM produits WHERE actif = true ORDER BY nom`);
+    const products = rows.map(convertProduitFromDb);
     res.json(products);
   } catch (error: any) {
     console.error("Error fetching products:", error);
