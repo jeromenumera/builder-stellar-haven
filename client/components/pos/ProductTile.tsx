@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePos } from "@/context/PosStore";
 import { feedback } from "@/lib/feedback";
-import { categoryIconDataUrl } from "@/lib/avatar";
 
 export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: number }) {
   const { addToCart, removeFromCart } = usePos();
