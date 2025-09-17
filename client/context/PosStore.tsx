@@ -50,6 +50,8 @@ const PosContext = createContext<{
   saveEvenement: (e: Evenement) => void;
   deleteEvenement: (id: string) => void;
   checkout: (mode: ModePaiement) => { ok: boolean; error?: string };
+  deleteVente: (id: string) => void;
+  updateVente: (v: Vente) => void;
 } | null>(null);
 
 const initial: State = {
