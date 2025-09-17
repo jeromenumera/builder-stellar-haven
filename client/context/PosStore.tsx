@@ -122,17 +122,61 @@ function reducer(state: State, action: Action): State {
 export function PosProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
 
+  // Load initial data
+  const loadInitialData = async () => {
+    const selectedEventId = getSelectedEventId();
+    dispatch({ type: "init", payload: { selectedEventId } });
+
+    // Load all data in parallel
+    await Promise.all([
+      loadProduits(),
+      loadEvenements(),
+      loadVentes(),
+    ]);
+  };
+
+  const loadProduits = async () => {
+    dispatch({ type: "setLoading", key: "produits", loading: true });
+    try {
+      const produits = await fetchProduits();
+      dispatch({ type: "setProduits", produits });
+    } catch (error) {
+      console.error("Failed to load products:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "produits", loading: false });
+    }
+  };
+
+  const loadEvenements = async () => {
+    dispatch({ type: "setLoading", key: "evenements", loading: true });
+    try {
+      const evenements = await fetchEvenements();
+      dispatch({ type: "setEvenements", evenements });
+    } catch (error) {
+      console.error("Failed to load events:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "evenements", loading: false });
+    }
+  };
+
+  const loadVentes = async () => {
+    dispatch({ type: "setLoading", key: "ventes", loading: true });
+    try {
+      const ventes = await fetchVentes();
+      dispatch({ type: "setVentes", ventes });
+    } catch (error) {
+      console.error("Failed to load sales:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "ventes", loading: false });
+    }
+  };
+
+  const refreshData = async () => {
+    await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
+  };
+
   useEffect(() => {
-    seedIfEmpty("/public/");
-    dispatch({
-      type: "init",
-      payload: {
-        produits: getProduits(),
-        evenements: getEvenements(),
-        ventes: getVentes(),
-        selectedEventId: getSelectedEventId(),
-      },
-    });
+    loadInitialData();
   }, []);
 
   const addToCart = (id: string) => dispatch({ type: "addToCart", id });
@@ -141,73 +185,101 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => dispatch({ type: "clearCart" });
   const selectEvent = (id: string | null) => dispatch({ type: "selectEvent", id });
 
-  const saveProduit = (p: Produit) => {
-    const existing = state.produits.find((x) => x.id === p.id);
-    const list = existing
-      ? state.produits.map((x) => (x.id === p.id ? p : x))
-      : [...state.produits, p].slice(0, 20);
-    dispatch({ type: "setProduits", produits: list });
+  const saveProduit = async (p: Produit) => {
+    try {
+      const saved = await apiSaveProduit(p);
+      await loadProduits(); // Reload to get updated list
+    } catch (error) {
+      console.error("Failed to save product:", error);
+      throw error;
+    }
   };
 
-  const deleteProduit = (id: string) => {
-    const list = state.produits.filter((x) => x.id !== id);
-    dispatch({ type: "setProduits", produits: list });
-    // Remove from cart if present
-    if (state.cart[id]) dispatch({ type: "removeFromCart", id });
+  const deleteProduit = async (id: string) => {
+    try {
+      await apiDeleteProduit(id);
+      await loadProduits(); // Reload to get updated list
+      // Remove from cart if present
+      if (state.cart[id]) dispatch({ type: "removeFromCart", id });
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+      throw error;
+    }
   };
 
-  const saveEvenement = (e: Evenement) => {
-    const existing = state.evenements.find((x) => x.id === e.id);
-    const list = existing
-      ? state.evenements.map((x) => (x.id === e.id ? e : x))
-      : [...state.evenements, e];
-    dispatch({ type: "setEvenements", evenements: list });
+  const saveEvenement = async (e: Evenement) => {
+    try {
+      const saved = await apiSaveEvenement(e);
+      await loadEvenements(); // Reload to get updated list
+    } catch (error) {
+      console.error("Failed to save event:", error);
+      throw error;
+    }
   };
 
-  const deleteEvenement = (id: string) => {
-    const list = state.evenements.filter((x) => x.id !== id);
-    dispatch({ type: "setEvenements", evenements: list });
-    if (state.selectedEventId === id) dispatch({ type: "selectEvent", id: null });
+  const deleteEvenement = async (id: string) => {
+    try {
+      await apiDeleteEvenement(id);
+      await loadEvenements(); // Reload to get updated list
+      if (state.selectedEventId === id) dispatch({ type: "selectEvent", id: null });
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+      throw error;
+    }
   };
 
-  const checkout = (mode: ModePaiement) => {
+  const checkout = async (mode: ModePaiement): Promise<{ ok: boolean; error?: string }> => {
     if (!state.selectedEventId)
       return { ok: false, error: "Sélectionnez un événement avant la vente." };
     const items = Object.entries(state.cart);
     if (items.length === 0) return { ok: false, error: "Panier vide." };
 
-    const venteId = uid("vente");
-    const lignes: LigneVente[] = items.map(([pid, qty]) => {
-      const produit = state.produits.find((p) => p.id === pid)!;
-      return buildLigneVente(venteId, produit, qty);
-    });
-    const { total_ttc, total_ht, tva_totale } = computeTotals(lignes);
+    try {
+      const lignes: LigneVente[] = items.map(([pid, qty]) => {
+        const produit = state.produits.find((p) => p.id === pid)!;
+        return buildLigneVente("temp", produit, qty); // temp ID, server will generate real one
+      });
+      const { total_ttc, total_ht, tva_totale } = computeTotals(lignes);
 
-    const vente: Vente = {
-      id: venteId,
-      horodatage: new Date().toISOString(),
-      evenement_id: state.selectedEventId,
-      mode_paiement: mode,
-      total_ttc,
-      total_ht,
-      tva_totale,
-      lignes,
-    };
+      const vente: Vente = {
+        id: uid("vente"), // temp ID
+        horodatage: new Date().toISOString(),
+        evenement_id: state.selectedEventId,
+        mode_paiement: mode,
+        total_ttc,
+        total_ht,
+        tva_totale,
+        lignes,
+      };
 
-    const ventes = [vente, ...state.ventes];
-    dispatch({ type: "setVentes", ventes });
-    dispatch({ type: "clearCart" });
-    return { ok: true };
+      await apiSaveVente(vente);
+      await loadVentes(); // Reload to get updated list
+      dispatch({ type: "clearCart" });
+      return { ok: true };
+    } catch (error) {
+      console.error("Failed to save sale:", error);
+      return { ok: false, error: "Erreur lors de l'enregistrement de la vente." };
+    }
   };
 
-  const deleteVente = (id: string) => {
-    const ventes = state.ventes.filter((v) => v.id !== id);
-    dispatch({ type: "setVentes", ventes });
+  const deleteVente = async (id: string) => {
+    try {
+      await apiDeleteVente(id);
+      await loadVentes(); // Reload to get updated list
+    } catch (error) {
+      console.error("Failed to delete sale:", error);
+      throw error;
+    }
   };
 
-  const updateVente = (updated: Vente) => {
-    const ventes = state.ventes.map((v) => (v.id === updated.id ? updated : v));
-    dispatch({ type: "setVentes", ventes });
+  const updateVente = async (updated: Vente) => {
+    try {
+      await apiSaveVente(updated); // Use same save function for updates
+      await loadVentes(); // Reload to get updated list
+    } catch (error) {
+      console.error("Failed to update sale:", error);
+      throw error;
+    }
   };
 
   const value = useMemo(
