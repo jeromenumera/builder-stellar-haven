@@ -15,11 +15,13 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper functions for data conversion
 export function convertProduitFromDb(dbProduit: any) {
+  const prix = parseFloat(dbProduit.prix_ttc);
+  const tva = parseFloat(dbProduit.tva);
   return {
     id: dbProduit.id,
     nom: dbProduit.nom,
-    prix_ttc: parseFloat(dbProduit.prix_ttc),
-    tva: parseFloat(dbProduit.tva),
+    prix_ttc: Number.isFinite(prix) ? prix : 0,
+    tva: Number.isFinite(tva) ? tva : 0,
     image_url: dbProduit.image_url || '',
     sku: dbProduit.sku || '',
   };
