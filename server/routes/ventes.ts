@@ -31,7 +31,11 @@ export const getSales: RequestHandler = async (req, res) => {
 
 export const createSale: RequestHandler = async (req, res) => {
   try {
-    const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body || {};
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { evenement_id, mode_paiement, total_ttc, total_ht, tva_totale, lignes } = body || {};
 
     // Basic request logging for diagnostics
     console.log('createSale payload', {
@@ -134,7 +138,11 @@ export const createSale: RequestHandler = async (req, res) => {
 export const updateSale: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { mode_paiement, total_ttc, total_ht, tva_totale, lignes } = req.body;
+    let body: any = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    const { mode_paiement, total_ttc, total_ht, tva_totale, lignes } = body || {};
 
     // Update sale record
     const { data: venteData, error: venteError } = await supabase
