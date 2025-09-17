@@ -87,7 +87,7 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
             alt={produit.nom}
             className="h-8 w-8 object-cover rounded-md bg-center"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = iconSrc;
+              (e.currentTarget as HTMLImageElement).src = '/public/placeholder.svg';
             }}
           />
         </div>
