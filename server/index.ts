@@ -46,5 +46,8 @@ export function createServer() {
   app.put("/api/ventes/:id", updateSale);
   app.delete("/api/ventes/:id", deleteSale);
 
+  // Debug endpoint
+  app.post("/api/debug-vente", debugVente);
+
   return app;
 }
