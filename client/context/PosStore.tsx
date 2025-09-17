@@ -86,14 +86,16 @@ function reducer(state: State, action: Action): State {
       setSelectedEventId(action.id);
       return { ...state, selectedEventId: action.id };
     case "setProduits":
-      setProduits(action.produits);
       return { ...state, produits: action.produits };
     case "setEvenements":
-      setEvenements(action.evenements);
       return { ...state, evenements: action.evenements };
     case "setVentes":
-      setVentes(action.ventes);
       return { ...state, ventes: action.ventes };
+    case "setLoading":
+      return {
+        ...state,
+        loading: { ...state.loading, [action.key]: action.loading }
+      };
     case "addToCart": {
       const qty = (state.cart[action.id] || 0) + 1;
       return { ...state, cart: { ...state.cart, [action.id]: qty } };
