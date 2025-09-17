@@ -29,7 +29,8 @@ export default function Vente() {
         <aside className="md:w-96 w-full order-2 md:order-1">
           <div className="sticky top-20">
             <CartSummary />
-            <div className="mt-3 md:hidden">{/* mobile: show payment buttons under cart */}
+            <div className="mt-3 md:hidden">
+              {/* mobile: show payment buttons under cart */}
               <PaymentButtons />
             </div>
           </div>
@@ -39,14 +40,14 @@ export default function Vente() {
           <div
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
             style={{
-              gridAutoRows: '140px',
-              maxHeight: 'calc(100vh - 8rem)',
-              overflow: 'hidden',
+              gridAutoRows: "140px",
+              maxHeight: "calc(100vh - 8rem)",
+              overflow: "hidden",
             }}
           >
             {gridProducts.map((p) => (
-              <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />)
-            )}
+              <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+            ))}
           </div>
         </section>
 

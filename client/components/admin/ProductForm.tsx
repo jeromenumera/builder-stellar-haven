@@ -7,7 +7,13 @@ import { usePos } from "@/context/PosStore";
 import { Produit } from "@shared/api";
 import { uid } from "@/services/id";
 
-export function ProductForm({ initial, onDone }: { initial?: Produit | null; onDone?: () => void }) {
+export function ProductForm({
+  initial,
+  onDone,
+}: {
+  initial?: Produit | null;
+  onDone?: () => void;
+}) {
   const { saveProduit } = usePos();
   const [form, setForm] = useState<Produit>(
     initial ?? {
@@ -64,7 +70,11 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
       <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Nom</Label>
-          <Input value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} required />
+          <Input
+            value={form.nom}
+            onChange={(e) => setForm({ ...form, nom: e.target.value })}
+            required
+          />
         </div>
         <div>
           <Label>Prix TTC (CHF)</Label>
@@ -73,7 +83,9 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
             min={0}
             step="0.05"
             value={form.prix_ttc}
-            onChange={(e) => setForm({ ...form, prix_ttc: Number(e.target.value) })}
+            onChange={(e) =>
+              setForm({ ...form, prix_ttc: Number(e.target.value) })
+            }
             required
           />
         </div>
@@ -83,7 +95,10 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
         </div>
         <div>
           <Label>SKU (optionnel)</Label>
-          <Input value={form.sku || ""} onChange={(e) => setForm({ ...form, sku: e.target.value })} />
+          <Input
+            value={form.sku || ""}
+            onChange={(e) => setForm({ ...form, sku: e.target.value })}
+          />
         </div>
 
         <div className="md:col-span-2">
@@ -92,9 +107,17 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
             <div className="w-20 h-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
               {form.image_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={form.image_url} alt="preview" className="w-full h-full object-cover" />
+                <img
+                  src={form.image_url}
+                  alt="preview"
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <img src="/public/placeholder.svg" alt="placeholder" className="w-10 h-10" />
+                <img
+                  src="/public/placeholder.svg"
+                  alt="placeholder"
+                  className="w-10 h-10"
+                />
               )}
             </div>
             <div className="flex flex-col gap-2">
@@ -106,16 +129,28 @@ export function ProductForm({ initial, onDone }: { initial?: Produit | null; onD
                 className="text-sm"
               />
               <div className="flex gap-2">
-                <Button type="button" onClick={() => document.getElementById('file-upload')?.click()} disabled={uploading}>
-                  {uploading ? 'Chargement...' : 'Téléverser'}
+                <Button
+                  type="button"
+                  onClick={() =>
+                    document.getElementById("file-upload")?.click()
+                  }
+                  disabled={uploading}
+                >
+                  {uploading ? "Chargement..." : "Téléverser"}
                 </Button>
                 {form.image_url && (
-                  <Button variant="destructive" type="button" onClick={removeImage}>
+                  <Button
+                    variant="destructive"
+                    type="button"
+                    onClick={removeImage}
+                  >
                     Supprimer
                   </Button>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">JPEG/PNG/WebP — max 3MB</p>
+              <p className="text-xs text-muted-foreground">
+                JPEG/PNG/WebP — max 3MB
+              </p>
             </div>
           </div>
         </div>

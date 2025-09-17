@@ -12,8 +12,10 @@ export default function Admin() {
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  const editingProduct = state.produits.find((p) => p.id === editingProductId) || null;
-  const editingEvent = state.evenements.find((e) => e.id === editingEventId) || null;
+  const editingProduct =
+    state.produits.find((p) => p.id === editingProductId) || null;
+  const editingEvent =
+    state.evenements.find((e) => e.id === editingEventId) || null;
 
   return (
     <div className="container mx-auto p-4">
@@ -30,18 +32,33 @@ export default function Admin() {
               <Card className="p-2">
                 <ul className="divide-y">
                   {state.produits.map((p) => {
-                    const thumb = p.image_url && p.image_url.length > 0 ? p.image_url : '/public/placeholder.svg';
+                    const thumb =
+                      p.image_url && p.image_url.length > 0
+                        ? p.image_url
+                        : "/public/placeholder.svg";
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
-                        <img src={thumb} alt={p.nom} className="h-10 w-10 object-cover rounded bg-muted" />
+                        <img
+                          src={thumb}
+                          alt={p.nom}
+                          className="h-10 w-10 object-cover rounded bg-muted"
+                        />
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
-                          <div className="text-xs text-muted-foreground">{p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%</div>
+                          <div className="text-xs text-muted-foreground">
+                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%
+                          </div>
                         </div>
-                        <Button variant="secondary" onClick={() => setEditingProductId(p.id)}>
+                        <Button
+                          variant="secondary"
+                          onClick={() => setEditingProductId(p.id)}
+                        >
                           Éditer
                         </Button>
-                        <Button variant="destructive" onClick={() => deleteProduit(p.id)}>
+                        <Button
+                          variant="destructive"
+                          onClick={() => deleteProduit(p.id)}
+                        >
                           Supprimer
                         </Button>
                       </li>
@@ -54,8 +71,13 @@ export default function Admin() {
               </Card>
             </div>
             <div>
-              <h2 className="text-xl font-semibold mb-2">{editingProduct ? "Éditer" : "Nouveau produit"}</h2>
-              <ProductForm initial={editingProduct} onDone={() => setEditingProductId(null)} />
+              <h2 className="text-xl font-semibold mb-2">
+                {editingProduct ? "Éditer" : "Nouveau produit"}
+              </h2>
+              <ProductForm
+                initial={editingProduct}
+                onDone={() => setEditingProductId(null)}
+              />
             </div>
           </div>
         </TabsContent>
@@ -73,24 +95,39 @@ export default function Admin() {
                           {e.date_debut} → {e.date_fin} · {e.lieu} · {e.statut}
                         </div>
                       </div>
-                      <Button variant="secondary" onClick={() => setEditingEventId(e.id)}>
+                      <Button
+                        variant="secondary"
+                        onClick={() => setEditingEventId(e.id)}
+                      >
                         Éditer
                       </Button>
-                      <Button variant="destructive" onClick={() => deleteEvenement(e.id)}>
+                      <Button
+                        variant="destructive"
+                        onClick={() => deleteEvenement(e.id)}
+                      >
                         Supprimer
                       </Button>
-                      <Button onClick={() => selectEvent(e.id)}>Sélectionner</Button>
+                      <Button onClick={() => selectEvent(e.id)}>
+                        Sélectionner
+                      </Button>
                     </li>
                   ))}
                   {state.evenements.length === 0 && (
-                    <li className="p-4 text-muted-foreground">Aucun événement</li>
+                    <li className="p-4 text-muted-foreground">
+                      Aucun événement
+                    </li>
                   )}
                 </ul>
               </Card>
             </div>
             <div>
-              <h2 className="text-xl font-semibold mb-2">{editingEvent ? "Éditer" : "Nouvel événement"}</h2>
-              <EventForm initial={editingEvent} onDone={() => setEditingEventId(null)} />
+              <h2 className="text-xl font-semibold mb-2">
+                {editingEvent ? "Éditer" : "Nouvel événement"}
+              </h2>
+              <EventForm
+                initial={editingEvent}
+                onDone={() => setEditingEventId(null)}
+              />
             </div>
           </div>
         </TabsContent>

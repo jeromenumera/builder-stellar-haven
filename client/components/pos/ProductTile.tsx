@@ -4,7 +4,13 @@ import { Card } from "@/components/ui/card";
 import { usePos } from "@/context/PosStore";
 import { feedback } from "@/lib/feedback";
 
-export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: number }) {
+export function ProductTile({
+  produit,
+  qty = 0,
+}: {
+  produit: Produit;
+  qty?: number;
+}) {
   const { addToCart, removeFromCart } = usePos();
 
   const onAdd = () => {
@@ -16,7 +22,10 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
     removeFromCart(produit.id);
   };
 
-  const imgSrc = produit.image_url && produit.image_url.length > 0 ? produit.image_url : '/public/placeholder.svg';
+  const imgSrc =
+    produit.image_url && produit.image_url.length > 0
+      ? produit.image_url
+      : "/public/placeholder.svg";
 
   return (
     <Card
@@ -51,7 +60,8 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
       className="relative overflow-hidden select-none transition-transform touch-manipulation rounded-[14px] border border-[#2A2A2A] cursor-pointer"
       style={{
         minHeight: 140,
-        background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12))",
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12))",
         backgroundColor: "rgba(44,44,46,0.8)",
         boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
         WebkitBackdropFilter: "blur(6px)",
@@ -63,11 +73,13 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
       }}
       onMouseUp={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.backgroundColor =
+          "rgba(44,44,46,0.8)";
         (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.backgroundColor =
+          "rgba(44,44,46,0.8)";
         (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
       }}
       onTouchStart={(e) => {
@@ -75,7 +87,8 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
         (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
       }}
       onTouchEnd={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(44,44,46,0.8)";
+        (e.currentTarget as HTMLDivElement).style.backgroundColor =
+          "rgba(44,44,46,0.8)";
         (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
       }}
     >
@@ -87,23 +100,30 @@ export function ProductTile({ produit, qty = 0 }: { produit: Produit; qty?: numb
             alt={produit.nom}
             className="h-20 w-20 object-cover rounded-[10px] bg-center"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/public/placeholder.svg';
+              (e.currentTarget as HTMLImageElement).src =
+                "/public/placeholder.svg";
             }}
           />
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="text-[18px] font-bold text-white leading-tight line-clamp-2">{produit.nom}</div>
-          <div className="text-[#34C759] text-[16px] font-semibold mt-1">{produit.prix_ttc.toFixed(2)} CHF</div>
+          <div className="text-[18px] font-bold text-white leading-tight line-clamp-2">
+            {produit.nom}
+          </div>
+          <div className="text-[#34C759] text-[16px] font-semibold mt-1">
+            {produit.prix_ttc.toFixed(2)} CHF
+          </div>
         </div>
 
         {qty > 0 && (
-        <div className="absolute top-3 right-3">
-          <div className="bg-primary text-primary-foreground rounded-full px-3 py-1 font-bold text-sm">{qty}</div>
-        </div>
-      )}
+          <div className="absolute top-3 right-3">
+            <div className="bg-primary text-primary-foreground rounded-full px-3 py-1 font-bold text-sm">
+              {qty}
+            </div>
+          </div>
+        )}
 
-      {/* Long press to decrement quantity */}
+        {/* Long press to decrement quantity */}
       </div>
     </Card>
   );
