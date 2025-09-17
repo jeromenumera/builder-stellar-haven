@@ -71,6 +71,11 @@ const initial: State = {
   ventes: [],
   selectedEventId: null,
   cart: {},
+  loading: {
+    produits: false,
+    evenements: false,
+    ventes: false,
+  },
 };
 
 function reducer(state: State, action: Action): State {
