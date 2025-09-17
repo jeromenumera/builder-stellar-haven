@@ -229,10 +229,13 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   };
 
   const checkout = async (mode: ModePaiement): Promise<{ ok: boolean; error?: string }> => {
-    if (!state.selectedEventId)
+    if (!state.selectedEventId) {
       return { ok: false, error: "Sélectionnez un événement avant la vente." };
+    }
     const items = Object.entries(state.cart);
-    if (items.length === 0) return { ok: false, error: "Panier vide." };
+    if (items.length === 0) {
+      return { ok: false, error: "Panier vide." };
+    }
 
     try {
       const lignes: LigneVente[] = items.map(([pid, qty]) => {
