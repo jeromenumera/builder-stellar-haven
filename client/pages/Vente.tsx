@@ -25,16 +25,28 @@ export default function Vente() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[70vh]">
-        <div className="lg:col-span-4 order-2 lg:order-1">
-          <CartSummary />
-          <PaymentButtons />
-        </div>
-        <div className="lg:col-span-8 order-1 lg:order-2">
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div className="flex flex-col md:flex-row gap-4 min-h-[70vh]">
+        <aside className="md:w-96 w-full order-2 md:order-1">
+          <div className="sticky top-20">
+            <CartSummary />
+            <div className="mt-3 md:hidden">{/* mobile: show payment buttons under cart */}
+              <PaymentButtons />
+            </div>
+          </div>
+        </aside>
+
+        <section className="flex-1 order-1 md:order-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {gridProducts.map((p) => (
               <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />)
             )}
+          </div>
+        </section>
+
+        {/* On tablets and up show payment buttons as a fixed bottom bar */}
+        <div className="hidden md:flex md:fixed md:left-[calc(100%-18rem)] md:bottom-6 md:w-80 md:justify-center pointer-events-none">
+          <div className="pointer-events-auto w-full">
+            <PaymentButtons />
           </div>
         </div>
       </div>
