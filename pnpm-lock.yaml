@@ -14,6 +14,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.57.4
         version: 2.57.4
+      body-parser:
+        specifier: ^2.2.0
+        version: 2.2.0
       dotenv:
         specifier: ^17.2.1
         version: 17.2.1
