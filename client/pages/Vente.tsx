@@ -29,8 +29,7 @@ export default function Vente() {
         <aside className="md:w-96 w-full order-2 md:order-1">
           <div className="sticky top-20">
             <CartSummary />
-            <div className="mt-3 md:hidden">
-              {/* mobile: show payment buttons under cart */}
+            <div className="mt-3">
               <PaymentButtons />
             </div>
           </div>
