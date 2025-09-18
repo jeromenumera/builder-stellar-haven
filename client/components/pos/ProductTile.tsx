@@ -101,7 +101,7 @@ export function ProductTile({
             className="h-20 w-20 object-cover rounded-[10px] bg-center"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src =
-                "/public/placeholder.svg";
+                "/placeholder.svg";
             }}
           />
         </div>
