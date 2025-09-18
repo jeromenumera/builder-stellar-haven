@@ -1,5 +1,7 @@
 import { Pool, PoolClient } from "pg";
 
+import { Pool, PoolClient } from "pg";
+
 const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || null;
 
 let pool: Pool | null = null;
