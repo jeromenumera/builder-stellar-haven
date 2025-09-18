@@ -26,7 +26,7 @@ export function ProductTile({
   const imgSrc =
     produit.image_url && produit.image_url.length > 0
       ? produit.image_url
-      : "/placeholder.svg";
+      : placeholderSvg;
 
   return (
     <Card
@@ -101,8 +101,7 @@ export function ProductTile({
             alt={produit.nom}
             className="h-20 w-20 object-cover rounded-[10px] bg-center"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src =
-                "/placeholder.svg";
+              (e.currentTarget as HTMLImageElement).src = placeholderSvg;
             }}
           />
         </div>
