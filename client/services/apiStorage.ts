@@ -14,11 +14,9 @@ export async function fetchProduits(): Promise<Produit[]> {
 }
 
 export async function saveProduit(produit: Produit): Promise<Produit> {
-  // @ts-ignore
-  const isDebug = window.location.search.includes("debug_product");
   try {
     const isNew = !produit.id || produit.id.startsWith("prod_");
-    const url = isDebug ? "/api/echo" : (isNew ? "/api/produits" : `/api/produits/${produit.id}`);
+    const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
     const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated ID for new records
@@ -33,13 +31,14 @@ export async function saveProduit(produit: Produit): Promise<Produit> {
       body: JSON.stringify(payload),
     });
 
-    if (isDebug) {
-      const data = await response.json();
-      alert('DEBUG PRODUCT: ' + JSON.stringify(data));
-      return produit; // prevent error
+    if (!response.ok) {
+      let detail = "";
+      try {
+        const data = await response.json();
+        detail = data?.error || JSON.stringify(data);
+      } catch {}
+      throw new Error(detail || `Failed to save product (${response.status})`);
     }
-
-    if (!response.ok) throw new Error("Failed to save product");
     return await response.json();
   } catch (error) {
     console.error("Error saving product:", error);
@@ -86,7 +85,14 @@ export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("Failed to save event");
+    if (!response.ok) {
+      let detail = "";
+      try {
+        const data = await response.json();
+        detail = data?.error || JSON.stringify(data);
+      } catch {}
+      throw new Error(detail || `Failed to save event (${response.status})`);
+    }
     return await response.json();
   } catch (error) {
     console.error("Error saving event:", error);
@@ -119,11 +125,9 @@ export async function fetchVentes(evenementId?: string): Promise<Vente[]> {
 }
 
 export async function saveVente(vente: Vente): Promise<Vente> {
-  // @ts-ignore
-  const isDebug = window.location.search.includes("debug_sale");
   try {
     const isNew = !vente.id || vente.id.startsWith("vente_");
-        const url = isDebug ? "/api/echo" : (isNew ? "/api/ventes" : `/api/ventes/${vente.id}`);
+    const url = isNew ? "/api/ventes" : `/api/ventes/${vente.id}`;
     const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated IDs and horodatage for new records (let Supabase handle timestamp)
@@ -148,12 +152,6 @@ export async function saveVente(vente: Vente): Promise<Vente> {
       },
       body: JSON.stringify(payload),
     });
-
-    if (isDebug) {
-      const data = await response.json();
-      alert('DEBUG SALE: ' + JSON.stringify(data));
-      return vente; // prevent error
-    }
 
     if (!response.ok) {
       let detail = "";
