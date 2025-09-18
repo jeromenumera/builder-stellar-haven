@@ -15,14 +15,20 @@ export const getEvents: RequestHandler = async (_req, res) => {
 
 export const createEvent: RequestHandler = async (req, res) => {
   try {
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     const nom = body?.nom ?? body?.name;
     const date_debut = body?.date_debut ?? body?.startDate;
     const date_fin = body?.date_fin ?? body?.endDate ?? null;
@@ -61,14 +67,20 @@ export const createEvent: RequestHandler = async (req, res) => {
 export const updateEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     const nom = body?.nom ?? body?.name;
     const date_debut = body?.date_debut ?? body?.startDate;
     const date_fin = body?.date_fin ?? body?.endDate ?? null;
