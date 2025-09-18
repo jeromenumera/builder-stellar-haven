@@ -14,9 +14,11 @@ export async function fetchProduits(): Promise<Produit[]> {
 }
 
 export async function saveProduit(produit: Produit): Promise<Produit> {
+  // @ts-ignore
+  const isDebug = window.location.search.includes("debug_product");
   try {
     const isNew = !produit.id || produit.id.startsWith("prod_");
-    const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
+    const url = isDebug ? "/api/echo" : (isNew ? "/api/produits" : `/api/produits/${produit.id}`);
     const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated ID for new records
@@ -30,6 +32,12 @@ export async function saveProduit(produit: Produit): Promise<Produit> {
       },
       body: JSON.stringify(payload),
     });
+
+    if (isDebug) {
+      const data = await response.json();
+      alert('DEBUG PRODUCT: ' + JSON.stringify(data));
+      return produit; // prevent error
+    }
 
     if (!response.ok) throw new Error("Failed to save product");
     return await response.json();

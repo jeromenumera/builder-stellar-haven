@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { usePos } from "@/context/PosStore";
 import { Produit } from "@shared/api";
 import { uid } from "@/services/id";
+import placeholderSvg from "@/assets/placeholder.svg";
 
 export function ProductForm({
   initial,
@@ -123,7 +124,7 @@ export function ProductForm({
                 />
               ) : (
                 <img
-                  src="/public/placeholder.svg"
+                  src={placeholderSvg}
                   alt="placeholder"
                   className="w-10 h-10"
                 />
