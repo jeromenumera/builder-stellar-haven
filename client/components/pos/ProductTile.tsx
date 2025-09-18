@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePos } from "@/context/PosStore";
 import { feedback } from "@/lib/feedback";
+import placeholderSvg from "@/assets/placeholder.svg";
 
 export function ProductTile({
   produit,
