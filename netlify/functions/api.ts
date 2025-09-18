@@ -1,5 +1,8 @@
 import serverless from "serverless-http";
-
 import { createServer } from "../../server";
 
-export const handler = serverless(createServer());
+// Create the express app from our server factory
+const app = createServer();
+
+// Export the serverless handler
+export const handler = serverless(app);
