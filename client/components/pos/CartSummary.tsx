@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { usePos } from "@/context/PosStore";
 import { categoryIconDataUrl } from "@/lib/avatar";
 import { Trash } from "lucide-react";
+import placeholderSvg from "@/assets/placeholder.svg";
 
 export function CartSummary() {
   const { state, addToCart, removeFromCart, removeItem, clearCart } = usePos();
@@ -41,7 +42,7 @@ export function CartSummary() {
               const thumb =
                 produit.image_url && produit.image_url.length > 0
                   ? produit.image_url
-                  : "/placeholder.svg";
+                  : placeholderSvg;
               return (
                 <li key={produit.id} className="flex items-center gap-3 py-2">
                   <img

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { EventForm } from "@/components/admin/EventForm";
 import { categoryIconDataUrl } from "@/lib/avatar";
+import placeholderSvg from "@/assets/placeholder.svg";
 
 export default function Admin() {
   const { state, deleteProduit, deleteEvenement, selectEvent } = usePos();
@@ -60,7 +61,7 @@ export default function Admin() {
                     const thumb =
                       p.image_url && p.image_url.length > 0
                         ? p.image_url
-                        : "/public/placeholder.svg";
+                        : placeholderSvg;
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
                         <img
