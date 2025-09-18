@@ -24,7 +24,7 @@ export function CartSummary() {
   return (
     <Card className="p-4 h-full flex flex-col">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg md:text-xl font-semibold">Récapitulatif</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Panier</h2>
         <Button
           variant="ghost"
           onClick={clearCart}
