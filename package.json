@@ -21,6 +21,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@netlify/neon": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
