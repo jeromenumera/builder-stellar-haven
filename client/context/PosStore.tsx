@@ -246,6 +246,25 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Ensure selected event exists on the server and has a valid UUID.
+      // Local seeded demo events use ids like "e1" which are not UUIDs and will
+      // cause the server to reject the sale. If the selected event is a local
+      // stub, persist it to the server first and update the selectedEventId.
+      const isUuid = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      let evenementId = state.selectedEventId as string;
+
+      if (!isUuid(evenementId)) {
+        const localEvt = state.evenements.find((e) => e.id === evenementId);
+        if (!localEvt) {
+          return { ok: false, error: "Événement sélectionné introuvable." };
+        }
+        // Save to server (apiSaveEvenement removes local id for new records)
+        const saved = await apiSaveEvenement(localEvt);
+        // Update selected event id both in state and persisted storage
+        dispatch({ type: "selectEvent", id: saved.id });
+        evenementId = saved.id;
+      }
+
       const lignes: LigneVente[] = items.map(([pid, qty]) => {
         const produit = state.produits.find((p) => p.id === pid)!;
         return buildLigneVente("temp", produit, qty); // temp ID, server will generate real one
@@ -255,7 +274,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       const vente: Vente = {
         id: uid("vente"), // temp ID
         horodatage: new Date().toISOString(),
-        evenement_id: state.selectedEventId,
+        evenement_id: evenementId,
         mode_paiement: mode,
         total_ttc,
         total_ht,
@@ -264,7 +283,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       };
 
       await apiSaveVente(vente);
-      await loadVentes(); // Reload to get updated list
+      await Promise.all([loadVentes(), loadEvenements()]); // Reload to get updated lists
       dispatch({ type: "clearCart" });
       return { ok: true };
     } catch (error) {
