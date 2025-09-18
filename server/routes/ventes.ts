@@ -223,12 +223,17 @@ export const updateSale: RequestHandler = async (req, res) => {
       }
       if (b && typeof b === "object" && !Array.isArray(b)) {
         const keys = Object.keys(b);
-        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string")) {
+        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k))) {
           try {
             const s = keys
               .map((k) => parseInt(k, 10))
               .sort((a, c) => a - c)
-              .map((i) => (b as any)[String(i)])
+              .map((i) => {
+                const v = (b as any)[String(i)];
+                if (typeof v === "string") return v;
+                if (typeof v === "number") return String.fromCharCode(v);
+                return "";
+              })
               .join("");
             const parsed = JSON.parse(s);
             if (parsed && typeof parsed === "object") b = parsed;
