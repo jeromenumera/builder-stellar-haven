@@ -50,12 +50,6 @@ export default function Vente() {
           </div>
         </section>
 
-        {/* On tablets and up show payment buttons as a fixed bottom bar */}
-        <div className="hidden md:flex md:fixed md:left-6 md:bottom-6 md:w-80 md:justify-center pointer-events-none">
-          <div className="pointer-events-auto w-full">
-            <PaymentButtons />
-          </div>
-        </div>
       </div>
     </div>
   );
