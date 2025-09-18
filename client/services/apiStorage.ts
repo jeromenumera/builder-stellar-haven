@@ -143,8 +143,7 @@ export async function saveVente(vente: Vente): Promise<Vente> {
 
     if (isDebug) {
       const data = await response.json();
-      console.log('DEBUG SALE', data);
-      alert('DEBUG SALE: check console');
+      alert('DEBUG SALE: ' + JSON.stringify(data));
       return vente; // prevent error
     }
 
