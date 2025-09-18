@@ -111,9 +111,11 @@ export async function fetchVentes(evenementId?: string): Promise<Vente[]> {
 }
 
 export async function saveVente(vente: Vente): Promise<Vente> {
+  // @ts-ignore
+  const isDebug = window.location.search.includes("debug_sale");
   try {
     const isNew = !vente.id || vente.id.startsWith("vente_");
-    const url = isNew ? "/api/ventes" : `/api/ventes/${vente.id}`;
+        const url = isDebug ? "/api/echo" : (isNew ? "/api/ventes" : `/api/ventes/${vente.id}`);
     const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated IDs and horodatage for new records (let Supabase handle timestamp)
@@ -138,6 +140,13 @@ export async function saveVente(vente: Vente): Promise<Vente> {
       },
       body: JSON.stringify(payload),
     });
+
+    if (isDebug) {
+      const data = await response.json();
+      console.log('DEBUG SALE', data);
+      alert('DEBUG SALE: check console');
+      return vente; // prevent error
+    }
 
     if (!response.ok) {
       let detail = "";
