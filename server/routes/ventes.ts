@@ -26,14 +26,22 @@ export const getSales: RequestHandler = async (req, res) => {
 
 export const createSale: RequestHandler = async (req, res) => {
   try {
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    // Normalize body across serverless environments
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          // prefer inner payload if it looks like the real one
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     // Accept snake_case and camelCase
     const evenement_id = body?.evenement_id ?? body?.eventId ?? body?.event_id;
     let mode_paiement: any =
@@ -167,14 +175,21 @@ export const createSale: RequestHandler = async (req, res) => {
 export const updateSale: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    // Normalize body across serverless environments
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     const mode_paiement = body?.mode_paiement ?? body?.paymentMethod ?? body?.modePaiement;
     const lignes = body?.lignes ?? body?.lines ?? [];
 
