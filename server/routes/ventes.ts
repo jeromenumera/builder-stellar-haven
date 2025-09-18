@@ -29,15 +29,38 @@ export const createSale: RequestHandler = async (req, res) => {
     // Normalize body across serverless environments
     const normalize = (input: any) => {
       let b: any = input;
+      // Case 1: plain JSON string
       if (typeof b === "string") {
         try { b = JSON.parse(b); } catch { b = {}; }
       }
+      // Case 2: wrapper { body: "..." }
       if (b && typeof b === "object" && typeof b.body === "string") {
         try {
           const inner = JSON.parse(b.body);
-          // prefer inner payload if it looks like the real one
           if (inner && typeof inner === "object") b = inner;
         } catch {}
+      }
+      // Case 3: Buffer/Uint8Array
+      if (b && typeof b === "object" && (Buffer.isBuffer?.(b) || b instanceof Uint8Array)) {
+        try {
+          const s = Buffer.isBuffer?.(b) ? (b as Buffer).toString("utf8") : new TextDecoder().decode(b as Uint8Array);
+          b = JSON.parse(s);
+        } catch {}
+      }
+      // Case 4: object with numeric keys representing chars
+      if (b && typeof b === "object" && !Array.isArray(b)) {
+        const keys = Object.keys(b);
+        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string")) {
+          try {
+            const s = keys
+              .map((k) => parseInt(k, 10))
+              .sort((a, c) => a - c)
+              .map((i) => (b as any)[String(i)])
+              .join("");
+            const parsed = JSON.parse(s);
+            if (parsed && typeof parsed === "object") b = parsed;
+          } catch {}
+        }
       }
       return b || {};
     };
@@ -186,6 +209,26 @@ export const updateSale: RequestHandler = async (req, res) => {
           const inner = JSON.parse(b.body);
           if (inner && typeof inner === "object") b = inner;
         } catch {}
+      }
+      if (b && typeof b === "object" && (Buffer.isBuffer?.(b) || b instanceof Uint8Array)) {
+        try {
+          const s = Buffer.isBuffer?.(b) ? (b as Buffer).toString("utf8") : new TextDecoder().decode(b as Uint8Array);
+          b = JSON.parse(s);
+        } catch {}
+      }
+      if (b && typeof b === "object" && !Array.isArray(b)) {
+        const keys = Object.keys(b);
+        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string")) {
+          try {
+            const s = keys
+              .map((k) => parseInt(k, 10))
+              .sort((a, c) => a - c)
+              .map((i) => (b as any)[String(i)])
+              .join("");
+            const parsed = JSON.parse(s);
+            if (parsed && typeof parsed === "object") b = parsed;
+          } catch {}
+        }
       }
       return b || {};
     };
