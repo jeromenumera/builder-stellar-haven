@@ -25,7 +25,7 @@ export function ProductTile({
   const imgSrc =
     produit.image_url && produit.image_url.length > 0
       ? produit.image_url
-      : "/public/placeholder.svg";
+      : "/placeholder.svg";
 
   return (
     <Card
