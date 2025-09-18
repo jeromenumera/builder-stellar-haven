@@ -15,14 +15,20 @@ export const getProducts: RequestHandler = async (_req, res) => {
 
 export const createProduct: RequestHandler = async (req, res) => {
   try {
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     const nom = body?.nom ?? body?.name;
     const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
     const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
@@ -56,14 +62,20 @@ export const createProduct: RequestHandler = async (req, res) => {
 export const updateProduct: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    let body: any = req.body;
-    if (typeof body === "string") {
-      try {
-        body = JSON.parse(body);
-      } catch {
-        body = {};
+    const normalize = (input: any) => {
+      let b: any = input;
+      if (typeof b === "string") {
+        try { b = JSON.parse(b); } catch { b = {}; }
       }
-    }
+      if (b && typeof b === "object" && typeof b.body === "string") {
+        try {
+          const inner = JSON.parse(b.body);
+          if (inner && typeof inner === "object") b = inner;
+        } catch {}
+      }
+      return b || {};
+    };
+    let body: any = normalize(req.body);
     const nom = body?.nom ?? body?.name;
     const prix_ttc = parseFloat(body?.prix_ttc ?? body?.priceTTC);
     const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
