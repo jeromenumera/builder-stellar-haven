@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePos } from "@/context/PosStore";
+import placeholderSvg from "@/assets/placeholder.svg";
 
 type Product = {
   id?: string;
@@ -32,6 +33,7 @@ export function ProductForm({
   const [imageUrl, setImageUrl] = useState<string>(initial?.image_url ?? "");
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const pdvList = useMemo(() => {
@@ -45,6 +47,33 @@ export function ProductForm({
 
   function togglePdv(id: string) {
     setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  async function onFileChange(f?: File) {
+    if (!f) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(f.type)) {
+      setErr("Type d'image non supporté. Utilisez JPG, PNG ou WebP.");
+      return;
+    }
+    if (f.size > 3 * 1024 * 1024) {
+      setErr("Image trop lourde (max 3MB).");
+      return;
+    }
+    setUploading(true);
+    try {
+      const { resizeImageFile } = await import("@/lib/image");
+      const data = await resizeImageFile(f, 512);
+      setImageUrl(data);
+    } catch (e) {
+      setErr("Erreur lors du traitement de l'image.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage() {
+    setImageUrl("");
   }
 
   async function save(e: React.FormEvent) {
@@ -135,13 +164,37 @@ export function ProductForm({
         </div>
       </div>
 
-      <div>
-        <Label>Image (URL)</Label>
-        <Input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
-        />
+      <div className="md:col-span-2">
+        <Label>Image</Label>
+        <div className="flex items-center gap-3">
+          <div className="w-20 h-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+            {imageUrl ? (
+              <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
+            ) : (
+              <img src={placeholderSvg} alt="placeholder" className="w-10 h-10" />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={(e) => onFileChange(e.target.files?.[0])}
+              className="text-sm"
+            />
+            <div className="flex gap-2">
+              <Button type="button" onClick={() => document.getElementById("file-upload")?.click()} disabled={uploading}>
+                {uploading ? "Chargement..." : "Téléverser"}
+              </Button>
+              {imageUrl && (
+                <Button variant="destructive" type="button" onClick={removeImage}>
+                  Supprimer
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">JPEG/PNG/WebP — max 3MB</p>
+          </div>
+        </div>
       </div>
 
       {err && <p className="text-red-400 text-sm">{err}</p>}
