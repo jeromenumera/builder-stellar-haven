@@ -67,7 +67,15 @@ export function Header() {
                 <select
                   className="h-10 w-full rounded-md border bg-background px-3"
                   value={selectedPdv}
-                  onChange={(e) => selectPointDeVente(e.target.value || null)}
+                  onChange={(e) => {
+                    const next = e.target.value || null;
+                    if (next === state.selectedPointDeVenteId) return;
+                    if (Object.keys(state.cart).length > 0) {
+                      const ok = confirm("Changer de stand va vider le panier, continuer ?");
+                      if (!ok) return;
+                    }
+                    selectPointDeVente(next);
+                  }}
                 >
                   <option value="">Sélectionner...</option>
                   {state.pointsDeVente.map((p) => (
