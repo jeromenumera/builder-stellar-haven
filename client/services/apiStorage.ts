@@ -91,22 +91,21 @@ export async function fetchEvenements(): Promise<Evenement[]> {
 export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
   try {
     const isNew = !evenement.id || evenement.id.startsWith("evt_");
-    const url = isNew ? "/api/evenements" : `/api/evenements/${evenement.id}`;
+    const rel = isNew ? "/api/evenements" : `/api/evenements/${evenement.id}`;
+    const abs = `https://cash.sosmediterranee.ch${rel}`;
     const method = isNew ? "POST" : "PUT";
 
     // Remove client-generated ID for new records
     const payload = isNew ? { ...evenement, id: undefined } : evenement;
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const tryFetch = async (u: string) => {
+      try { return await fetch(u, { method, headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload), credentials: "omit" }); } catch { return null as any; }
+    };
 
-    if (!response.ok) {
+    let response = await tryFetch(rel);
+    if (!response || !response.ok) response = await tryFetch(abs);
+
+    if (!response || !response.ok) {
       let detail = "";
       try {
         const data = await response.json();
@@ -225,14 +224,18 @@ export async function savePointDeVente(
   pdv: Partial<PointDeVente> & { evenement_id: string; nom: string },
 ): Promise<PointDeVente> {
   const isNew = !pdv.id;
-  const url = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
+  const rel = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
+  const abs = `https://cash.sosmediterranee.ch${rel}`;
   const method = isNew ? "POST" : "PUT";
-  const response = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify(pdv),
-  });
-  if (!response.ok) {
+
+  const tryFetch = async (u: string) => {
+    try { return await fetch(u, { method, headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(pdv), credentials: "omit" }); } catch { return null as any; }
+  };
+
+  let response = await tryFetch(rel);
+  if (!response || !response.ok) response = await tryFetch(abs);
+
+  if (!response || !response.ok) {
     let detail = "";
     try {
       const data = await response.json();
