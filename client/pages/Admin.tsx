@@ -112,7 +112,11 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">
-                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}%
+                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}% · PDV: {
+                              p.points_de_vente && p.points_de_vente.length > 0
+                                ? p.points_de_vente.map(pdv => pdv.nom).join(', ')
+                                : 'Aucun'
+                            }
                           </div>
                         </div>
                         <Button
