@@ -4,24 +4,27 @@ import { convertProduitFromDb } from "../services/converters";
 
 export const getProducts: RequestHandler = async (req, res) => {
   try {
-    const { point_de_vente_id } = req.query as { point_de_vente_id?: string };
-    if (point_de_vente_id) {
-      const { rows } = await query(
-        `SELECT p.id, p.nom, COALESCE(ppv.prix_ttc_override, p.prix_ttc) AS prix_ttc, p.tva, p.image_url, p.sku
-         FROM produits p
-         LEFT JOIN produit_point_de_vente ppv
-           ON ppv.produit_id = p.id AND ppv.point_de_vente_id = $1
-         WHERE (p.actif = true OR ppv.produit_id IS NOT NULL)
-         ORDER BY p.nom`,
-        [point_de_vente_id]
-      );
-      const products = rows.map(convertProduitFromDb);
-      return res.json(products);
-    } else {
-      const { rows } = await query(`SELECT * FROM produits WHERE actif = true ORDER BY nom`);
-      const products = rows.map(convertProduitFromDb);
-      return res.json(products);
+    const q: any = req.query || {};
+    const eventId = q.evenement_id || q.eventId || q.event_id || null;
+    const pdvId = q.point_de_vente_id || q.pointOfSaleId || q.point_of_sale_id || null;
+    if (!pdvId) return res.json([]);
+    const params: any[] = [pdvId];
+    let where = "ppv.point_de_vente_id = $1 AND p.actif = true";
+    if (eventId) {
+      where += " AND pdv.evenement_id = $2";
+      params.push(eventId);
     }
+    const { rows } = await query(
+      `SELECT p.id, p.nom, p.prix_ttc, p.tva, p.image_url, p.sku
+       FROM produits p
+       JOIN produit_point_de_vente ppv ON ppv.produit_id = p.id
+       JOIN point_de_vente pdv ON pdv.id = ppv.point_de_vente_id
+       WHERE ${where}
+       ORDER BY p.nom`,
+      params
+    );
+    const products = rows.map(convertProduitFromDb);
+    return res.json(products);
   } catch (error: any) {
     console.error("Error fetching products:", error);
     res.status(500).json({ error: error.message });
