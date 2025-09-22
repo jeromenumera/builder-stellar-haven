@@ -25,9 +25,11 @@ export function ProductForm({
 }) {
   const { state, refreshData, loadProduitsAdmin } = usePos() as any;
   const [nom, setNom] = useState(initial?.nom ?? "");
-  const [prix, setPrix] = useState<string>(initial ? String(initial.prix_ttc) : "");
+  const [prix, setPrix] = useState<string>(
+    initial ? String(initial.prix_ttc) : "",
+  );
   const [tva, setTva] = useState<string>(
-    initial?.tva != null ? String(initial.tva) : "8.1"
+    initial?.tva != null ? String(initial.tva) : "8.1",
   );
   const [sku, setSku] = useState<string>(initial?.sku ?? "");
   const [imageUrl, setImageUrl] = useState<string>(initial?.image_url ?? "");
@@ -39,7 +41,9 @@ export function ProductForm({
 
   const pdvList = useMemo(() => {
     const evId = state.selectedEventId;
-    return state.pointsDeVente.filter((p) => p.evenement_id === evId && p.actif);
+    return state.pointsDeVente.filter(
+      (p) => p.evenement_id === evId && p.actif,
+    );
   }, [state.pointsDeVente, state.selectedEventId]);
 
   useEffect(() => {
@@ -83,9 +87,13 @@ export function ProductForm({
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/upload-image", { method: "POST", body: form });
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: form,
+      });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any)?.error || "Upload image échoué");
+      if (!res.ok)
+        throw new Error((data as any)?.error || "Upload image échoué");
       return (data as any).url || null;
     } finally {
       setUploading(false);
@@ -98,8 +106,10 @@ export function ProductForm({
 
     const eventId = state.selectedEventId;
     if (!nom.trim()) return setErr("Le nom est requis.");
-    if (prix.trim() === "" || isNaN(Number(prix))) return setErr("Prix TTC invalide.");
-    if (!eventId) return setErr("Sélectionne un événement dans la barre du haut.");
+    if (prix.trim() === "" || isNaN(Number(prix)))
+      return setErr("Prix TTC invalide.");
+    if (!eventId)
+      return setErr("Sélectionne un événement dans la barre du haut.");
 
     let tvaNumber = Number(tva);
     if (isNaN(tvaNumber)) tvaNumber = 0;
@@ -121,16 +131,22 @@ export function ProductForm({
 
     setSaving(true);
     try {
-      const res = await fetch("/api/produits" + (initial?.id ? `/${initial.id}` : ""), {
-        method: initial?.id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "/api/produits" + (initial?.id ? `/${initial.id}` : ""),
+        {
+          method: initial?.id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any)?.error || "Échec de l'enregistrement");
+      if (!res.ok)
+        throw new Error((data as any)?.error || "Échec de l'enregistrement");
 
       // Reload admin list explicitly to avoid POS filters interfering
-      try { await loadProduitsAdmin?.(); } catch {}
+      try {
+        await loadProduitsAdmin?.();
+      } catch {}
       onDone?.();
       if (!initial?.id) {
         setNom("");
@@ -152,15 +168,27 @@ export function ProductForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label>Nom</Label>
-          <Input value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Ex: ToteBag" />
+          <Input
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            placeholder="Ex: ToteBag"
+          />
         </div>
         <div>
           <Label>Prix TTC (CHF)</Label>
-          <Input value={prix} onChange={(e) => setPrix(e.target.value)} placeholder="20" />
+          <Input
+            value={prix}
+            onChange={(e) => setPrix(e.target.value)}
+            placeholder="20"
+          />
         </div>
         <div>
           <Label>TVA (%)</Label>
-          <Input value={tva} onChange={(e) => setTva(e.target.value)} placeholder="8.1" />
+          <Input
+            value={tva}
+            onChange={(e) => setTva(e.target.value)}
+            placeholder="8.1"
+          />
         </div>
         <div>
           <Label>SKU (optionnel)</Label>
@@ -173,12 +201,17 @@ export function ProductForm({
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           {pdvList.map((p) => (
             <label key={p.id} className="flex items-center gap-2">
-              <Checkbox checked={!!checked[p.id]} onCheckedChange={(v) => setPDV(p.id, v as any)} />
+              <Checkbox
+                checked={!!checked[p.id]}
+                onCheckedChange={(v) => setPDV(p.id, v as any)}
+              />
               <span>{p.nom}</span>
             </label>
           ))}
           {pdvList.length === 0 && (
-            <div className="text-xs text-muted-foreground">Aucun point de vente actif pour l'événement courant.</div>
+            <div className="text-xs text-muted-foreground">
+              Aucun point de vente actif pour l'événement courant.
+            </div>
           )}
         </div>
       </div>
@@ -187,10 +220,18 @@ export function ProductForm({
         <Label>Image produit</Label>
         <div className="flex items-center gap-3">
           <div className="w-20 h-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-            {(imageUrl || file) ? (
-              <img src={file ? URL.createObjectURL(file) : imageUrl} alt="preview" className="w-full h-full object-cover" />
+            {imageUrl || file ? (
+              <img
+                src={file ? URL.createObjectURL(file) : imageUrl}
+                alt="preview"
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <img src={placeholderSvg} alt="placeholder" className="w-10 h-10" />
+              <img
+                src={placeholderSvg}
+                alt="placeholder"
+                className="w-10 h-10"
+              />
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -202,16 +243,26 @@ export function ProductForm({
               className="text-sm"
             />
             <div className="flex gap-2">
-              <Button type="button" onClick={() => document.getElementById("file-upload")?.click()} disabled={uploading}>
+              <Button
+                type="button"
+                onClick={() => document.getElementById("file-upload")?.click()}
+                disabled={uploading}
+              >
                 {uploading ? "Chargement..." : "Choisir un fichier"}
               </Button>
               {(imageUrl || file) && (
-                <Button variant="destructive" type="button" onClick={removeImage}>
+                <Button
+                  variant="destructive"
+                  type="button"
+                  onClick={removeImage}
+                >
                   Supprimer
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">JPEG/PNG/WebP — max 5MB</p>
+            <p className="text-xs text-muted-foreground">
+              JPEG/PNG/WebP — max 5MB
+            </p>
           </div>
         </div>
       </div>

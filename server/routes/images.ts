@@ -2,7 +2,10 @@ import type { RequestHandler } from "express";
 import { query } from "../services/db";
 import multer from "multer";
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 export const uploadImage: RequestHandler = (req, res, next) => {
   // Use multer to parse a single file field named "file"
@@ -17,7 +20,7 @@ export const uploadImage: RequestHandler = (req, res, next) => {
       const data = f.buffer; // Buffer
       const { rows } = await query(
         `INSERT INTO images (mime, data) VALUES ($1, $2) RETURNING id`,
-        [mime, data]
+        [mime, data],
       );
       const id = rows[0]?.id;
       return res.json({ id, url: `/api/image/${id}` });
@@ -31,8 +34,11 @@ export const uploadImage: RequestHandler = (req, res, next) => {
 export const getImage: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { rows } = await query(`SELECT mime, data FROM images WHERE id=$1`, [id]);
-    if (!rows || rows.length === 0) return res.status(404).json({ error: "Not found" });
+    const { rows } = await query(`SELECT mime, data FROM images WHERE id=$1`, [
+      id,
+    ]);
+    if (!rows || rows.length === 0)
+      return res.status(404).json({ error: "Not found" });
     const row = rows[0];
     res.setHeader("Content-Type", row.mime || "application/octet-stream");
     // Neon returns bytea as Buffer/Uint8Array compatible in Node env

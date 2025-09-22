@@ -57,7 +57,6 @@ export default function Vente() {
             ))}
           </div>
         </section>
-
       </div>
     </div>
   );

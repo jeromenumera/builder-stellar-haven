@@ -2,7 +2,10 @@ import { Evenement, Produit, Vente, PointDeVente } from "@shared/api";
 
 // API client functions for Supabase backend
 
-export async function fetchProduits(eventId?: string, pointDeVenteId?: string): Promise<Produit[]> {
+export async function fetchProduits(
+  eventId?: string,
+  pointDeVenteId?: string,
+): Promise<Produit[]> {
   try {
     const params = new URLSearchParams();
     if (eventId) params.set("evenement_id", eventId);
@@ -12,7 +15,11 @@ export async function fetchProduits(eventId?: string, pointDeVenteId?: string): 
     const abs = `https://cash.sosmediterranee.ch${rel}`;
 
     const tryFetch = async (u: string) => {
-      try { return await fetch(u, { credentials: "omit" }); } catch { return null as any; }
+      try {
+        return await fetch(u, { credentials: "omit" });
+      } catch {
+        return null as any;
+      }
     };
 
     let response = await tryFetch(rel);
@@ -25,7 +32,9 @@ export async function fetchProduits(eventId?: string, pointDeVenteId?: string): 
   }
 }
 
-export async function saveProduit(produit: Produit & { pointOfSaleIds?: string[] }): Promise<Produit> {
+export async function saveProduit(
+  produit: Produit & { pointOfSaleIds?: string[] },
+): Promise<Produit> {
   try {
     const isNew = !produit.id || produit.id.startsWith("prod_");
     const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
@@ -122,12 +131,17 @@ export async function deleteEvenement(id: string): Promise<void> {
   }
 }
 
-export async function fetchVentes(evenementId?: string, pointDeVenteId?: string): Promise<Vente[]> {
+export async function fetchVentes(
+  evenementId?: string,
+  pointDeVenteId?: string,
+): Promise<Vente[]> {
   try {
     const params = new URLSearchParams();
     if (evenementId) params.set("evenement_id", evenementId);
     if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
-    const url = params.toString() ? `/api/ventes?${params.toString()}` : "/api/ventes";
+    const url = params.toString()
+      ? `/api/ventes?${params.toString()}`
+      : "/api/ventes";
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch sales");
     return await response.json();
@@ -191,9 +205,13 @@ export async function deleteVente(id: string): Promise<void> {
   }
 }
 
-export async function fetchPointsDeVente(evenementId?: string): Promise<PointDeVente[]> {
+export async function fetchPointsDeVente(
+  evenementId?: string,
+): Promise<PointDeVente[]> {
   try {
-    const url = evenementId ? `/api/points-de-vente?evenement_id=${encodeURIComponent(evenementId)}` : "/api/points-de-vente";
+    const url = evenementId
+      ? `/api/points-de-vente?evenement_id=${encodeURIComponent(evenementId)}`
+      : "/api/points-de-vente";
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch points de vente");
     return await response.json();
@@ -203,7 +221,9 @@ export async function fetchPointsDeVente(evenementId?: string): Promise<PointDeV
   }
 }
 
-export async function savePointDeVente(pdv: Partial<PointDeVente> & { evenement_id: string; nom: string }): Promise<PointDeVente> {
+export async function savePointDeVente(
+  pdv: Partial<PointDeVente> & { evenement_id: string; nom: string },
+): Promise<PointDeVente> {
   const isNew = !pdv.id;
   const url = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
   const method = isNew ? "POST" : "PUT";
@@ -214,14 +234,21 @@ export async function savePointDeVente(pdv: Partial<PointDeVente> & { evenement_
   });
   if (!response.ok) {
     let detail = "";
-    try { const data = await response.json(); detail = data?.error || JSON.stringify(data); } catch {}
-    throw new Error(detail || `Failed to save point de vente (${response.status})`);
+    try {
+      const data = await response.json();
+      detail = data?.error || JSON.stringify(data);
+    } catch {}
+    throw new Error(
+      detail || `Failed to save point de vente (${response.status})`,
+    );
   }
   return response.json();
 }
 
 export async function deletePointDeVente(id: string): Promise<void> {
-  const response = await fetch(`/api/points-de-vente/${id}`, { method: "DELETE" });
+  const response = await fetch(`/api/points-de-vente/${id}`, {
+    method: "DELETE",
+  });
   if (!response.ok) throw new Error("Failed to delete point de vente");
 }
 

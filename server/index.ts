@@ -18,7 +18,12 @@ import {
   deleteEvent,
 } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
-import { getPointsDeVente, createPointDeVente, updatePointDeVente, deletePointDeVente } from "./routes/points_de_vente";
+import {
+  getPointsDeVente,
+  createPointDeVente,
+  updatePointDeVente,
+  deletePointDeVente,
+} from "./routes/points_de_vente";
 import { echo } from "./routes/echo";
 import { uploadImage, getImage } from "./routes/images";
 
@@ -46,7 +51,11 @@ export function createServer() {
 
   // Ensure DB schema
   (async () => {
-    try { await ensurePdvSchema(); } catch (e) { console.error('Schema init error', e); }
+    try {
+      await ensurePdvSchema();
+    } catch (e) {
+      console.error("Schema init error", e);
+    }
   })();
 
   // Example API routes

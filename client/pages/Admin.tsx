@@ -10,7 +10,14 @@ import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
 
 export default function Admin() {
-  const { state, deleteProduit, deleteEvenement, deletePointDeVente, selectEvent, loadProduitsAdmin } = usePos();
+  const {
+    state,
+    deleteProduit,
+    deleteEvenement,
+    deletePointDeVente,
+    selectEvent,
+    loadProduitsAdmin,
+  } = usePos();
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [editingPointId, setEditingPointId] = useState<string | null>(null);
@@ -24,7 +31,8 @@ export default function Admin() {
     state.produits.find((p) => p.id === editingProductId) || null;
   const editingEvent =
     state.evenements.find((e) => e.id === editingEventId) || null;
-  const editingPoint = state.pointsDeVente.find((p) => p.id === editingPointId) || null;
+  const editingPoint =
+    state.pointsDeVente.find((p) => p.id === editingPointId) || null;
 
   const handleDeleteProduct = async (id: string) => {
     if (!confirm("Confirmer la suppression de ce produit ?")) return;
@@ -124,7 +132,10 @@ export default function Admin() {
               <ProductForm
                 key={editingProduct ? editingProduct.id : "new"}
                 initial={editingProduct}
-                onDone={() => { setEditingProductId(null); loadProduitsAdmin(); }}
+                onDone={() => {
+                  setEditingProductId(null);
+                  loadProduitsAdmin();
+                }}
               />
             </div>
           </div>
@@ -135,14 +146,17 @@ export default function Admin() {
               <h2 className="text-xl font-semibold mb-2">Liste (max 20)</h2>
               <Card className="p-2">
                 <ul className="divide-y">
-                  {state.pointsDeVente.slice(0,20).map((p) => {
-                    const evt = state.evenements.find((e) => e.id === p.evenement_id);
+                  {state.pointsDeVente.slice(0, 20).map((p) => {
+                    const evt = state.evenements.find(
+                      (e) => e.id === p.evenement_id,
+                    );
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">
-                            {evt ? evt.nom : p.evenement_id} · {p.actif ? "Actif" : "Inactif"}
+                            {evt ? evt.nom : p.evenement_id} ·{" "}
+                            {p.actif ? "Actif" : "Inactif"}
                           </div>
                         </div>
                         <Button
@@ -162,7 +176,9 @@ export default function Admin() {
                     );
                   })}
                   {state.pointsDeVente.length === 0 && (
-                    <li className="p-4 text-muted-foreground">Aucun point de vente</li>
+                    <li className="p-4 text-muted-foreground">
+                      Aucun point de vente
+                    </li>
                   )}
                 </ul>
               </Card>

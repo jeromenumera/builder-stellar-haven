@@ -1,21 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePos } from "@/context/PosStore";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export function InitialSelectionDialog() {
   const { state, selectEvent, selectPointDeVente, refreshData } = usePos();
   const [open, setOpen] = useState(false);
   const [eventId, setEventId] = useState<string>(state.selectedEventId || "");
-  const [pdvId, setPdvId] = useState<string>(state.selectedPointDeVenteId || "");
+  const [pdvId, setPdvId] = useState<string>(
+    state.selectedPointDeVenteId || "",
+  );
 
   useEffect(() => {
-    const hasPdv = !!(state.selectedPointDeVenteId && state.selectedPointDeVenteId.length > 0);
+    const hasPdv = !!(
+      state.selectedPointDeVenteId && state.selectedPointDeVenteId.length > 0
+    );
     setOpen(!hasPdv);
   }, [state.selectedPointDeVenteId]);
 
   const pdvOptions = useMemo(() => {
-    return state.pointsDeVente.filter((p) => !eventId || p.evenement_id === eventId);
+    return state.pointsDeVente.filter(
+      (p) => !eventId || p.evenement_id === eventId,
+    );
   }, [state.pointsDeVente, eventId]);
 
   const confirm = async () => {
@@ -30,9 +42,12 @@ export function InitialSelectionDialog() {
     <Dialog open={open}>
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Sélectionner l'événement et le point de vente</DialogTitle>
+          <DialogTitle>
+            Sélectionner l'événement et le point de vente
+          </DialogTitle>
           <DialogDescription>
-            Choisis d'abord l'événement, puis le point de vente. Cette sélection est obligatoire pour continuer.
+            Choisis d'abord l'événement, puis le point de vente. Cette sélection
+            est obligatoire pour continuer.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -41,12 +56,19 @@ export function InitialSelectionDialog() {
             <select
               className="h-10 w-full rounded-md border bg-background px-3"
               value={eventId}
-              onChange={(e) => { setEventId(e.target.value); setPdvId(""); }}
+              onChange={(e) => {
+                setEventId(e.target.value);
+                setPdvId("");
+              }}
             >
               <option value="">— Choisir —</option>
-              {state.evenements.filter(e => e.statut === "actif").map((e) => (
-                <option key={e.id} value={e.id}>{e.nom} — {e.lieu}</option>
-              ))}
+              {state.evenements
+                .filter((e) => e.statut === "actif")
+                .map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.nom} — {e.lieu}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
@@ -59,12 +81,16 @@ export function InitialSelectionDialog() {
             >
               <option value="">— Choisir —</option>
               {pdvOptions.map((p) => (
-                <option key={p.id} value={p.id}>{p.nom}</option>
+                <option key={p.id} value={p.id}>
+                  {p.nom}
+                </option>
               ))}
             </select>
           </div>
           <div className="flex justify-end gap-2">
-            <Button onClick={confirm} disabled={!eventId || !pdvId}>Confirmer</Button>
+            <Button onClick={confirm} disabled={!eventId || !pdvId}>
+              Confirmer
+            </Button>
           </div>
         </div>
       </DialogContent>

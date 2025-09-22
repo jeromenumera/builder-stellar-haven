@@ -2,11 +2,20 @@ import { Pool, PoolClient } from "pg";
 
 import type { PoolClient } from "pg";
 
-const DATABASE_URL = process.env.NETLIFY_DATABASE_URL || process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || null;
+const DATABASE_URL =
+  process.env.NETLIFY_DATABASE_URL ||
+  process.env.NEON_DATABASE_URL ||
+  process.env.DATABASE_URL ||
+  null;
 
-let neonSql: ((strings: TemplateStringsArray, ...values: any[]) => Promise<any[]>) | null = null;
+let neonSql:
+  | ((strings: TemplateStringsArray, ...values: any[]) => Promise<any[]>)
+  | null = null;
 
-function toTemplate(text: string, params: any[] = []): [TemplateStringsArray, any[]] {
+function toTemplate(
+  text: string,
+  params: any[] = [],
+): [TemplateStringsArray, any[]] {
   const parts: string[] = [];
   const values: any[] = [];
   let idx = 0;
@@ -31,7 +40,8 @@ async function ensureNeon() {
   const mod = await import("@neondatabase/serverless");
   const factory = (mod as any).neon as (url: string) => any;
   const sql = factory(DATABASE_URL);
-  neonSql = (strings: TemplateStringsArray, ...values: any[]) => sql(strings, ...values);
+  neonSql = (strings: TemplateStringsArray, ...values: any[]) =>
+    sql(strings, ...values);
   return neonSql!;
 }
 
@@ -44,7 +54,7 @@ export async function query(text: string, params?: any[]) {
 
 export async function testConnection() {
   try {
-    const { rows } = await query('SELECT 1 as ok');
+    const { rows } = await query("SELECT 1 as ok");
     return { ok: true, rowCount: rows.length };
   } catch (err: any) {
     return { ok: false, error: err.message || String(err) };
@@ -55,7 +65,9 @@ export async function closePool() {
   neonSql = null;
 }
 
-export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+export async function withTransaction<T>(
+  fn: (client: PoolClient) => Promise<T>,
+): Promise<T> {
   const client = {
     query: async (text: string, params?: any[]) => query(text, params),
     release: () => {},

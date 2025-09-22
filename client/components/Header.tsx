@@ -40,7 +40,9 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="rounded-full">
                 <MapPin className="h-5 w-5" />
-                <span className="sr-only">Sélection Événement/Point de vente</span>
+                <span className="sr-only">
+                  Sélection Événement/Point de vente
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
@@ -71,7 +73,9 @@ export function Header() {
                     const next = e.target.value || null;
                     if (next === state.selectedPointDeVenteId) return;
                     if (Object.keys(state.cart).length > 0) {
-                      const ok = confirm("Changer de stand va vider le panier, continuer ?");
+                      const ok = confirm(
+                        "Changer de stand va vider le panier, continuer ?",
+                      );
                       if (!ok) return;
                     }
                     selectPointDeVente(next);

@@ -9,7 +9,7 @@ export async function ensurePdvSchema() {
         IF NOT FOUND THEN
           CREATE EXTENSION pgcrypto;
         END IF;
-      END$$;`
+      END$$;`,
     );
   } catch {}
   await query(
@@ -20,7 +20,7 @@ export async function ensurePdvSchema() {
       actif boolean NOT NULL DEFAULT true,
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now()
-    );`
+    );`,
   );
   await query(
     `CREATE TABLE IF NOT EXISTS produit_point_de_vente (
@@ -28,7 +28,7 @@ export async function ensurePdvSchema() {
       produit_id uuid NOT NULL REFERENCES produits(id) ON DELETE CASCADE,
       point_de_vente_id uuid NOT NULL REFERENCES point_de_vente(id) ON DELETE CASCADE,
       UNIQUE (produit_id, point_de_vente_id)
-    );`
+    );`,
   );
   await query(
     `CREATE TABLE IF NOT EXISTS images (
@@ -36,10 +36,10 @@ export async function ensurePdvSchema() {
       mime text NOT NULL,
       data bytea NOT NULL,
       created_at timestamptz NOT NULL DEFAULT now()
-    );`
+    );`,
   );
   await query(
     `ALTER TABLE ventes
-       ADD COLUMN IF NOT EXISTS point_de_vente_id uuid REFERENCES point_de_vente(id);`
+       ADD COLUMN IF NOT EXISTS point_de_vente_id uuid REFERENCES point_de_vente(id);`,
   );
 }
