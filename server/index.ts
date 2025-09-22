@@ -43,6 +43,11 @@ export function createServer() {
     next();
   });
 
+  // Ensure DB schema
+  (async () => {
+    try { await ensurePdvSchema(); } catch (e) { console.error('Schema init error', e); }
+  })();
+
   // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
