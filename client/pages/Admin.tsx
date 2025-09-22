@@ -118,6 +118,7 @@ export default function Admin() {
                 {editingProduct ? "Éditer" : "Nouveau produit"}
               </h2>
               <ProductForm
+                key={editingProduct ? editingProduct.id : "new"}
                 initial={editingProduct}
                 onDone={() => setEditingProductId(null)}
               />
