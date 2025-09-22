@@ -31,6 +31,14 @@ export async function ensurePdvSchema() {
     );`
   );
   await query(
+    `CREATE TABLE IF NOT EXISTS images (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      mime text NOT NULL,
+      data bytea NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );`
+  );
+  await query(
     `ALTER TABLE ventes
        ADD COLUMN IF NOT EXISTS point_de_vente_id uuid REFERENCES point_de_vente(id);`
   );
