@@ -16,7 +16,6 @@ export async function fetchProduits(
 
     const tryFetch = async (u: string, timeout = 10000) => {
       try {
-        console.log(`Fetching products from: ${u}`);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -30,10 +29,8 @@ export async function fetchProduits(
         });
 
         clearTimeout(timeoutId);
-        console.log(`Response from ${u}:`, response.status, response.statusText);
         return response;
       } catch (error) {
-        console.error(`Fetch failed for ${u}:`, error);
         return null;
       }
     };
@@ -43,20 +40,14 @@ export async function fetchProduits(
 
     // If local fails, try production with longer timeout
     if (!response || !response.ok) {
-      console.log("Local API failed, trying production...");
       response = await tryFetch(abs, 15000);
     }
 
     if (!response || !response.ok) {
-      const errorMsg = response
-        ? `HTTP ${response.status}: ${response.statusText}`
-        : "Network error - unable to connect";
-      console.error("All API endpoints failed:", errorMsg);
-      throw new Error(`Failed to fetch products: ${errorMsg}`);
+      throw new Error("Failed to fetch products");
     }
 
     const data = await response.json();
-    console.log(`Successfully fetched ${data.length} products`);
     return data;
   } catch (error) {
     console.error("Error fetching products:", error);
