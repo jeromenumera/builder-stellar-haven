@@ -30,6 +30,7 @@
     "jspdf-autotable": "^5.0.2",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.16.3",
+    "@neondatabase/serverless": "^0.10.4",
     "zod": "^3.25.76"
   },
   "devDependencies": {
