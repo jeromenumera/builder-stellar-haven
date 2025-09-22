@@ -151,8 +151,7 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Delete in transaction: lignes_ventes -> ventes -> evenements
-    // (point_de_vente will be cascade deleted automatically due to ON DELETE CASCADE)
+    // Delete in transaction: lignes_ventes -> ventes -> point_de_vente -> evenements
     await withTransaction(async (client) => {
       // First delete all lignes_ventes for sales associated with this event
       await client.query(
@@ -162,6 +161,10 @@ export const deleteEvent: RequestHandler = async (req, res) => {
 
       // Then delete all ventes associated with this event
       await client.query(`DELETE FROM ventes WHERE evenement_id=$1`, [id]);
+
+      // Delete point_de_vente records associated with this event
+      // (this prevents the cascade delete from failing due to remaining ventes references)
+      await client.query(`DELETE FROM point_de_vente WHERE evenement_id=$1`, [id]);
 
       // Finally delete the event itself
       await client.query(`DELETE FROM evenements WHERE id=$1`, [id]);
