@@ -21,6 +21,8 @@ import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
 import { getPointsDeVente, createPointDeVente, updatePointDeVente, deletePointDeVente } from "./routes/points_de_vente";
 import { echo } from "./routes/echo";
 
+import { ensurePdvSchema } from "./bootstrap";
+
 export function createServer() {
   const app = express();
 
