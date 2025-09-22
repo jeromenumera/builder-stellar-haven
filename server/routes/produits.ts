@@ -9,13 +9,44 @@ export const getProducts: RequestHandler = async (req, res) => {
     const pdvId =
       q.point_de_vente_id || q.pointOfSaleId || q.point_of_sale_id || null;
 
-    // Admin mode: no PDV filter -> return all active products (optionally could filter by event if schema supports it)
+    // Admin mode: no PDV filter -> return all active products with associated PDV info
     if (!pdvId) {
+      // detect PDV table name (singular/plural)
+      const t = await query(
+        `SELECT to_regclass('public.point_de_vente') AS s, to_regclass('public.points_de_vente') AS p`,
+      );
+      const row = (t.rows && t.rows[0]) || {};
+      const pdvTable = row.s
+        ? "point_de_vente"
+        : row.p
+          ? "points_de_vente"
+          : null;
+      if (!pdvTable)
+        return res
+          .status(500)
+          .json({ error: "PDV table missing (point_de_vente/points_de_vente)" });
+
       const { rows } = await query(
-        `SELECT id, nom, prix_ttc, tva, image_url, sku
-         FROM produits
-         WHERE actif = true
-         ORDER BY nom`,
+        `SELECT
+           p.id, p.nom, p.prix_ttc, p.tva, p.image_url, p.sku,
+           COALESCE(
+             json_agg(
+               DISTINCT jsonb_build_object(
+                 'id', pdv.id,
+                 'nom', pdv.nom,
+                 'evenement_id', pdv.evenement_id,
+                 'actif', pdv.actif
+               )
+               ORDER BY pdv.nom
+             ) FILTER (WHERE pdv.id IS NOT NULL),
+             '[]'
+           ) AS points_de_vente
+         FROM produits p
+         LEFT JOIN produit_point_de_vente ppv ON ppv.produit_id = p.id
+         LEFT JOIN ${pdvTable} pdv ON pdv.id = ppv.point_de_vente_id
+         WHERE p.actif = true
+         GROUP BY p.id, p.nom, p.prix_ttc, p.tva, p.image_url, p.sku
+         ORDER BY p.nom`,
       );
       const products = rows.map(convertProduitFromDb);
       return res.json(products);
