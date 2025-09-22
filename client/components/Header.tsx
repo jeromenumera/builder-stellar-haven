@@ -94,7 +94,7 @@ export function Header() {
           {/* Desktop: Show full status */}
           <div className="hidden sm:flex items-center gap-2">
             {state.selectedEventId ? (
-              <Badge variant="default" className="text-xs font-medium max-w-32 truncate">
+              <Badge variant="default" className="text-xs font-medium truncate max-w-48 md:max-w-64">
                 📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
               </Badge>
             ) : (
