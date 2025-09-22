@@ -117,36 +117,21 @@ export function ProductForm({
 
     const finalUrl = await uploadImageIfNeeded();
 
-    const payload = {
+    const produit = {
       id: initial?.id,
-      name: nom.trim(),
-      priceTTC: Number(prix),
-      taxRate: tvaNumber,
-      imageUrl: finalUrl,
+      nom: nom.trim(),
+      prix_ttc: Number(prix),
+      tva: tvaNumber,
+      image_url: finalUrl,
       sku: sku || null,
-      active: true,
+      actif: true,
+      evenement_id: eventId,
       pointOfSaleIds: Object.keys(checked).filter((k) => checked[k]),
-      eventId,
     };
 
     setSaving(true);
     try {
-      const res = await fetch(
-        "/api/produits" + (initial?.id ? `/${initial.id}` : ""),
-        {
-          method: initial?.id ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok)
-        throw new Error((data as any)?.error || "Échec de l'enregistrement");
-
-      // Reload admin list explicitly to avoid POS filters interfering
-      try {
-        await loadProduitsAdmin?.();
-      } catch {}
+      await saveProduit(produit);
       onDone?.();
       if (!initial?.id) {
         setNom("");
