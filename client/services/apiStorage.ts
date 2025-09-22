@@ -14,20 +14,53 @@ export async function fetchProduits(
     const rel = `/api/produits${qs ? `?${qs}` : ""}`;
     const abs = `https://cash.sosmediterranee.ch${rel}`;
 
-    const tryFetch = async (u: string) => {
+    const tryFetch = async (u: string, timeout = 10000) => {
       try {
-        return await fetch(u, { credentials: "omit" });
-      } catch {
-        return null as any;
+        console.log(`Fetching products from: ${u}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+        const response = await fetch(u, {
+          credentials: "omit",
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        clearTimeout(timeoutId);
+        console.log(`Response from ${u}:`, response.status, response.statusText);
+        return response;
+      } catch (error) {
+        console.error(`Fetch failed for ${u}:`, error);
+        return null;
       }
     };
 
-    let response = await tryFetch(rel);
-    if (!response || !response.ok) response = await tryFetch(abs);
-    if (!response || !response.ok) throw new Error("Failed to fetch products");
-    return await response.json();
+    // Try local first with shorter timeout
+    let response = await tryFetch(rel, 5000);
+
+    // If local fails, try production with longer timeout
+    if (!response || !response.ok) {
+      console.log("Local API failed, trying production...");
+      response = await tryFetch(abs, 15000);
+    }
+
+    if (!response || !response.ok) {
+      const errorMsg = response
+        ? `HTTP ${response.status}: ${response.statusText}`
+        : "Network error - unable to connect";
+      console.error("All API endpoints failed:", errorMsg);
+      throw new Error(`Failed to fetch products: ${errorMsg}`);
+    }
+
+    const data = await response.json();
+    console.log(`Successfully fetched ${data.length} products`);
+    return data;
   } catch (error) {
     console.error("Error fetching products:", error);
+    // Return empty array to prevent UI crashes, but log the error
     return [];
   }
 }
