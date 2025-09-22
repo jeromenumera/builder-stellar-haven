@@ -10,7 +10,7 @@ import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
 
 export default function Admin() {
-  const { state, deleteProduit, deleteEvenement, deletePointDeVente, selectEvent } = usePos();
+  const { state, deleteProduit, deleteEvenement, deletePointDeVente, selectEvent, loadProduitsAdmin } = usePos();
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [editingPointId, setEditingPointId] = useState<string | null>(null);
