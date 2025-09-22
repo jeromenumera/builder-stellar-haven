@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback, memo } from "react";
 import { usePos } from "@/context/PosStore";
 import { Card } from "@/components/ui/card";
 import {
@@ -18,29 +18,119 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { computeTotals } from "@shared/api";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, RefreshCw } from "lucide-react";
+import { computeTotals, Vente } from "@shared/api";
 
-export default function Historique() {
-  const { state, deleteVente, updateVente } = usePos();
+// Memoized row component for better performance
+const VenteRow = memo(({
+  vente,
+  produits,
+  onEdit,
+  onDelete,
+  isDeleting
+}: {
+  vente: Vente;
+  produits: any[];
+  onEdit: (v: any) => void;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+}) => (
+  <TableRow>
+    <TableCell className="font-mono text-sm">
+      {new Date(vente.horodatage).toLocaleTimeString('fr-FR')}
+    </TableCell>
+    <TableCell className="font-semibold text-green-600">
+      {vente.total_ttc.toFixed(2)} CHF
+    </TableCell>
+    <TableCell>
+      <Badge variant={vente.mode_paiement === 'carte' ? 'default' : 'secondary'}>
+        {vente.mode_paiement === 'carte' ? '💳 Carte' : '💰 Espèces'}
+      </Badge>
+    </TableCell>
+    <TableCell>
+      <ul className="text-sm space-y-1">
+        {vente.lignes.map((l) => (
+          <li key={l.id} className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              {l.quantite}×
+            </Badge>
+            <span>{produits.find((p) => p.id === l.produit_id)?.nom || l.produit_id}</span>
+          </li>
+        ))}
+      </ul>
+    </TableCell>
+    <TableCell className="text-right">
+      <div className="flex gap-2 justify-end">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => onEdit(vente)}
+          disabled={isDeleting}
+        >
+          Modifier
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => onDelete(vente.id)}
+          disabled={isDeleting}
+        >
+          {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Supprimer"}
+        </Button>
+      </div>
+    </TableCell>
+  </TableRow>
+));
+
+VenteRow.displayName = 'VenteRow';
+
+function Historique() {
+  const { state, deleteVente, updateVente, refreshData } = usePos();
   const [editing, setEditing] = useState<null | string>(null);
   const [draft, setDraft] = useState<any>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const ventes = useMemo(() => {
-    if (!state.selectedEventId) return [];
+  // Optimized filtering with early returns
+  const { ventes, totalCount, filteredCount } = useMemo(() => {
+    const allVentes = state.ventes || [];
+    let filtered = allVentes;
 
-    return state.ventes.filter((v) => {
-      const matchEvent = v.evenement_id === state.selectedEventId;
-      const matchPdv = state.selectedPointDeVenteId
-        ? v.point_de_vente_id === state.selectedPointDeVenteId
-        : true; // Si aucun PDV sélectionné, afficher toutes les ventes de l'événement
+    // Filter by event first (most selective)
+    if (state.selectedEventId) {
+      filtered = filtered.filter(v => v.evenement_id === state.selectedEventId);
+    }
 
-      return matchEvent && matchPdv;
-    });
+    // Then filter by POS if selected
+    if (state.selectedPointDeVenteId) {
+      filtered = filtered.filter(v => v.point_de_vente_id === state.selectedPointDeVenteId);
+    }
+
+    // Sort by most recent first
+    filtered.sort((a, b) => new Date(b.horodatage).getTime() - new Date(a.horodatage).getTime());
+
+    return {
+      ventes: filtered,
+      totalCount: allVentes.length,
+      filteredCount: filtered.length
+    };
   }, [state.ventes, state.selectedEventId, state.selectedPointDeVenteId]);
 
-  const onDelete = async (id: string) => {
+  // Optimized callbacks
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshData();
+    } catch (error) {
+      console.error('Erreur lors du rafraîchissement:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [refreshData]);
+
+  const onDelete = useCallback(async (id: string) => {
     if (
       !confirm(
         "Confirmer la suppression de cette vente ? Cette action est irréversible.",
@@ -55,12 +145,12 @@ export default function Historique() {
     } finally {
       setDeleting(null);
     }
-  };
+  }, [deleteVente]);
 
-  const openEdit = (v: any) => {
+  const openEdit = useCallback((v: any) => {
     setDraft(JSON.parse(JSON.stringify(v)));
     setEditing(v.id);
-  };
+  }, []);
 
   const saveEdit = async () => {
     setSaving(true);
@@ -86,71 +176,95 @@ export default function Historique() {
   return (
     <div className="container mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Historique des ventes</h1>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold">Historique des ventes</h1>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>{filteredCount} vente{filteredCount !== 1 ? 's' : ''} affichée{filteredCount !== 1 ? 's' : ''}</span>
+            {filteredCount !== totalCount && (
+              <span>({totalCount} au total)</span>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-8 px-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="ml-1">Actualiser</span>
+            </Button>
+          </div>
+        </div>
         <ExportActions />
       </div>
-      <Card className="p-0 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Heure</TableHead>
-              <TableHead>Total TTC</TableHead>
-              <TableHead>Mode</TableHead>
-              <TableHead>Produits</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {ventes.map((v) => (
-              <TableRow key={v.id}>
-                <TableCell>
-                  {new Date(v.horodatage).toLocaleTimeString()}
-                </TableCell>
-                <TableCell className="font-semibold text-green-300">
-                  {v.total_ttc.toFixed(2)} CHF
-                </TableCell>
-                <TableCell className="capitalize">{v.mode_paiement}</TableCell>
-                <TableCell>
-                  <ul className="text-sm">
-                    {v.lignes.map((l) => (
-                      <li key={l.id}>
-                        {l.quantite} ×{" "}
-                        {state.produits.find((p) => p.id === l.produit_id)
-                          ?.nom || l.produit_id}
-                      </li>
-                    ))}
-                  </ul>
-                </TableCell>
-                <TableCell className="flex gap-2 justify-end">
-                  <Button
-                    variant="secondary"
-                    onClick={() => openEdit(v)}
-                    disabled={deleting === v.id}
-                  >
-                    Modifier
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => onDelete(v.id)}
-                    disabled={deleting === v.id}
-                  >
-                    {deleting === v.id ? "..." : "Supprimer"}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {ventes.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center text-muted-foreground py-10"
-                >
-                  Aucun enregistrement pour l'événement sélectionné
-                </TableCell>
-              </TableRow>
+
+      {/* Filter Status */}
+      {(state.selectedEventId || state.selectedPointDeVenteId) && (
+        <Card className="p-4">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Filtres actifs:</span>
+            {state.selectedEventId && (
+              <Badge variant="default">
+                📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+              </Badge>
             )}
-          </TableBody>
-        </Table>
+            {state.selectedPointDeVenteId && (
+              <Badge variant="secondary">
+                🏪 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
+              </Badge>
+            )}
+          </div>
+        </Card>
+      )}
+
+      <Card className="p-0 overflow-hidden">
+        {state.loading.ventes ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" />
+            <span>Chargement de l'historique...</span>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-32">Heure</TableHead>
+                <TableHead className="w-32">Total TTC</TableHead>
+                <TableHead className="w-28">Mode</TableHead>
+                <TableHead>Produits</TableHead>
+                <TableHead className="w-48 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {ventes.map((v) => (
+                <VenteRow
+                  key={v.id}
+                  vente={v}
+                  produits={state.produits}
+                  onEdit={openEdit}
+                  onDelete={onDelete}
+                  isDeleting={deleting === v.id}
+                />
+              ))}
+              {ventes.length === 0 && !state.loading.ventes && (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground py-12"
+                  >
+                    <div className="space-y-2">
+                      <div className="text-lg">📊 Aucune vente trouvée</div>
+                      <div className="text-sm">
+                        {!state.selectedEventId
+                          ? "Sélectionnez un événement pour voir l'historique"
+                          : "Aucune vente enregistrée pour les filtres sélectionnés"}
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
 
       <Dialog open={!!editing} onOpenChange={() => setEditing(null)}>
