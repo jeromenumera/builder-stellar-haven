@@ -4,9 +4,21 @@ import { convertVenteFromDb } from "../services/converters";
 
 export const getSales: RequestHandler = async (req, res) => {
   try {
-    const { evenement_id } = req.query as { evenement_id?: string };
-    const where = evenement_id ? 'WHERE v.evenement_id = $1' : '';
-    const params: any[] = evenement_id ? [evenement_id] : [];
+    const { evenement_id, point_de_vente_id } = req.query as {
+      evenement_id?: string;
+      point_de_vente_id?: string;
+    };
+    const clauses: string[] = [];
+    const params: any[] = [];
+    if (evenement_id) {
+      params.push(evenement_id);
+      clauses.push(`v.evenement_id = $${params.length}`);
+    }
+    if (point_de_vente_id) {
+      params.push(point_de_vente_id);
+      clauses.push(`v.point_de_vente_id = $${params.length}`);
+    }
+    const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
     const { rows } = await query(
       `SELECT v.*, COALESCE(json_agg(l.*) FILTER (WHERE l.id IS NOT NULL), '[]') AS lignes
        FROM ventes v
@@ -72,6 +84,7 @@ export const createSale: RequestHandler = async (req, res) => {
     let body: any = normalize(req.body);
     // Accept snake_case and camelCase
     const evenement_id = body?.evenement_id ?? body?.eventId ?? body?.event_id;
+    const point_de_vente_id = body?.point_de_vente_id ?? body?.pointOfSaleId ?? body?.point_of_sale_id ?? null;
     let mode_paiement: any =
       body?.mode_paiement ?? body?.paymentMethod ?? body?.modePaiement;
     if (mode_paiement === "card") mode_paiement = "carte";
@@ -165,9 +178,9 @@ export const createSale: RequestHandler = async (req, res) => {
 
     const vente = await withTransaction(async (client) => {
       const inserted = await client.query(
-        `INSERT INTO ventes (evenement_id, mode_paiement, total_ttc, total_ht, tva_totale)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [evenement_id, mode_paiement, total_ttc, total_ht, tva_totale]
+        `INSERT INTO ventes (evenement_id, point_de_vente_id, mode_paiement, total_ttc, total_ht, tva_totale)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+        [evenement_id, point_de_vente_id, mode_paiement, total_ttc, total_ht, tva_totale]
       );
       const vd = inserted.rows[0];
 
@@ -243,6 +256,7 @@ export const updateSale: RequestHandler = async (req, res) => {
       return b || {};
     };
     let body: any = normalize(req.body);
+    const point_de_vente_id = body?.point_de_vente_id ?? body?.pointOfSaleId ?? body?.point_of_sale_id ?? null;
     const mode_paiement = body?.mode_paiement ?? body?.paymentMethod ?? body?.modePaiement;
     const lignes = body?.lignes ?? body?.lines ?? [];
 
@@ -269,8 +283,8 @@ export const updateSale: RequestHandler = async (req, res) => {
 
     const vente = await withTransaction(async (client) => {
       const updated = await client.query(
-        `UPDATE ventes SET mode_paiement=$2, total_ttc=$3, total_ht=$4, tva_totale=$5 WHERE id=$1 RETURNING *`,
-        [id, mode_paiement, total_ttc, total_ht, tva_totale]
+        `UPDATE ventes SET point_de_vente_id=$2, mode_paiement=$3, total_ttc=$4, total_ht=$5, tva_totale=$6 WHERE id=$1 RETURNING *`,
+        [id, point_de_vente_id, mode_paiement, total_ttc, total_ht, tva_totale]
       );
       await client.query(`DELETE FROM lignes_ventes WHERE vente_id=$1`, [id]);
 
