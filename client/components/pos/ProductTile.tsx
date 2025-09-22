@@ -79,7 +79,11 @@ export function ProductTile({
             src={imgSrc}
             alt={produit.nom}
             className="w-full h-full object-cover rounded-lg bg-center"
+            onLoad={() => {
+              console.log(`✅ Image loaded successfully: ${imgSrc}`);
+            }}
             onError={(e) => {
+              console.error(`❌ Image failed to load: ${imgSrc}`);
               (e.currentTarget as HTMLImageElement).src = placeholderSvg;
             }}
           />

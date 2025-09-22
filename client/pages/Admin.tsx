@@ -108,6 +108,13 @@ export default function Admin() {
                           src={thumb}
                           alt={p.nom}
                           className="h-10 w-10 object-cover rounded bg-muted"
+                          onLoad={() => {
+                            console.log(`✅ Admin image loaded: ${thumb}`);
+                          }}
+                          onError={(e) => {
+                            console.error(`❌ Admin image failed: ${thumb}`);
+                            (e.currentTarget as HTMLImageElement).src = placeholderSvg;
+                          }}
                         />
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
