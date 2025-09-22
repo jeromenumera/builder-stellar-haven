@@ -130,8 +130,7 @@ export function ProductForm({
       if (!res.ok) throw new Error((data as any)?.error || "Échec de l'enregistrement");
 
       // Reload admin list explicitly to avoid POS filters interfering
-      try { (usePos() as any).loadProduitsAdmin?.(); } catch {}
-      await refreshData();
+      try { await loadProduitsAdmin?.(); } catch {}
       onDone?.();
       if (!initial?.id) {
         setNom("");
