@@ -60,17 +60,16 @@ export const createPointDeVente: RequestHandler = async (req, res) => {
     const body: any = normalize(req.body);
     const evenement_id = body?.evenement_id ?? body?.eventId;
     const nom = body?.nom ?? body?.name;
-    const type = body?.type ?? "autre";
     const actif = typeof body?.actif === "boolean" ? body.actif : true;
 
-    if (!evenement_id || !nom || !type) {
-      return res.status(400).json({ error: "Missing required fields: evenement_id, nom, type" });
+    if (!evenement_id || !nom) {
+      return res.status(400).json({ error: "Missing required fields: evenement_id, nom" });
     }
 
     const { rows } = await query(
-      `INSERT INTO point_de_vente (evenement_id, nom, type, actif)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [evenement_id, nom, type, actif]
+      `INSERT INTO point_de_vente (evenement_id, nom, actif)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [evenement_id, nom, actif]
     );
     return res.json(rows[0]);
   } catch (error: any) {
