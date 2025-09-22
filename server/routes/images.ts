@@ -11,11 +11,18 @@ export const uploadImage: RequestHandler = (req, res, next) => {
   // Use multer to parse a single file field named "file"
   (upload.single("file") as any)(req, res, async (err: any) => {
     if (err) {
+      console.error("Multer upload error:", err);
       return res.status(400).json({ error: err.message || "Upload error" });
     }
     try {
       const f = (req as any).file as Express.Multer.File | undefined;
-      if (!f) return res.status(400).json({ error: "Missing file" });
+      if (!f) {
+        console.error("No file provided in upload request");
+        return res.status(400).json({ error: "Missing file" });
+      }
+
+      console.log(`Uploading image: ${f.originalname}, size: ${f.size}, mime: ${f.mimetype}`);
+
       const mime = f.mimetype || "application/octet-stream";
       const data = f.buffer; // Buffer
       const { rows } = await query(
@@ -23,6 +30,8 @@ export const uploadImage: RequestHandler = (req, res, next) => {
         [mime, data],
       );
       const id = rows[0]?.id;
+
+      console.log(`Image uploaded successfully with ID: ${id}`);
       return res.json({ id, url: `/api/image/${id}` });
     } catch (e: any) {
       console.error("uploadImage error", e);
