@@ -19,6 +19,7 @@ const queryClient = new QueryClient();
 const AppShell = () => (
   <PosProvider>
     <Header />
+    <InitialSelectionDialog />
     <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0">
       <Routes>
         <Route path="/" element={<Navigate to="/vente" replace />} />
