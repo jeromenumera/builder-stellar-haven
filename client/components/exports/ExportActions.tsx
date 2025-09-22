@@ -7,12 +7,13 @@ export function ExportActions() {
   const { state } = usePos();
   const produitsById = Object.fromEntries(state.produits.map((p) => [p.id, p] as const));
   const evenementsById = Object.fromEntries(state.evenements.map((e) => [e.id, e] as const));
+  const pointsById = Object.fromEntries(state.pointsDeVente.map((p) => [p.id, p] as const));
 
-  const ventesForEvent = state.selectedEventId
-    ? state.ventes.filter((v) => v.evenement_id === state.selectedEventId)
+  const ventesForScope = state.selectedEventId
+    ? state.ventes.filter((v) => v.evenement_id === state.selectedEventId && (!state.selectedPointDeVenteId || v.point_de_vente_id === state.selectedPointDeVenteId))
     : [];
 
-  const disabled = ventesForEvent.length === 0 || !state.selectedEventId;
+  const disabled = ventesForScope.length === 0 || !state.selectedEventId;
 
   return (
     <div className="flex gap-2">
