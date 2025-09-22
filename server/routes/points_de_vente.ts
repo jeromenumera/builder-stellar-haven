@@ -39,6 +39,8 @@ export const getPointsDeVente: RequestHandler = async (req, res) => {
   try {
     const { evenement_id } = req.query as { evenement_id?: string };
     if (evenement_id) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evenement_id);
+      if (!isUuid) return res.json([]);
       const { rows } = await query(
         `SELECT * FROM point_de_vente WHERE actif = true AND evenement_id = $1 ORDER BY nom`,
         [evenement_id]
