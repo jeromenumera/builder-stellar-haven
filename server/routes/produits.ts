@@ -14,11 +14,17 @@ export const getProducts: RequestHandler = async (req, res) => {
       where += " AND pdv.evenement_id = $2";
       params.push(eventId);
     }
+    // detect PDV table name (singular/plural)
+    const t = await query(`SELECT to_regclass('public.point_de_vente') AS s, to_regclass('public.points_de_vente') AS p`);
+    const row = (t.rows && t.rows[0]) || {};
+    const pdvTable = row.s ? 'point_de_vente' : (row.p ? 'points_de_vente' : null);
+    if (!pdvTable) return res.status(500).json({ error: "PDV table missing (point_de_vente/points_de_vente)" });
+
     const { rows } = await query(
       `SELECT p.id, p.nom, p.prix_ttc, p.tva, p.image_url, p.sku
        FROM produits p
        JOIN produit_point_de_vente ppv ON ppv.produit_id = p.id
-       JOIN point_de_vente pdv ON pdv.id = ppv.point_de_vente_id
+       JOIN ${pdvTable} pdv ON pdv.id = ppv.point_de_vente_id
        WHERE ${where}
        ORDER BY p.nom`,
       params
