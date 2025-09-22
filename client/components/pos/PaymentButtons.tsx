@@ -23,6 +23,7 @@ export function PaymentButtons() {
   const disabled =
     Object.keys(state.cart).length === 0 ||
     !state.selectedEventId ||
+    !state.selectedPointDeVenteId ||
     processing;
 
   return (
