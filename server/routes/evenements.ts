@@ -151,22 +151,26 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Delete in transaction: lignes_ventes -> ventes -> point_de_vente -> evenements
+    // Delete in transaction with proper constraint handling
     await withTransaction(async (client) => {
-      // First delete all lignes_ventes for sales associated with this event
+      // First, set point_de_vente_id to NULL in all ventes for this event's PDVs
+      // This prevents foreign key constraint violations when deleting point_de_vente
+      await client.query(
+        `UPDATE ventes SET point_de_vente_id = NULL
+         WHERE point_de_vente_id IN (SELECT id FROM point_de_vente WHERE evenement_id=$1)`,
+        [id]
+      );
+
+      // Delete all lignes_ventes for sales associated with this event
       await client.query(
         `DELETE FROM lignes_ventes WHERE vente_id IN (SELECT id FROM ventes WHERE evenement_id=$1)`,
         [id]
       );
 
-      // Then delete all ventes associated with this event
+      // Delete all ventes associated with this event
       await client.query(`DELETE FROM ventes WHERE evenement_id=$1`, [id]);
 
-      // Delete point_de_vente records associated with this event
-      // (this prevents the cascade delete from failing due to remaining ventes references)
-      await client.query(`DELETE FROM point_de_vente WHERE evenement_id=$1`, [id]);
-
-      // Finally delete the event itself
+      // Now we can safely delete the event (point_de_vente will cascade delete automatically)
       await client.query(`DELETE FROM evenements WHERE id=$1`, [id]);
     });
 
