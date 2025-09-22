@@ -16,7 +16,7 @@ export function ProductForm({
   onDone?: () => void;
 }) {
   const { saveProduit, state } = usePos();
-  const [form, setForm] = useState<Produit>(
+  const [form, setForm] = useState<Produit & { pointOfSaleIds?: string[] }>(
     initial ?? {
       id: uid("prod"),
       nom: "",
@@ -39,7 +39,7 @@ export function ProductForm({
     setSaving(true);
     try {
       // enforce TVA fixed at 8.1
-      await saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: 8.1 });
+      await saveProduit({ ...form, prix_ttc: Number(form.prix_ttc), tva: 8.1, pointOfSaleIds: form.pointOfSaleIds || [] });
       onDone?.();
     } catch (error) {
       console.error("Failed to save product:", error);
@@ -109,6 +109,33 @@ export function ProductForm({
             value={form.sku || ""}
             onChange={(e) => setForm({ ...form, sku: e.target.value })}
           />
+        </div>
+
+        <div className="md:col-span-2">
+          <Label>Attribution aux points de vente</Label>
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            {state.pointsDeVente.map((pdv) => {
+              const checked = (form.pointOfSaleIds || []).includes(pdv.id);
+              return (
+                <label key={pdv.id} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      const prev = new Set(form.pointOfSaleIds || []);
+                      if (e.target.checked) prev.add(pdv.id);
+                      else prev.delete(pdv.id);
+                      setForm({ ...form, pointOfSaleIds: Array.from(prev) });
+                    }}
+                  />
+                  {pdv.nom}
+                </label>
+              );
+            })}
+            {state.pointsDeVente.length === 0 && (
+              <div className="text-sm text-muted-foreground">Aucun point de vente</div>
+            )}
+          </div>
         </div>
 
         <div className="md:col-span-2">
