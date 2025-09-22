@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePos } from "@/context/PosStore";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export function InitialSelectionDialog() {
@@ -31,6 +31,9 @@ export function InitialSelectionDialog() {
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
           <DialogTitle>Sélectionner l'événement et le point de vente</DialogTitle>
+          <DialogDescription>
+            Choisis d'abord l'événement, puis le point de vente. Cette sélection est obligatoire pour continuer.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
