@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,7 +30,7 @@ export function PointDeVenteForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.nom || !form.type || !form.evenement_id) return;
+    if (!form.nom || !form.evenement_id) return;
     setSaving(true);
     try {
       await savePointDeVente({
