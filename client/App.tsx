@@ -12,6 +12,7 @@ import Historique from "./pages/Historique";
 import Admin from "./pages/Admin";
 import { PosProvider } from "@/context/PosStore";
 import { Header } from "@/components/Header";
+import { MobileNav } from "@/components/MobileNav";
 
 const queryClient = new QueryClient();
 
