@@ -40,8 +40,16 @@ export async function saveProduit(
     const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
     const method = isNew ? "POST" : "PUT";
 
-    // Remove client-generated ID for new records
-    const payload = isNew ? { ...produit, id: undefined } : produit;
+    // Prepare payload with proper field mapping for the API
+    const payload = {
+      id: isNew ? undefined : produit.id,
+      nom: produit.nom,
+      prix_ttc: produit.prix_ttc,
+      tva: produit.tva,
+      image_url: produit.image_url,
+      sku: produit.sku,
+      pointOfSaleIds: produit.pointOfSaleIds || [],
+    };
 
     const response = await fetch(url, {
       method,
