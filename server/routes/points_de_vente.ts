@@ -82,20 +82,19 @@ export const updatePointDeVente: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const body: any = normalize(req.body);
-    const evenement_id = body?.evenement_id ?? body?.eventId ?? null;
-    const nom = body?.nom ?? body?.name ?? null;
-    const type = body?.type ?? null;
-    const actif = typeof body?.actif === "boolean" ? body.actif : null;
+  const evenement_id = body?.evenement_id ?? body?.eventId ?? null;
+  const nom = body?.nom ?? body?.name ?? null;
+  const actif = typeof body?.actif === "boolean" ? body.actif : null;
 
-    const { rows } = await query(
+  const { rows } = await query(
       `UPDATE point_de_vente
          SET evenement_id = COALESCE($2, evenement_id),
              nom = COALESCE($3, nom),
-             type = COALESCE($4, type),
-             actif = COALESCE($5, actif)
+             actif = COALESCE($4, actif),
+             updated_at = now()
        WHERE id = $1
        RETURNING *`,
-      [id, evenement_id, nom, type, actif]
+      [id, evenement_id, nom, actif]
     );
     return res.json(rows[0]);
   } catch (error: any) {
