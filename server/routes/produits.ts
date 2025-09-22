@@ -7,7 +7,19 @@ export const getProducts: RequestHandler = async (req, res) => {
     const q: any = req.query || {};
     const eventId = q.evenement_id || q.eventId || q.event_id || null;
     const pdvId = q.point_de_vente_id || q.pointOfSaleId || q.point_of_sale_id || null;
-    if (!pdvId) return res.json([]);
+
+    // Admin mode: no PDV filter -> return all active products (optionally could filter by event if schema supports it)
+    if (!pdvId) {
+      const { rows } = await query(
+        `SELECT id, nom, prix_ttc, tva, image_url, sku
+         FROM produits
+         WHERE actif = true
+         ORDER BY nom`
+      );
+      const products = rows.map(convertProduitFromDb);
+      return res.json(products);
+    }
+
     const params: any[] = [pdvId];
     let where = "ppv.point_de_vente_id = $1 AND p.actif = true";
     if (eventId) {
