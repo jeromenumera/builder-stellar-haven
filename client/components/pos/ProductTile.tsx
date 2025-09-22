@@ -59,72 +59,54 @@ export function ProductTile({
           (target as any)._lp = null;
         }
       }}
-      className="relative overflow-hidden select-none transition-transform touch-manipulation rounded-[14px] border border-[#2A2A2A] cursor-pointer"
+      className="relative overflow-hidden select-none transition-all duration-200 touch-manipulation rounded-xl border border-border/50 cursor-pointer hover:border-border active:scale-95 group"
       style={{
-        minHeight: 140,
+        minHeight: 'clamp(120px, 15vh, 160px)',
         background:
-          "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12))",
-        backgroundColor: "rgba(44,44,46,0.8)",
-        boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
-        WebkitBackdropFilter: "blur(6px)",
-        backdropFilter: "blur(6px)",
-        transition: "transform 120ms ease, background-color 120ms ease",
-      }}
-      onMouseDown={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#3A3A3C";
-        (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
-      }}
-      onMouseUp={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor =
-          "rgba(44,44,46,0.8)";
-        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor =
-          "rgba(44,44,46,0.8)";
-        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
-      }}
-      onTouchStart={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "#3A3A3C";
-        (e.currentTarget as HTMLDivElement).style.transform = "scale(0.98)";
-      }}
-      onTouchEnd={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor =
-          "rgba(44,44,46,0.8)";
-        (e.currentTarget as HTMLDivElement).style.transform = "scale(1)";
+          "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0,0,0,0.05))",
+        backgroundColor: "hsl(var(--card))",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+        WebkitBackdropFilter: "blur(8px)",
+        backdropFilter: "blur(8px)",
       }}
     >
-      <div className="flex items-center h-full px-3 py-3">
-        <div className="flex-shrink-0 mr-4 w-20 h-20 flex items-center justify-center">
+      <div className="flex flex-col h-full p-3 sm:p-4">
+        {/* Image Section */}
+        <div className="flex-shrink-0 mb-3 w-full aspect-square max-h-20 sm:max-h-24 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imgSrc}
             alt={produit.nom}
-            className="h-20 w-20 object-cover rounded-[10px] bg-center"
+            className="w-full h-full object-cover rounded-lg bg-center"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = placeholderSvg;
             }}
           />
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="text-[18px] font-bold text-white leading-tight line-clamp-2">
+        {/* Content Section */}
+        <div className="flex-1 flex flex-col justify-between min-h-0">
+          <div className="text-sm sm:text-base font-semibold text-foreground leading-tight line-clamp-2 mb-2">
             {produit.nom}
           </div>
-          <div className={(isNegative ? "text-amber-400" : "text-[#34C759]") + " text-[16px] font-semibold mt-1"}>
+          <div className={(isNegative ? "text-amber-500" : "text-green-600") + " text-sm sm:text-base font-bold"}>
             {produit.prix_ttc.toFixed(2)} CHF
           </div>
         </div>
 
+        {/* Quantity Badge */}
         {qty > 0 && (
-          <div className="absolute top-3 right-3">
-            <div className="bg-primary text-primary-foreground rounded-full px-3 py-1 font-bold text-sm">
+          <div className="absolute top-2 right-2">
+            <div className="bg-primary text-primary-foreground rounded-full px-2 py-1 font-bold text-xs sm:text-sm min-w-[1.5rem] text-center">
               {qty}
             </div>
           </div>
         )}
 
-        {/* Long press to decrement quantity */}
+        {/* Touch indicator for mobile */}
+        <div className="absolute bottom-1 right-1 opacity-30 group-active:opacity-60 transition-opacity">
+          <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+        </div>
       </div>
     </Card>
   );
