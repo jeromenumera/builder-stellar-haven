@@ -99,7 +99,7 @@ export default function Vente() {
                   <div className="space-y-4 px-1">
                     {/* Positive products */}
                     {positiveProducts.length > 0 && (
-                      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                         {positiveProducts.map((p) => (
                           <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
                         ))}
@@ -112,7 +112,7 @@ export default function Vente() {
                         <p className="text-sm font-semibold text-amber-400 border-b border-amber-400/30 pb-2">
                           Retour (Consignes)
                         </p>
-                        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                           {negativeProducts.map((p) => (
                             <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
                           ))}

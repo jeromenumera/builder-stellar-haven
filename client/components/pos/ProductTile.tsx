@@ -61,7 +61,8 @@ export function ProductTile({
       }}
       className="relative overflow-hidden select-none transition-all duration-200 touch-manipulation rounded-xl border border-border/50 cursor-pointer hover:border-border active:scale-95 group"
       style={{
-        minHeight: 'clamp(120px, 15vh, 160px)',
+        minHeight: '100px',
+        height: '100px',
         background:
           "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0,0,0,0.05))",
         backgroundColor: "hsl(var(--card))",
@@ -70,9 +71,9 @@ export function ProductTile({
         backdropFilter: "blur(8px)",
       }}
     >
-      <div className="flex flex-col h-full p-3 sm:p-4">
-        {/* Image Section */}
-        <div className="flex-shrink-0 mb-3 w-full aspect-square max-h-20 sm:max-h-24 flex items-center justify-center">
+      <div className="flex items-center h-full p-3">
+        {/* Image Section - Fixed size on left */}
+        <div className="flex-shrink-0 mr-3 w-16 h-16 flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imgSrc}
@@ -84,12 +85,12 @@ export function ProductTile({
           />
         </div>
 
-        {/* Content Section */}
-        <div className="flex-1 flex flex-col justify-between min-h-0">
-          <div className="text-sm sm:text-base font-semibold text-foreground leading-tight line-clamp-2 mb-2">
+        {/* Content Section - Flexible width */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <div className="text-sm font-semibold text-foreground leading-tight line-clamp-2 mb-1">
             {produit.nom}
           </div>
-          <div className={(isNegative ? "text-amber-500" : "text-green-600") + " text-sm sm:text-base font-bold"}>
+          <div className={(isNegative ? "text-amber-500" : "text-green-600") + " text-sm font-bold"}>
             {produit.prix_ttc.toFixed(2)} CHF
           </div>
         </div>
@@ -97,16 +98,11 @@ export function ProductTile({
         {/* Quantity Badge */}
         {qty > 0 && (
           <div className="absolute top-2 right-2">
-            <div className="bg-primary text-primary-foreground rounded-full px-2 py-1 font-bold text-xs sm:text-sm min-w-[1.5rem] text-center">
+            <div className="bg-primary text-primary-foreground rounded-full px-2 py-1 font-bold text-xs min-w-[1.5rem] text-center">
               {qty}
             </div>
           </div>
         )}
-
-        {/* Touch indicator for mobile */}
-        <div className="absolute bottom-1 right-1 opacity-30 group-active:opacity-60 transition-opacity">
-          <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
-        </div>
       </div>
     </Card>
   );
