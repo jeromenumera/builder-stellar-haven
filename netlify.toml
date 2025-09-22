@@ -11,6 +11,9 @@
 [functions]
   node_bundler = "esbuild"
 
+[functions.api]
+  included_files = ["dist/server/**"]
+
 [[redirects]]
   from = "/api/*"
   status = 200
