@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { RequestHandler } from "express";
 import { query } from "../services/db";
 
 function normalize(input: any) {
