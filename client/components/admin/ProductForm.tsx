@@ -53,8 +53,8 @@ export function ProductForm({
     setErr(null);
   }, [initial]);
 
-  function togglePdv(id: string) {
-    setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+  function setPDV(id: string, v: boolean | "indeterminate") {
+    setChecked((prev) => ({ ...prev, [id]: v === true }));
   }
 
   async function onFileChange(f?: File) {
@@ -173,7 +173,7 @@ export function ProductForm({
         <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
           {pdvList.map((p) => (
             <label key={p.id} className="flex items-center gap-2">
-              <Checkbox checked={!!checked[p.id]} onCheckedChange={() => togglePdv(p.id)} />
+              <Checkbox checked={!!checked[p.id]} onCheckedChange={(v) => setPDV(p.id, v as any)} />
               <span>{p.nom}</span>
             </label>
           ))}
