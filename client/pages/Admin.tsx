@@ -83,7 +83,18 @@ export default function Admin() {
         <TabsContent value="produits" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
-              <h2 className="text-xl font-semibold mb-2">Liste (max 20)</h2>
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-xl font-semibold">Liste (max 20)</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => loadProduitsAdmin()}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Rafraîchir
+                </Button>
+              </div>
               <Card className="p-2">
                 <ul className="divide-y">
                   {state.produits.map((p) => {
