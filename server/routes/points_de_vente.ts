@@ -36,20 +36,31 @@ function normalize(input: any) {
   return b || {};
 }
 
+let PDV_TABLE: string | null = null;
+async function getPdvTable(): Promise<string> {
+  if (PDV_TABLE) return PDV_TABLE;
+  const r = await query(`SELECT to_regclass('public.point_de_vente') AS s, to_regclass('public.points_de_vente') AS p`);
+  const row = (r.rows && r.rows[0]) || {};
+  PDV_TABLE = row.s ? 'point_de_vente' : (row.p ? 'points_de_vente' : null);
+  if (!PDV_TABLE) throw new Error("No PDV table found: expected point_de_vente or points_de_vente");
+  return PDV_TABLE;
+}
+
 export const getPointsDeVente: RequestHandler = async (req, res) => {
   try {
+    const table = await getPdvTable();
     const { evenement_id } = req.query as { evenement_id?: string };
     if (evenement_id) {
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(evenement_id);
       if (!isUuid) return res.json([]);
       const { rows } = await query(
-        `SELECT * FROM point_de_vente WHERE actif = true AND evenement_id = $1 ORDER BY nom`,
+        `SELECT * FROM ${table} WHERE actif = true AND evenement_id = $1 ORDER BY nom`,
         [evenement_id]
       );
       return res.json(rows);
     }
     const { rows } = await query(
-      `SELECT * FROM point_de_vente WHERE actif = true ORDER BY nom`
+      `SELECT * FROM ${table} WHERE actif = true ORDER BY nom`
     );
     return res.json(rows);
   } catch (error: any) {
@@ -69,8 +80,9 @@ export const createPointDeVente: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields: evenement_id, nom" });
     }
 
+    const table = await getPdvTable();
     const { rows } = await query(
-      `INSERT INTO point_de_vente (evenement_id, nom, actif)
+      `INSERT INTO ${table} (evenement_id, nom, actif)
        VALUES ($1, $2, $3) RETURNING *`,
       [evenement_id, nom, actif]
     );
@@ -89,8 +101,9 @@ export const updatePointDeVente: RequestHandler = async (req, res) => {
   const nom = body?.nom ?? body?.name ?? null;
   const actif = typeof body?.actif === "boolean" ? body.actif : null;
 
+  const table = await getPdvTable();
   const { rows } = await query(
-      `UPDATE point_de_vente
+      `UPDATE ${table}
          SET evenement_id = COALESCE($2, evenement_id),
              nom = COALESCE($3, nom),
              actif = COALESCE($4, actif),
@@ -109,7 +122,8 @@ export const updatePointDeVente: RequestHandler = async (req, res) => {
 export const deletePointDeVente: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    await query(`UPDATE point_de_vente SET actif=false WHERE id=$1`, [id]);
+    const table = await getPdvTable();
+    await query(`UPDATE ${table} SET actif=false WHERE id=$1`, [id]);
     return res.json({ success: true });
   } catch (error: any) {
     console.error("Error deleting point_de_vente:", error);
