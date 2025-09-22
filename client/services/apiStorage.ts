@@ -1,10 +1,13 @@
-import { Evenement, Produit, Vente } from "@shared/api";
+import { Evenement, Produit, Vente, PointDeVente } from "@shared/api";
 
 // API client functions for Supabase backend
 
-export async function fetchProduits(): Promise<Produit[]> {
+export async function fetchProduits(pointDeVenteId?: string): Promise<Produit[]> {
   try {
-    const response = await fetch("/api/produits");
+    const url = pointDeVenteId
+      ? `/api/produits?point_de_vente_id=${encodeURIComponent(pointDeVenteId)}`
+      : "/api/produits";
+    const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch products");
     return await response.json();
   } catch (error) {
@@ -110,11 +113,12 @@ export async function deleteEvenement(id: string): Promise<void> {
   }
 }
 
-export async function fetchVentes(evenementId?: string): Promise<Vente[]> {
+export async function fetchVentes(evenementId?: string, pointDeVenteId?: string): Promise<Vente[]> {
   try {
-    const url = evenementId
-      ? `/api/ventes?evenement_id=${evenementId}`
-      : "/api/ventes";
+    const params = new URLSearchParams();
+    if (evenementId) params.set("evenement_id", evenementId);
+    if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
+    const url = params.toString() ? `/api/ventes?${params.toString()}` : "/api/ventes";
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch sales");
     return await response.json();
@@ -176,6 +180,40 @@ export async function deleteVente(id: string): Promise<void> {
     console.error("Error deleting sale:", error);
     throw error;
   }
+}
+
+export async function fetchPointsDeVente(evenementId?: string): Promise<PointDeVente[]> {
+  try {
+    const url = evenementId ? `/api/points-de-vente?evenement_id=${encodeURIComponent(evenementId)}` : "/api/points-de-vente";
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch points de vente");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching points de vente:", error);
+    return [];
+  }
+}
+
+export async function savePointDeVente(pdv: Partial<PointDeVente> & { evenement_id: string; nom: string; type: PointDeVente["type"] }): Promise<PointDeVente> {
+  const isNew = !pdv.id;
+  const url = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
+  const method = isNew ? "POST" : "PUT";
+  const response = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(pdv),
+  });
+  if (!response.ok) {
+    let detail = "";
+    try { const data = await response.json(); detail = data?.error || JSON.stringify(data); } catch {}
+    throw new Error(detail || `Failed to save point de vente (${response.status})`);
+  }
+  return response.json();
+}
+
+export async function deletePointDeVente(id: string): Promise<void> {
+  const response = await fetch(`/api/points-de-vente/${id}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Failed to delete point de vente");
 }
 
 // Local storage fallback for selected event ID
