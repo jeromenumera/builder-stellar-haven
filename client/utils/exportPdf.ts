@@ -1,4 +1,4 @@
-import { Evenement, KPIResume, Produit, Vente, computeKPI } from "@shared/api";
+import { Evenement, KPIResume, Produit, Vente, computeKPI, PointDeVente } from "@shared/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -6,7 +6,9 @@ export function exportPDF(
   ventes: Vente[],
   evenementsById: Record<string, Evenement>,
   produitsById: Record<string, Produit>,
+  pointsById: Record<string, PointDeVente>,
   selectedEventId: string | null,
+  selectedPointDeVenteId: string | null,
   filename = "ventes.pdf",
 ) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -15,7 +17,8 @@ export function exportPDF(
 
   const now = new Date();
   const evt = selectedEventId ? evenementsById[selectedEventId] : null;
-  const title = evt ? `Rapport — ${evt.nom}` : "Rapport des ventes";
+  const pdv = selectedPointDeVenteId ? pointsById[selectedPointDeVenteId] : null;
+  const title = evt && pdv ? `Rapport — ${evt.nom} — ${pdv.nom}` : evt ? `Rapport — ${evt.nom}` : "Rapport des ventes";
   const subtitle = evt
     ? `${evt.date_debut} → ${evt.date_fin} — ${evt.lieu}`
     : "Tous événements";
