@@ -31,7 +31,7 @@ export const getProducts: RequestHandler = async (req, res) => {
            p.id, p.nom, p.prix_ttc, p.tva, p.image_url, p.sku,
            COALESCE(
              json_agg(
-               DISTINCT jsonb_build_object(
+               jsonb_build_object(
                  'id', pdv.id,
                  'nom', pdv.nom,
                  'evenement_id', pdv.evenement_id,
