@@ -46,13 +46,15 @@ const AppContent = () => {
       </div>
       {showInitialSelector && <InitialSelectionDialog />}
       <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0">
-        <Routes>
-          <Route path="/" element={<Navigate to="/vente" replace />} />
-          <Route path="/vente" element={<Vente />} />
-          <Route path="/historique" element={<Historique />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary onRetry={handleRetry}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/vente" replace />} />
+            <Route path="/vente" element={<Vente />} />
+            <Route path="/historique" element={<Historique />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
       <MobileNav />
     </>
