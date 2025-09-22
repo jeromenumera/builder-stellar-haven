@@ -35,7 +35,24 @@ export function Header() {
             Administration
           </NavLink>
         </nav>
-        <div className="ml-auto flex items-center justify-end">
+        <div className="ml-auto flex items-center justify-end gap-3">
+          {/* Display selected event and POS names */}
+          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+            {state.selectedEventId && (
+              <span className="font-medium">
+                {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+              </span>
+            )}
+            {state.selectedEventId && state.selectedPointDeVenteId && (
+              <span className="text-muted-foreground/60">•</span>
+            )}
+            {state.selectedPointDeVenteId && (
+              <span className="font-medium">
+                {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
+              </span>
+            )}
+          </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="rounded-full">

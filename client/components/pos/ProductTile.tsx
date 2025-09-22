@@ -111,13 +111,8 @@ export function ProductTile({
           <div className="text-[18px] font-bold text-white leading-tight line-clamp-2">
             {produit.nom}
           </div>
-          <div className={(isNegative ? "text-amber-400" : "text-[#34C759]") + " text-[16px] font-semibold mt-1 flex items-center gap-2"}>
+          <div className={(isNegative ? "text-amber-400" : "text-[#34C759]") + " text-[16px] font-semibold mt-1"}>
             {produit.prix_ttc.toFixed(2)} CHF
-            {isNegative && (
-              <span className="text-amber-300 bg-amber-500/15 border border-amber-400/30 rounded-full px-2 py-0.5 text-[12px] font-medium">
-                Consigne/Retour
-              </span>
-            )}
           </div>
         </div>
 

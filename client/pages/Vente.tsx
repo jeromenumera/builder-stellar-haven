@@ -21,9 +21,11 @@ export default function Vente() {
     }
   }, [state.selectedEventId, state.selectedPointDeVenteId, loadProduitsByPOS]);
 
-  const gridProducts = useMemo(() => {
-    // Only active products; limit 20
-    return state.produits.slice(0, 20);
+  const { positiveProducts, negativeProducts } = useMemo(() => {
+    const allProducts = state.produits.slice(0, 20);
+    const positive = allProducts.filter(p => p.prix_ttc >= 0);
+    const negative = allProducts.filter(p => p.prix_ttc < 0);
+    return { positiveProducts: positive, negativeProducts: negative };
   }, [state.produits]);
 
   const requireEvent = !state.selectedEventId;
@@ -77,26 +79,51 @@ export default function Vente() {
             </div>
           </div>
           <div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
             style={{
-              gridAutoRows: "140px",
               maxHeight: "calc(100vh - 8rem)",
-              overflow: "hidden",
+              overflow: "auto",
             }}
           >
-            {state.loading.produits && gridProducts.length === 0 ? (
-              <div className="col-span-full flex items-center justify-center py-8 text-muted-foreground">
+            {state.loading.produits && positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground">
                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
                 Chargement des produits...
               </div>
-            ) : gridProducts.length === 0 ? (
-              <div className="col-span-full flex items-center justify-center py-8 text-muted-foreground">
+            ) : positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground">
                 Aucun produit disponible pour ce point de vente
               </div>
             ) : (
-              gridProducts.map((p) => (
-                <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
-              ))
+              <>
+                {/* Positive products section */}
+                {positiveProducts.length > 0 && (
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6"
+                    style={{ gridAutoRows: "140px" }}
+                  >
+                    {positiveProducts.map((p) => (
+                      <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Negative products section */}
+                {negativeProducts.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-amber-400 mb-4 border-b border-amber-400/30 pb-2">
+                      Retour
+                    </h3>
+                    <div
+                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
+                      style={{ gridAutoRows: "140px" }}
+                    >
+                      {negativeProducts.map((p) => (
+                        <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>
