@@ -324,7 +324,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const saveProduit = async (p: Produit) => {
     try {
       const saved = await apiSaveProduit(p);
-      await loadProduits(); // Reload to get updated list
+      // Reload admin products to show all products regardless of filters
+      await loadProduitsAdmin();
     } catch (error) {
       console.error("Failed to save product:", error);
       throw error;
