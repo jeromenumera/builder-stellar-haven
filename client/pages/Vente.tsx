@@ -16,7 +16,7 @@ export default function Vente() {
     if (evId && posId) {
       loadProduitsByPOS(evId, posId);
     }
-  }, [state.selectedEventId, state.selectedPointDeVenteId, loadProduitsByPOS]);
+  }, [state.selectedEventId, state.selectedPointDeVenteId]);
 
   const gridProducts = useMemo(() => {
     // Only active products; limit 20
