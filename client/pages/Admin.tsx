@@ -10,15 +10,17 @@ import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
 
 export default function Admin() {
-  const { state, deleteProduit, deleteEvenement, selectEvent } = usePos();
+  const { state, deleteProduit, deleteEvenement, deletePointDeVente, selectEvent } = usePos();
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [editingPointId, setEditingPointId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const editingProduct =
     state.produits.find((p) => p.id === editingProductId) || null;
   const editingEvent =
     state.evenements.find((e) => e.id === editingEventId) || null;
+  const editingPoint = state.pointsDeVente.find((p) => p.id === editingPointId) || null;
 
   const handleDeleteProduct = async (id: string) => {
     if (!confirm("Confirmer la suppression de ce produit ?")) return;
@@ -44,6 +46,18 @@ export default function Admin() {
     }
   };
 
+  const handleDeletePoint = async (id: string) => {
+    if (!confirm("Confirmer la suppression de ce point de vente ?")) return;
+    setDeleting(id);
+    try {
+      await deletePointDeVente(id);
+    } catch (error) {
+      alert("Erreur lors de la suppression du point de vente.");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Administration</h1>
@@ -51,6 +65,7 @@ export default function Admin() {
         <TabsList>
           <TabsTrigger value="produits">Produits</TabsTrigger>
           <TabsTrigger value="evenements">Événements</TabsTrigger>
+          <TabsTrigger value="points">Points de vente</TabsTrigger>
         </TabsList>
         <TabsContent value="produits" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -105,6 +120,55 @@ export default function Admin() {
               <ProductForm
                 initial={editingProduct}
                 onDone={() => setEditingProductId(null)}
+              />
+            </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="points" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <h2 className="text-xl font-semibold mb-2">Liste (max 20)</h2>
+              <Card className="p-2">
+                <ul className="divide-y">
+                  {state.pointsDeVente.slice(0,20).map((p) => {
+                    const evt = state.evenements.find((e) => e.id === p.evenement_id);
+                    return (
+                      <li key={p.id} className="flex items-center gap-2 p-2">
+                        <div className="flex-1">
+                          <div className="font-medium">{p.nom}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {p.type} · {evt ? evt.nom : p.evenement_id}
+                          </div>
+                        </div>
+                        <Button
+                          variant="secondary"
+                          onClick={() => setEditingPointId(p.id)}
+                        >
+                          Éditer
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDeletePoint(p.id)}
+                          disabled={deleting === p.id}
+                        >
+                          {deleting === p.id ? "..." : "Supprimer"}
+                        </Button>
+                      </li>
+                    );
+                  })}
+                  {state.pointsDeVente.length === 0 && (
+                    <li className="p-4 text-muted-foreground">Aucun point de vente</li>
+                  )}
+                </ul>
+              </Card>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-2">
+                {editingPoint ? "Éditer" : "Nouveau point de vente"}
+              </h2>
+              <PointDeVenteForm
+                initial={editingPoint}
+                onDone={() => setEditingPointId(null)}
               />
             </div>
           </div>
