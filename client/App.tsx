@@ -21,6 +21,7 @@ import { Header } from "@/components/Header";
 import { MobileNav } from "@/components/MobileNav";
 import { InitialSelectionDialog } from "@/components/pos/InitialSelectionDialog";
 import { NetworkStatus } from "@/components/NetworkStatus";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
