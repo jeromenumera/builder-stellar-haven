@@ -31,6 +31,7 @@ export function ProductForm({
   );
   const [sku, setSku] = useState<string>(initial?.sku ?? "");
   const [imageUrl, setImageUrl] = useState<string>(initial?.image_url ?? "");
+  const [file, setFile] = useState<File | null>(null);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
