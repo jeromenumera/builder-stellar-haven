@@ -89,6 +89,8 @@ const PosContext = createContext<{
   updateVente: (v: Vente) => Promise<void>;
   removeItem: (id: string) => void;
   refreshData: () => Promise<void>;
+  loadProduitsAdmin: () => Promise<void>;
+  loadProduitsByPOS: (eventId: string, posId: string) => Promise<void>;
 } | null>(null);
 
 const initial: State = {
