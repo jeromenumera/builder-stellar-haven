@@ -1,12 +1,14 @@
 import { NavLink } from "react-router-dom";
 import { usePos } from "@/context/PosStore";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 
 export function Header() {
   const { state, selectEvent, selectPointDeVente } = usePos();
@@ -18,11 +20,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center gap-4">
+      <div className="container mx-auto px-4 h-16 grid grid-cols-3 items-center">
         <div className="font-extrabold text-xl tracking-tight">
           SOS MEDITERRANEE
         </div>
-        <nav className="hidden md:flex items-center gap-2">
+        <nav className="hidden md:flex items-center justify-center gap-2">
           <NavLink to="/vente" className={activeClass}>
             Vente
           </NavLink>
@@ -33,56 +35,50 @@ export function Header() {
             Administration
           </NavLink>
         </nav>
-        <div className="ml-auto flex items-center gap-3">
-          <div className="text-sm text-muted-foreground hidden md:block">
-            Événement
-          </div>
-          <Select
-            value={selectedValue}
-            onValueChange={(v) => selectEvent(v || null)}
-          >
-            <SelectTrigger className="min-w-[220px]">
-              <SelectValue placeholder="Sélectionner un événement" />
-            </SelectTrigger>
-            <SelectContent>
-              {state.evenements
-                .filter((e) => e.statut === "actif")
-                .map((e) => (
-                  <SelectItem key={e.id} value={e.id}>
-                    {e.nom} — {e.lieu}
-                  </SelectItem>
-                ))}
-              {state.evenements.filter((e) => e.statut === "actif").length ===
-                0 && (
-                <div className="px-3 py-2 text-sm text-muted-foreground">
-                  Aucun événement actif
-                </div>
-              )}
-            </SelectContent>
-          </Select>
-          <div className="text-sm text-muted-foreground hidden md:block">
-            Point de vente
-          </div>
-          <Select
-            value={selectedPdv}
-            onValueChange={(v) => selectPointDeVente(v || null)}
-          >
-            <SelectTrigger className="min-w-[180px]">
-              <SelectValue placeholder="Point de vente" />
-            </SelectTrigger>
-            <SelectContent>
-              {state.pointsDeVente.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.nom}
-                </SelectItem>
-              ))}
-              {state.pointsDeVente.length === 0 && (
-                <div className="px-3 py-2 text-sm text-muted-foreground">
-                  Aucun stand
-                </div>
-              )}
-            </SelectContent>
-          </Select>
+        <div className="ml-auto flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full">
+                <MapPin className="h-5 w-5" />
+                <span className="sr-only">Sélection Événement/Point de vente</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel>Événement</DropdownMenuLabel>
+              <div className="p-2">
+                <select
+                  className="h-10 w-full rounded-md border bg-background px-3"
+                  value={selectedValue}
+                  onChange={(e) => selectEvent(e.target.value || null)}
+                >
+                  <option value="">Sélectionner...</option>
+                  {state.evenements
+                    .filter((e) => e.statut === "actif")
+                    .map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.nom} — {e.lieu}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Point de vente</DropdownMenuLabel>
+              <div className="p-2">
+                <select
+                  className="h-10 w-full rounded-md border bg-background px-3"
+                  value={selectedPdv}
+                  onChange={(e) => selectPointDeVente(e.target.value || null)}
+                >
+                  <option value="">Sélectionner...</option>
+                  {state.pointsDeVente.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nom}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
