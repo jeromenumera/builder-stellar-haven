@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { EventForm } from "@/components/admin/EventForm";
+import { PointDeVenteForm } from "@/components/admin/PointDeVenteForm";
 import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
 
