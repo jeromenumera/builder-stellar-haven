@@ -1,12 +1,6 @@
-import { Pool, PoolClient } from "pg";
-
 import type { PoolClient } from "pg";
 
-const DATABASE_URL =
-  process.env.NETLIFY_DATABASE_URL ||
-  process.env.NEON_DATABASE_URL ||
-  process.env.DATABASE_URL ||
-  null;
+const DATABASE_URL = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL || process.env.NEON_DATABASE_URL || null;
 
 let neonSql:
   | ((strings: TemplateStringsArray, ...values: any[]) => Promise<any[]>)
