@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { query } from "../services/db";
+import { query, withTransaction } from "../services/db";
 import { convertEvenementFromDb } from "../services/converters";
 
 export const getEvents: RequestHandler = async (_req, res) => {
@@ -151,7 +151,21 @@ export const deleteEvent: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await query(`DELETE FROM evenements WHERE id=$1`, [id]);
+    // Delete in transaction: lignes_ventes -> ventes -> evenements
+    // (point_de_vente will be cascade deleted automatically due to ON DELETE CASCADE)
+    await withTransaction(async (client) => {
+      // First delete all lignes_ventes for sales associated with this event
+      await client.query(
+        `DELETE FROM lignes_ventes WHERE vente_id IN (SELECT id FROM ventes WHERE evenement_id=$1)`,
+        [id]
+      );
+
+      // Then delete all ventes associated with this event
+      await client.query(`DELETE FROM ventes WHERE evenement_id=$1`, [id]);
+
+      // Finally delete the event itself
+      await client.query(`DELETE FROM evenements WHERE id=$1`, [id]);
+    });
 
     res.json({ success: true });
   } catch (error: any) {
