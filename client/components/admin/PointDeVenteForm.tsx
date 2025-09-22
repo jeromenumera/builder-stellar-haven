@@ -18,7 +18,6 @@ export function PointDeVenteForm({
   const [form, setForm] = useState<Partial<PointDeVente>>(
     initial ?? {
       nom: "",
-      type: "autre",
       actif: true,
       evenement_id: state.selectedEventId || "",
     },
