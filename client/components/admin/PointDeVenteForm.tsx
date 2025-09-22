@@ -37,6 +37,7 @@ export function PointDeVenteForm({
         nom: form.nom!,
         actif: !!form.actif,
         evenement_id: form.evenement_id!,
+        type: form.type as "merch" | "bar" | "vestiaire" | "autre",
       });
       onDone?.();
     } catch (error) {
