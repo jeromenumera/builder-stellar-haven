@@ -335,7 +335,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const deleteProduit = async (id: string) => {
     try {
       await apiDeleteProduit(id);
-      await loadProduits(); // Reload to get updated list
+      // Reload admin products to show all products regardless of filters
+      await loadProduitsAdmin();
       // Remove from cart if present
       if (state.cart[id]) dispatch({ type: "removeFromCart", id });
     } catch (error) {
