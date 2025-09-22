@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { usePos } from "@/context/PosStore";
 import { ProductTile } from "@/components/pos/ProductTile";
 import { useEffect, useMemo } from "react";
