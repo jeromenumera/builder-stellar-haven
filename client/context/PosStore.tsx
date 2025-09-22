@@ -179,6 +179,32 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loadProduitsAdmin = async () => {
+    dispatch({ type: "setLoading", key: "produits", loading: true });
+    try {
+      const res = await fetch("/api/produits");
+      if (!res.ok) throw new Error("Failed to fetch products (admin)");
+      const produits: Produit[] = await res.json();
+      dispatch({ type: "setProduits", produits });
+    } catch (error) {
+      console.error("Failed to load admin products:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "produits", loading: false });
+    }
+  };
+
+  const loadProduitsByPOS = async (eventId: string, posId: string) => {
+    dispatch({ type: "setLoading", key: "produits", loading: true });
+    try {
+      const produits = await fetchProduits(eventId, posId);
+      dispatch({ type: "setProduits", produits });
+    } catch (error) {
+      console.error("Failed to load POS products:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "produits", loading: false });
+    }
+  };
+
   const loadEvenements = async () => {
     dispatch({ type: "setLoading", key: "evenements", loading: true });
     try {
@@ -429,6 +455,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       deleteVente,
       updateVente,
       refreshData,
+      loadProduitsAdmin,
+      loadProduitsByPOS,
     }),
     [state],
   );
