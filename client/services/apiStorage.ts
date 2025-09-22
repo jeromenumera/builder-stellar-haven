@@ -2,11 +2,12 @@ import { Evenement, Produit, Vente, PointDeVente } from "@shared/api";
 
 // API client functions for Supabase backend
 
-export async function fetchProduits(pointDeVenteId?: string): Promise<Produit[]> {
+export async function fetchProduits(eventId?: string, pointDeVenteId?: string): Promise<Produit[]> {
   try {
-    const url = pointDeVenteId
-      ? `/api/produits?point_de_vente_id=${encodeURIComponent(pointDeVenteId)}`
-      : "/api/produits";
+    const params = new URLSearchParams();
+    if (eventId) params.set("evenement_id", eventId);
+    if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
+    const url = `/api/produits${params.toString() ? `?${params.toString()}` : ""}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Failed to fetch products");
     return await response.json();
@@ -16,7 +17,7 @@ export async function fetchProduits(pointDeVenteId?: string): Promise<Produit[]>
   }
 }
 
-export async function saveProduit(produit: Produit): Promise<Produit> {
+export async function saveProduit(produit: Produit & { pointOfSaleIds?: string[] }): Promise<Produit> {
   try {
     const isNew = !produit.id || produit.id.startsWith("prod_");
     const url = isNew ? "/api/produits" : `/api/produits/${produit.id}`;
