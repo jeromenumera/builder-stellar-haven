@@ -43,12 +43,19 @@ export const uploadImage: RequestHandler = (req, res, next) => {
 export const getImage: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(`Fetching image with ID: ${id}`);
+
     const { rows } = await query(`SELECT mime, data FROM images WHERE id=$1`, [
       id,
     ]);
-    if (!rows || rows.length === 0)
+
+    if (!rows || rows.length === 0) {
+      console.log(`Image not found for ID: ${id}`);
       return res.status(404).json({ error: "Not found" });
+    }
+
     const row = rows[0];
+    console.log(`Found image: mime=${row.mime}, data size=${row.data?.length || 0} bytes`);
 
     // Convert to Buffer for better serverless compatibility
     const buffer = Buffer.from(row.data);
