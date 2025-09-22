@@ -24,12 +24,25 @@ import { NetworkStatus } from "@/components/NetworkStatus";
 
 const queryClient = new QueryClient();
 
-const AppShell = () => {
+const AppContent = () => {
   const { pathname } = useLocation();
+  const { refreshData } = usePos();
   const showInitialSelector = pathname !== "/admin";
+
+  const handleRetry = async () => {
+    try {
+      await refreshData();
+    } catch (error) {
+      console.error("Retry failed:", error);
+    }
+  };
+
   return (
-    <PosProvider>
+    <>
       <Header />
+      <div className="container mx-auto px-4 py-2">
+        <NetworkStatus onRetry={handleRetry} />
+      </div>
       {showInitialSelector && <InitialSelectionDialog />}
       <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0">
         <Routes>
@@ -41,9 +54,15 @@ const AppShell = () => {
         </Routes>
       </main>
       <MobileNav />
-    </PosProvider>
+    </>
   );
 };
+
+const AppShell = () => (
+  <PosProvider>
+    <AppContent />
+  </PosProvider>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
