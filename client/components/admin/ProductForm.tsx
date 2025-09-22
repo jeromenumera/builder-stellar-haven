@@ -59,9 +59,6 @@ export function ProductForm({
     setErr(null);
   }, [initial]);
 
-  function setPDV(id: string, v: boolean | "indeterminate") {
-    setChecked((prev) => ({ ...prev, [id]: v === true }));
-  }
 
   async function onFileChange(f?: File) {
     if (!f) return;
