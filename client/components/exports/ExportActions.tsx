@@ -22,9 +22,10 @@ export function ExportActions() {
         disabled={disabled}
         onClick={() =>
           exportCSV(
-            ventesForEvent,
+            ventesForScope,
             evenementsById,
             produitsById,
+            pointsById,
             `ventes_${state.selectedEventId}.csv`,
           )
         }
@@ -35,10 +36,12 @@ export function ExportActions() {
         disabled={disabled}
         onClick={() =>
           exportPDF(
-            ventesForEvent,
+            ventesForScope,
             evenementsById,
             produitsById,
+            pointsById,
             state.selectedEventId,
+            state.selectedPointDeVenteId,
             `ventes_${state.selectedEventId}.pdf`,
           )
         }
