@@ -197,7 +197,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loadProduitsAdmin = async () => {
+  const loadProduitsAdmin = useCallback(async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
       // Use existing fetchProduits without PDV filter (admin mode)
@@ -210,7 +210,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     } finally {
       dispatch({ type: "setLoading", key: "produits", loading: false });
     }
-  };
+  }, []);
 
   const loadProduitsByPOS = useCallback(async (eventId: string, posId: string) => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
