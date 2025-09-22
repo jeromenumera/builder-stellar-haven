@@ -270,10 +270,10 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     await loadPointsDeVente();
     await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
-  };
+  }, []);
 
   useEffect(() => {
     loadInitialData();
