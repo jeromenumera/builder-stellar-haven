@@ -9,6 +9,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  upsertProductOverride,
 } from "./routes/produits";
 import {
   getEvents,
@@ -17,6 +18,7 @@ import {
   deleteEvent,
 } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
+import { getPointsDeVente, createPointDeVente, updatePointDeVente, deletePointDeVente } from "./routes/points_de_vente";
 import { echo } from "./routes/echo";
 
 export function createServer() {
@@ -56,6 +58,7 @@ export function createServer() {
   app.post("/api/produits", createProduct);
   app.put("/api/produits/:id", updateProduct);
   app.delete("/api/produits/:id", deleteProduct);
+  app.post("/api/produits/:id/override", upsertProductOverride);
 
   // Events API
   app.get("/api/evenements", getEvents);
@@ -68,6 +71,12 @@ export function createServer() {
   app.post("/api/ventes", createSale);
   app.put("/api/ventes/:id", updateSale);
   app.delete("/api/ventes/:id", deleteSale);
+
+  // Points de vente API
+  app.get("/api/points-de-vente", getPointsDeVente);
+  app.post("/api/points-de-vente", createPointDeVente);
+  app.put("/api/points-de-vente/:id", updatePointDeVente);
+  app.delete("/api/points-de-vente/:id", deletePointDeVente);
 
   // Test API
   app.all("/api/echo", echo);
