@@ -15,7 +15,7 @@ export function ProductForm({
   initial?: Produit | null;
   onDone?: () => void;
 }) {
-  const { saveProduit } = usePos();
+  const { saveProduit, state } = usePos();
   const [form, setForm] = useState<Produit>(
     initial ?? {
       id: uid("prod"),
