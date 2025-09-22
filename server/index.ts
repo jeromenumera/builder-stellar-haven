@@ -86,6 +86,10 @@ export function createServer() {
   app.put("/api/points-de-vente/:id", updatePointDeVente);
   app.delete("/api/points-de-vente/:id", deletePointDeVente);
 
+  // Image upload/serve
+  app.post("/api/upload-image", uploadImage);
+  app.get("/api/image/:id", getImage);
+
   // Test API
   app.all("/api/echo", echo);
 
