@@ -100,6 +100,10 @@ export function createServer() {
   app.post("/api/upload-image", uploadImage);
   app.get("/api/image/:id", getImage);
 
+  // Debug endpoints
+  app.get("/api/debug/images", debugImages);
+  app.get("/api/debug/db", testDbConnection);
+
   // Test API
   app.all("/api/echo", echo);
 
