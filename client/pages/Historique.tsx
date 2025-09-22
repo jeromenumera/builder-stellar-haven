@@ -351,3 +351,5 @@ function Historique() {
     </div>
   );
 }
+
+export default memo(Historique);
