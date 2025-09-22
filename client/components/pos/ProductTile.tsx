@@ -23,9 +23,11 @@ export function ProductTile({
     removeFromCart(produit.id);
   };
 
+  // Use a fixed version parameter to bust cache but avoid constant reloading
+  const version = "v2"; // Change this when DB is fixed
   const imgSrc =
     produit.image_url && produit.image_url.length > 0
-      ? `${produit.image_url}?v=${Date.now()}`
+      ? `${produit.image_url}?${version}`
       : placeholderSvg;
   const isNegative = produit.prix_ttc < 0;
 

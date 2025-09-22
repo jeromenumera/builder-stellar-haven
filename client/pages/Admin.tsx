@@ -98,9 +98,11 @@ export default function Admin() {
               <Card className="p-2">
                 <ul className="divide-y">
                   {state.produits.map((p) => {
+                    // Use a fixed version parameter to bust cache but avoid constant reloading
+                    const version = "v2"; // Change this when DB is fixed
                     const thumb =
                       p.image_url && p.image_url.length > 0
-                        ? `${p.image_url}?v=${Date.now()}`
+                        ? `${p.image_url}?${version}`
                         : placeholderSvg;
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
