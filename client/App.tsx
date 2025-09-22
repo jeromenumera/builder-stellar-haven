@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import { PosProvider } from "@/context/PosStore";
 import { Header } from "@/components/Header";
 import { MobileNav } from "@/components/MobileNav";
+import { InitialSelectionDialog } from "@/components/pos/InitialSelectionDialog";
 
 const queryClient = new QueryClient();
 
