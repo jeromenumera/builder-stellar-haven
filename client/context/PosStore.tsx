@@ -167,7 +167,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadProduits = async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const produits = await fetchProduits(state.selectedPointDeVenteId || undefined);
+      const produits = await fetchProduits(state.selectedEventId || undefined, state.selectedPointDeVenteId || undefined);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load products:", error);
