@@ -182,8 +182,14 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadProduitsAdmin = async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const res = await fetch("/api/produits");
-      if (!res.ok) throw new Error("Failed to fetch products (admin)");
+      const tryFetch = async (u: string) => {
+        try { return await fetch(u, { credentials: "omit" }); } catch { return null as any; }
+      };
+      let res = await tryFetch("/api/produits");
+      if (!res || !res.ok) {
+        res = await tryFetch("https://cash.sosmediterranee.ch/api/produits");
+      }
+      if (!res || !res.ok) throw new Error("Failed to fetch products (admin)");
       const produits: Produit[] = await res.json();
       dispatch({ type: "setProduits", produits });
     } catch (error) {
