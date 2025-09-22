@@ -29,7 +29,6 @@ import {
   saveVente as apiSaveVente,
   deleteVente as apiDeleteVente,
   fetchPointsDeVente,
-  fetchPointsDeVente,
   savePointDeVente as apiSavePointDeVente,
   deletePointDeVente as apiDeletePointDeVente,
 } from "@/services/apiStorage";
