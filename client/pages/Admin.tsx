@@ -8,6 +8,7 @@ import { EventForm } from "@/components/admin/EventForm";
 import { PointDeVenteForm } from "@/components/admin/PointDeVenteForm";
 import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
+import { RefreshCw } from "lucide-react";
 
 export default function Admin() {
   const {
