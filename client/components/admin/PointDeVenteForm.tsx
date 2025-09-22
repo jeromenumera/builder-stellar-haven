@@ -34,8 +34,7 @@ export function PointDeVenteForm({
     try {
       await savePointDeVente({
         id: form.id,
-        nom: form.nom,
-        type: form.type as any,
+        nom: form.nom!,
         actif: !!form.actif,
         evenement_id: form.evenement_id!,
       });
@@ -58,19 +57,6 @@ export function PointDeVenteForm({
             onChange={(e) => setForm({ ...form, nom: e.target.value })}
             required
           />
-        </div>
-        <div>
-          <Label>Type</Label>
-          <select
-            className="h-10 rounded-md border bg-background px-3 w-full"
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value as any })}
-          >
-            <option value="merch">Merch</option>
-            <option value="bar">Bar</option>
-            <option value="vestiaire">Vestiaire</option>
-            <option value="autre">Autre</option>
-          </select>
         </div>
         <div className="md:col-span-2">
           <Label>Événement associé</Label>
