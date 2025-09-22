@@ -195,7 +195,7 @@ export async function fetchPointsDeVente(evenementId?: string): Promise<PointDeV
   }
 }
 
-export async function savePointDeVente(pdv: Partial<PointDeVente> & { evenement_id: string; nom: string; type: PointDeVente["type"] }): Promise<PointDeVente> {
+export async function savePointDeVente(pdv: Partial<PointDeVente> & { evenement_id: string; nom: string }): Promise<PointDeVente> {
   const isNew = !pdv.id;
   const url = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
   const method = isNew ? "POST" : "PUT";
