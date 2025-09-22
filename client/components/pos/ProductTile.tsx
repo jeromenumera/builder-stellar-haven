@@ -25,7 +25,7 @@ export function ProductTile({
 
   const imgSrc =
     produit.image_url && produit.image_url.length > 0
-      ? produit.image_url
+      ? `${produit.image_url}?v=${Date.now()}`
       : placeholderSvg;
   const isNegative = produit.prix_ttc < 0;
 

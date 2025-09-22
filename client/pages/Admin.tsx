@@ -100,7 +100,7 @@ export default function Admin() {
                   {state.produits.map((p) => {
                     const thumb =
                       p.image_url && p.image_url.length > 0
-                        ? p.image_url
+                        ? `${p.image_url}?v=${Date.now()}`
                         : placeholderSvg;
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
