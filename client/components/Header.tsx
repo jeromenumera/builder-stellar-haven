@@ -8,15 +8,52 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Check, X } from "lucide-react";
+import { useState } from "react";
 
 export function Header() {
   const { state, selectEvent, selectPointDeVente } = usePos();
+  const [isOpen, setIsOpen] = useState(false);
+  const [draftEventId, setDraftEventId] = useState<string | null>(null);
+  const [draftPdvId, setDraftPdvId] = useState<string | null>(null);
+
   const activeClass = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`;
 
   const selectedValue = state.selectedEventId ?? "";
   const selectedPdv = state.selectedPointDeVenteId ?? "";
+
+  // Initialize draft values when dropdown opens
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      setDraftEventId(state.selectedEventId);
+      setDraftPdvId(state.selectedPointDeVenteId);
+    }
+  };
+
+  // Apply selections
+  const handleApplySelection = () => {
+    if (draftEventId !== state.selectedEventId) {
+      selectEvent(draftEventId);
+    }
+    if (draftPdvId !== state.selectedPointDeVenteId) {
+      if (Object.keys(state.cart).length > 0 && draftPdvId !== state.selectedPointDeVenteId) {
+        const ok = confirm("Changer de stand va vider le panier, continuer ?");
+        if (!ok) return;
+      }
+      selectPointDeVente(draftPdvId);
+    }
+    setIsOpen(false);
+  };
+
+  // Cancel selection
+  const handleCancel = () => {
+    setDraftEventId(state.selectedEventId);
+    setDraftPdvId(state.selectedPointDeVenteId);
+    setIsOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -36,75 +73,132 @@ export function Header() {
           </NavLink>
         </nav>
         <div className="ml-auto flex items-center justify-end gap-3">
-          {/* Display selected event and POS names */}
-          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-            {state.selectedEventId && (
-              <span className="font-medium">
+          {/* Display selected event and POS names with badges */}
+          <div className="hidden sm:flex items-center gap-2">
+            {state.selectedEventId ? (
+              <Badge variant="default" className="text-xs font-medium">
                 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
-              </span>
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs">
+                Aucun événement
+              </Badge>
             )}
-            {state.selectedEventId && state.selectedPointDeVenteId && (
-              <span className="text-muted-foreground/60">•</span>
-            )}
-            {state.selectedPointDeVenteId && (
-              <span className="font-medium">
+            {state.selectedPointDeVenteId ? (
+              <Badge variant="secondary" className="text-xs font-medium">
                 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
-              </span>
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs">
+                Aucun PDV
+              </Badge>
             )}
           </div>
 
-          <DropdownMenu>
+          <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full">
+              <Button
+                variant="outline"
+                size="icon"
+                className={`rounded-full transition-colors ${
+                  isOpen ? 'bg-primary text-primary-foreground' : ''
+                }`}
+              >
                 <MapPin className="h-5 w-5" />
                 <span className="sr-only">
                   Sélection Événement/Point de vente
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Événement</DropdownMenuLabel>
-              <div className="p-2">
-                <select
-                  className="h-10 w-full rounded-md border bg-background px-3"
-                  value={selectedValue}
-                  onChange={(e) => selectEvent(e.target.value || null)}
-                >
-                  <option value="">Sélectionner...</option>
-                  {state.evenements
-                    .filter((e) => e.statut === "actif")
-                    .map((e) => (
-                      <option key={e.id} value={e.id}>
-                        {e.nom} — {e.lieu}
+            <DropdownMenuContent align="end" className="w-96 p-0">
+              <div className="p-4 space-y-4">
+                <DropdownMenuLabel className="p-0 text-base font-semibold">
+                  Configuration
+                </DropdownMenuLabel>
+
+                {/* Event Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Événement</label>
+                  <select
+                    className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                    value={draftEventId ?? ""}
+                    onChange={(e) => setDraftEventId(e.target.value || null)}
+                  >
+                    <option value="">Sélectionner un événement...</option>
+                    {state.evenements
+                      .filter((e) => e.statut === "actif")
+                      .map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.nom} — {e.lieu}
+                        </option>
+                      ))}
+                  </select>
+                  {draftEventId && (
+                    <div className="text-xs text-muted-foreground">
+                      ✓ {state.evenements.find(e => e.id === draftEventId)?.nom}
+                    </div>
+                  )}
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* POS Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Point de vente</label>
+                  <select
+                    className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                    value={draftPdvId ?? ""}
+                    onChange={(e) => setDraftPdvId(e.target.value || null)}
+                  >
+                    <option value="">Sélectionner un point de vente...</option>
+                    {state.pointsDeVente.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nom}
                       </option>
                     ))}
-                </select>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Point de vente</DropdownMenuLabel>
-              <div className="p-2">
-                <select
-                  className="h-10 w-full rounded-md border bg-background px-3"
-                  value={selectedPdv}
-                  onChange={(e) => {
-                    const next = e.target.value || null;
-                    if (next === state.selectedPointDeVenteId) return;
-                    if (Object.keys(state.cart).length > 0) {
-                      const ok = confirm(
-                        "Changer de stand va vider le panier, continuer ?",
-                      );
-                      if (!ok) return;
-                    }
-                    selectPointDeVente(next);
-                  }}
-                >
-                  <option value="">Sélectionner...</option>
-                  {state.pointsDeVente.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.nom}
-                    </option>
-                  ))}
-                </select>
+                  </select>
+                  {draftPdvId && (
+                    <div className="text-xs text-muted-foreground">
+                      ✓ {state.pointsDeVente.find(p => p.id === draftPdvId)?.nom}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCancel}
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Annuler
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleApplySelection}
+                    className="flex-1"
+                    disabled={draftEventId === state.selectedEventId && draftPdvId === state.selectedPointDeVenteId}
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Appliquer
+                  </Button>
+                </div>
+
+                {/* Current Status */}
+                <div className="text-xs text-muted-foreground border-t pt-2">
+                  <div className="flex items-center justify-between">
+                    <span>Statut actuel:</span>
+                    <div className="flex gap-1">
+                      {state.selectedEventId && state.selectedPointDeVenteId ? (
+                        <Badge variant="default" className="text-xs">Configuré</Badge>
+                      ) : (
+                        <Badge variant="destructive" className="text-xs">Incomplet</Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
