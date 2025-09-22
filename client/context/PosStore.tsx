@@ -154,9 +154,12 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
 
   // Load initial data
   const loadInitialData = async () => {
-    const selectedEventId = getSelectedEventId();
+    let selectedEventId: string | null = null;
     let selectedPointDeVenteId: string | null = null;
-    try { selectedPointDeVenteId = localStorage.getItem("pos_selected_pdv_id"); } catch {}
+    try {
+      selectedEventId = localStorage.getItem("pos.selectedEventId") || getSelectedEventId() || localStorage.getItem("pos_selected_event_id");
+      selectedPointDeVenteId = localStorage.getItem("pos.selectedPointOfSaleId") || localStorage.getItem("pos_selected_pdv_id");
+    } catch {}
     dispatch({ type: "init", payload: { selectedEventId, selectedPointDeVenteId } });
 
     await Promise.all([loadEvenements()]);
@@ -222,6 +225,18 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     loadInitialData();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "pos.selectedEventId") {
+        dispatch({ type: "selectEvent", id: e.newValue });
+        refreshData();
+      }
+      if (e.key === "pos.selectedPointOfSaleId") {
+        dispatch({ type: "selectPointDeVente", id: e.newValue });
+        refreshData();
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   const addToCart = (id: string) => dispatch({ type: "addToCart", id });
@@ -229,10 +244,16 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "removeFromCart", id });
   const removeItem = (id: string) => dispatch({ type: "removeItem", id });
   const clearCart = () => dispatch({ type: "clearCart" });
-  const selectEvent = (id: string | null) =>
+  const selectEvent = (id: string | null) => {
+    try { id ? localStorage.setItem("pos.selectedEventId", id) : localStorage.removeItem("pos.selectedEventId"); } catch {}
     dispatch({ type: "selectEvent", id });
-  const selectPointDeVente = (id: string | null) =>
+    window.dispatchEvent(new CustomEvent("pos:changed", { detail: { eventId: id, pointOfSaleId: state.selectedPointDeVenteId } }));
+  };
+  const selectPointDeVente = (id: string | null) => {
+    try { id ? localStorage.setItem("pos.selectedPointOfSaleId", id) : localStorage.removeItem("pos.selectedPointOfSaleId"); } catch {}
     dispatch({ type: "selectPointDeVente", id });
+    window.dispatchEvent(new CustomEvent("pos:changed", { detail: { eventId: state.selectedEventId, pointOfSaleId: id } }));
+  };
 
   const saveProduit = async (p: Produit) => {
     try {
