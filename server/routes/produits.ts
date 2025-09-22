@@ -72,6 +72,7 @@ export const createProduct: RequestHandler = async (req, res) => {
     const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
     const image_url = body?.image_url ?? body?.imageUrl ?? null;
     const sku = body?.sku ?? null;
+    const pointOfSaleIds: string[] = Array.isArray(body?.pointOfSaleIds) ? body.pointOfSaleIds : [];
 
     if (!nom || !Number.isFinite(prix_ttc)) {
       return res
@@ -89,7 +90,17 @@ export const createProduct: RequestHandler = async (req, res) => {
       [nom, prix_ttc, tva, image_url, sku]
     );
 
-    const product = convertProduitFromDb(rows[0]);
+    const prod = rows[0];
+    if (pointOfSaleIds.length > 0) {
+      await query(
+        `INSERT INTO produit_point_de_vente (produit_id, point_de_vente_id)
+         VALUES ${pointOfSaleIds.map((_, i) => `($1, $${i + 2})`).join(',')}
+         ON CONFLICT (produit_id, point_de_vente_id) DO NOTHING`,
+        [prod.id, ...pointOfSaleIds]
+      );
+    }
+
+    const product = convertProduitFromDb(prod);
     res.json(product);
   } catch (error: any) {
     console.error("Error creating product:", error);
@@ -139,12 +150,27 @@ export const updateProduct: RequestHandler = async (req, res) => {
     const tva = parseFloat(body?.tva ?? body?.taxRate ?? 0);
     const image_url = body?.image_url ?? body?.imageUrl ?? null;
     const sku = body?.sku ?? null;
+    const pointOfSaleIds: string[] | undefined = Array.isArray(body?.pointOfSaleIds)
+      ? (body.pointOfSaleIds as string[])
+      : undefined;
 
     const { rows } = await query(
       `UPDATE produits SET nom=$2, prix_ttc=$3, tva=$4, image_url=$5, sku=$6
        WHERE id=$1 RETURNING *`,
       [id, nom, prix_ttc, tva, image_url, sku]
     );
+
+    if (pointOfSaleIds) {
+      await query(`DELETE FROM produit_point_de_vente WHERE produit_id=$1`, [id]);
+      if (pointOfSaleIds.length > 0) {
+        await query(
+          `INSERT INTO produit_point_de_vente (produit_id, point_de_vente_id)
+           VALUES ${pointOfSaleIds.map((_, i) => `($1, $${i + 2})`).join(',')}
+           ON CONFLICT (produit_id, point_de_vente_id) DO NOTHING`,
+          [id, ...pointOfSaleIds]
+        );
+      }
+    }
 
     const product = convertProduitFromDb(rows[0]);
     res.json(product);
