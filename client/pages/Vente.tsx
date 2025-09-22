@@ -15,13 +15,9 @@ export default function Vente() {
   useEffect(() => {
     const evId = state.selectedEventId;
     const posId = state.selectedPointDeVenteId;
-    console.log('Vente useEffect triggered:', { evId, posId, hasLoadFunction: !!loadProduitsByPOS });
 
     if (evId && posId) {
-      console.log('Loading products for POS in Vente page...');
       loadProduitsByPOS(evId, posId);
-    } else {
-      console.log('Missing event or POS ID, not loading products:', { evId, posId });
     }
   }, [state.selectedEventId, state.selectedPointDeVenteId, loadProduitsByPOS]);
 
