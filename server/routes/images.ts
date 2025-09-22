@@ -40,9 +40,16 @@ export const getImage: RequestHandler = async (req, res) => {
     if (!rows || rows.length === 0)
       return res.status(404).json({ error: "Not found" });
     const row = rows[0];
+
+    // Convert to Buffer for better serverless compatibility
+    const buffer = Buffer.from(row.data);
+
     res.setHeader("Content-Type", row.mime || "application/octet-stream");
-    // Neon returns bytea as Buffer/Uint8Array compatible in Node env
-    return res.end(row.data, "binary");
+    res.setHeader("Content-Length", buffer.length.toString());
+    res.setHeader("Cache-Control", "public, max-age=31536000"); // Cache for 1 year
+
+    // Use res.send with Buffer for serverless compatibility
+    return res.send(buffer);
   } catch (e: any) {
     console.error("getImage error", e);
     return res.status(500).json({ error: e.message || String(e) });
