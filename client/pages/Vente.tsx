@@ -1,14 +1,23 @@
 import { useMemo } from "react";
 import { usePos } from "@/context/PosStore";
 import { ProductTile } from "@/components/pos/ProductTile";
+import { useEffect, useMemo } from "react";
 import { CartSummary } from "@/components/pos/CartSummary";
 import { PaymentButtons } from "@/components/pos/PaymentButtons";
 import { Card } from "@/components/ui/card";
 
 export default function Vente() {
-  const { state } = usePos();
+  const { state, loadProduitsByPOS } = usePos() as any;
 
   const qtyById = state.cart;
+
+  useEffect(() => {
+    const evId = state.selectedEventId;
+    const posId = state.selectedPointDeVenteId;
+    if (evId && posId) {
+      loadProduitsByPOS(evId, posId);
+    }
+  }, [state.selectedEventId, state.selectedPointDeVenteId, loadProduitsByPOS]);
 
   const gridProducts = useMemo(() => {
     // Only active products; limit 20
