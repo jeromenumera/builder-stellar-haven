@@ -58,14 +58,24 @@ export const getImage: RequestHandler = async (req, res) => {
     console.log(`Found image: mime=${row.mime}, data size=${row.data?.length || 0} bytes`);
 
     // Convert to Buffer for better serverless compatibility
-    const buffer = Buffer.from(row.data);
+    const buffer = Buffer.isBuffer(row.data) ? row.data : Buffer.from(row.data);
 
     res.setHeader("Content-Type", row.mime || "application/octet-stream");
     res.setHeader("Content-Length", buffer.length.toString());
     res.setHeader("Cache-Control", "public, max-age=31536000"); // Cache for 1 year
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Use res.send with Buffer for serverless compatibility
-    return res.send(buffer);
+    // For serverless, end the response properly
+    res.writeHead(200, {
+      "Content-Type": row.mime || "application/octet-stream",
+      "Content-Length": buffer.length.toString(),
+      "Cache-Control": "public, max-age=31536000",
+      "Access-Control-Allow-Origin": "*"
+    });
+
+    return res.end(buffer, 'binary');
   } catch (e: any) {
     console.error("getImage error", e);
     return res.status(500).json({ error: e.message || String(e) });
