@@ -215,10 +215,14 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadProduitsByPOS = async (eventId: string, posId: string) => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
+      console.log(`Loading products for event: ${eventId}, POS: ${posId}`);
       const produits = await fetchProduits(eventId, posId);
+      console.log(`Loaded ${produits.length} products for POS`);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load POS products:", error);
+      // Set empty array to prevent UI blocking
+      dispatch({ type: "setProduits", produits: [] });
     } finally {
       dispatch({ type: "setLoading", key: "produits", loading: false });
     }
