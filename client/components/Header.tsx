@@ -7,14 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 
 export function Header() {
-  const { state, selectEvent } = usePos();
+  const { state, selectEvent, selectPointDeVente } = usePos();
   const activeClass = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`;
 
   const selectedValue = state.selectedEventId ?? "";
+  const selectedPdv = state.selectedPointDeVenteId ?? "";
 
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -60,11 +60,29 @@ export function Header() {
               )}
             </SelectContent>
           </Select>
-          <NavLink to="/admin">
-            <Button variant="secondary" className="hidden md:inline-flex">
-              Gérer
-            </Button>
-          </NavLink>
+          <div className="text-sm text-muted-foreground hidden md:block">
+            Point de vente
+          </div>
+          <Select
+            value={selectedPdv}
+            onValueChange={(v) => selectPointDeVente(v || null)}
+          >
+            <SelectTrigger className="min-w-[180px]">
+              <SelectValue placeholder="Point de vente" />
+            </SelectTrigger>
+            <SelectContent>
+              {state.pointsDeVente.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.nom}
+                </SelectItem>
+              ))}
+              {state.pointsDeVente.length === 0 && (
+                <div className="px-3 py-2 text-sm text-muted-foreground">
+                  Aucun stand
+                </div>
+              )}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </header>
