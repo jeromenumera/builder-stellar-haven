@@ -181,19 +181,22 @@ export function ProductForm({
       </div>
 
       <div>
-        <Label>Attribution aux points de vente</Label>
-        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {pdvList.map((p) => (
-            <label key={p.id} className="flex items-center gap-2">
-              <Checkbox
-                checked={!!checked[p.id]}
-                onCheckedChange={(v) => setPDV(p.id, v as any)}
-              />
-              <span>{p.nom}</span>
-            </label>
-          ))}
+        <Label>Point de vente</Label>
+        <div className="mt-2">
+          <Select value={selectedPdv} onValueChange={setSelectedPdv}>
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionner un point de vente" />
+            </SelectTrigger>
+            <SelectContent>
+              {pdvList.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.nom}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {pdvList.length === 0 && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground mt-2">
               Aucun point de vente actif pour l'événement courant.
             </div>
           )}
