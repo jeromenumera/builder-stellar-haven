@@ -4,17 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePos } from "@/context/PosStore";
+import { Produit } from "@shared/api";
 import placeholderSvg from "@/assets/placeholder.svg";
-
-type Product = {
-  id?: string;
-  nom: string;
-  prix_ttc: number;
-  tva?: number | null;
-  sku?: string | null;
-  image_url?: string | null;
-  actif?: boolean;
-};
 
 export function ProductForm({
   initial,
