@@ -23,7 +23,7 @@ export function ProductForm({
   initial: Product | null;
   onDone?: () => void;
 }) {
-  const { state, refreshData } = usePos();
+  const { state, refreshData, loadProduitsAdmin } = usePos() as any;
   const [nom, setNom] = useState(initial?.nom ?? "");
   const [prix, setPrix] = useState<string>(initial ? String(initial.prix_ttc) : "");
   const [tva, setTva] = useState<string>(
