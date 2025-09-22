@@ -2,6 +2,17 @@ import { Evenement, KPIResume, Produit, Vente, computeKPI, PointDeVente } from "
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+// Helper function to clean text for PDF
+function cleanText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/[^\x20-\x7E\u00C0-\u017F\u0100-\u024F]/g, '') // Keep only printable ASCII + Latin characters
+    .replace(/∅/g, '') // Remove empty set symbol
+    .replace(/=/g, ' - ') // Replace = with dash
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+}
+
 export function exportPDF(
   ventes: Vente[],
   evenementsById: Record<string, Evenement>,
@@ -39,20 +50,20 @@ export function exportPDF(
   doc.setTextColor(...primaryColor);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.text("SOS MÉDITERRANÉE", marginX, cursorY + 35);
+  doc.text(cleanText("SOS MÉDITERRANÉE"), marginX, cursorY + 35);
 
   // Report title
   const title = evt && pdv
-    ? `Rapport de ventes — ${evt.nom}`
+    ? `Rapport de ventes - ${cleanText(evt.nom)}`
     : evt
-    ? `Rapport de ventes — ${evt.nom}`
+    ? `Rapport de ventes - ${cleanText(evt.nom)}`
     : "Rapport de ventes";
 
   doc.setTextColor(...darkGray);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   cursorY += 65;
-  doc.text(title, marginX, cursorY);
+  doc.text(cleanText(title), marginX, cursorY);
 
   // Subtitle with location and POS
   doc.setFont("helvetica", "normal");
@@ -64,14 +75,14 @@ export function exportPDF(
     const dateDebut = new Date(evt.date_debut).toLocaleDateString('fr-FR');
     const dateFin = evt.date_fin ? new Date(evt.date_fin).toLocaleDateString('fr-FR') : dateDebut;
     const dateRange = dateDebut === dateFin ? dateDebut : `${dateDebut} - ${dateFin}`;
-    doc.text(`📅 ${dateRange} • 📍 ${evt.lieu}`, marginX, cursorY);
+    doc.text(cleanText(`${dateRange} - ${evt.lieu}`), marginX, cursorY);
   } else {
-    doc.text("📊 Tous événements", marginX, cursorY);
+    doc.text("Tous événements", marginX, cursorY);
   }
 
   if (pdv) {
     cursorY += 15;
-    doc.text(`🏪 Point de vente: ${pdv.nom}`, marginX, cursorY);
+    doc.text(cleanText(`Point de vente: ${pdv.nom}`), marginX, cursorY);
   }
 
   // Generation timestamp
@@ -87,7 +98,7 @@ export function exportPDF(
   doc.setTextColor(...darkGray);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("📈 Indicateurs clés", marginX, cursorY);
+  doc.text("Indicateurs cles", marginX, cursorY);
   cursorY += 25;
 
   // Create KPI cards layout
@@ -96,9 +107,9 @@ export function exportPDF(
   const cardSpacing = 10;
 
   const kpiCards = [
-    { label: "Chiffre d'affaires", value: `${kpi.ca_total.toFixed(2)} CHF`, color: accentColor, icon: "💰" },
-    { label: "Nombre de ventes", value: kpi.nombre_ventes.toString(), color: primaryColor, icon: "🛒" },
-    { label: "Ticket moyen", value: `${kpi.ticket_moyen.toFixed(2)} CHF`, color: secondaryColor, icon: "📊" }
+    { label: "Chiffre d'affaires", value: `${kpi.ca_total.toFixed(2)} CHF`, color: accentColor },
+    { label: "Nombre de ventes", value: kpi.nombre_ventes.toString(), color: primaryColor },
+    { label: "Ticket moyen", value: `${kpi.ticket_moyen.toFixed(2)} CHF`, color: secondaryColor }
   ];
 
   kpiCards.forEach((card, index) => {
@@ -115,16 +126,12 @@ export function exportPDF(
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(...secondaryColor);
-    doc.text(card.label, x + 15, cursorY + 25);
+    doc.text(cleanText(card.label), x + 15, cursorY + 25);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(...card.color);
-    doc.text(card.value, x + 15, cursorY + 45);
-
-    // Icon
-    doc.setFontSize(20);
-    doc.text(card.icon, x + cardWidth - 35, cursorY + 45);
+    doc.text(cleanText(card.value), x + 15, cursorY + 45);
   });
 
   cursorY += cardHeight + 40;
@@ -132,7 +139,7 @@ export function exportPDF(
   // Payment methods section
   autoTable(doc, {
     startY: cursorY,
-    head: [["💳 Mode de paiement", "Montant (CHF)", "Pourcentage"]],
+    head: [["Mode de paiement", "Montant (CHF)", "Pourcentage"]],
     body: [
       [
         "Carte bancaire",
@@ -140,7 +147,7 @@ export function exportPDF(
         `${((kpi.par_mode_paiement.carte / kpi.ca_total) * 100).toFixed(1)}%`
       ],
       [
-        "Espèces",
+        "Especes",
         `${kpi.par_mode_paiement.cash.toFixed(2)}`,
         `${((kpi.par_mode_paiement.cash / kpi.ca_total) * 100).toFixed(1)}%`
       ],
@@ -174,9 +181,9 @@ export function exportPDF(
 
   autoTable(doc, {
     startY: productStartY,
-    head: [["🛍️ Produit", "Quantité", "Prix unitaire", "Total (CHF)"]],
+    head: [["Produit", "Quantite", "Prix unitaire", "Total (CHF)"]],
     body: kpi.par_produit.map((x) => [
-      x.produit?.nom || "Produit inconnu",
+      cleanText(x.produit?.nom || "Produit inconnu"),
       x.quantite.toString(),
       `${(x.ca / x.quantite).toFixed(2)} CHF`,
       `${x.ca.toFixed(2)}`
@@ -214,7 +221,7 @@ export function exportPDF(
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text("SOS MÉDITERRANÉE - Rapport automatisé", marginX, footerY + 25);
+  doc.text(cleanText("SOS MÉDITERRANÉE - Rapport automatise"), marginX, footerY + 25);
 
   const pageNum = `Page 1`;
   const pageNumWidth = doc.getTextWidth(pageNum);
