@@ -16,6 +16,10 @@ export default function Admin() {
   const [editingPointId, setEditingPointId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadProduitsAdmin();
+  }, [loadProduitsAdmin, state.selectedEventId]);
+
   const editingProduct =
     state.produits.find((p) => p.id === editingProductId) || null;
   const editingEvent =
@@ -120,7 +124,7 @@ export default function Admin() {
               <ProductForm
                 key={editingProduct ? editingProduct.id : "new"}
                 initial={editingProduct}
-                onDone={() => setEditingProductId(null)}
+                onDone={() => { setEditingProductId(null); loadProduitsAdmin(); }}
               />
             </div>
           </div>
