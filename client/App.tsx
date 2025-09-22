@@ -16,10 +16,11 @@ import NotFound from "./pages/NotFound";
 import Vente from "./pages/Vente";
 import Historique from "./pages/Historique";
 import Admin from "./pages/Admin";
-import { PosProvider } from "@/context/PosStore";
+import { PosProvider, usePos } from "@/context/PosStore";
 import { Header } from "@/components/Header";
 import { MobileNav } from "@/components/MobileNav";
 import { InitialSelectionDialog } from "@/components/pos/InitialSelectionDialog";
+import { NetworkStatus } from "@/components/NetworkStatus";
 
 const queryClient = new QueryClient();
 
