@@ -356,7 +356,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   };
 
   const savePointDeVente = async (
-    pdv: Partial<PointDeVente> & { evenement_id: string; nom: string; type: PointDeVente["type"] },
+    pdv: Partial<PointDeVente> & { evenement_id: string; nom: string },
   ) => {
     try {
       await apiSavePointDeVente(pdv);
