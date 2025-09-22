@@ -137,7 +137,7 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">
-                            {p.type} · {evt ? evt.nom : p.evenement_id}
+                            {evt ? evt.nom : p.evenement_id} · {p.actif ? "Actif" : "Inactif"}
                           </div>
                         </div>
                         <Button
