@@ -125,7 +125,7 @@ export function ProductForm({
       sku: sku || null,
       actif: true,
       evenement_id: eventId,
-      pointOfSaleIds: Object.keys(checked).filter((k) => checked[k]),
+      pointOfSaleIds: selectedPdv ? [selectedPdv] : [],
     };
 
     setSaving(true);
