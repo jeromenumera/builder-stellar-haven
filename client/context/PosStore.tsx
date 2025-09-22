@@ -199,22 +199,13 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadProduitsAdmin = async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const tryFetch = async (u: string) => {
-        try {
-          return await fetch(u, { credentials: "omit" });
-        } catch {
-          return null as any;
-        }
-      };
-      let res = await tryFetch("/api/produits");
-      if (!res || !res.ok) {
-        res = await tryFetch("https://cash.sosmediterranee.ch/api/produits");
-      }
-      if (!res || !res.ok) throw new Error("Failed to fetch products (admin)");
-      const produits: Produit[] = await res.json();
+      // Use existing fetchProduits without PDV filter (admin mode)
+      const produits = await fetchProduits();
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load admin products:", error);
+      // Set empty array on error to prevent UI blocking
+      dispatch({ type: "setProduits", produits: [] });
     } finally {
       dispatch({ type: "setLoading", key: "produits", loading: false });
     }
