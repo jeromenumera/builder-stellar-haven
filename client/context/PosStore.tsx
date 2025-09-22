@@ -276,7 +276,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const refreshData = useCallback(async () => {
     await loadPointsDeVente();
     await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
-  }, []);
+  }, [loadPointsDeVente, loadProduits, loadEvenements, loadVentes]);
 
   useEffect(() => {
     loadInitialData();
