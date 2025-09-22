@@ -43,6 +43,13 @@ export function ProductForm({
   }, [state.pointsDeVente, state.selectedEventId]);
 
   useEffect(() => {
+    setNom(initial?.nom ?? "");
+    setPrix(initial ? String(initial.prix_ttc) : "");
+    setTva(initial?.tva != null ? String(initial.tva) : "8.1");
+    setSku(initial?.sku ?? "");
+    setImageUrl(initial?.image_url ?? "");
+    setFile(null);
+    setChecked({});
     setErr(null);
   }, [initial]);
 
@@ -57,24 +64,32 @@ export function ProductForm({
       setErr("Type d'image non supporté. Utilisez JPG, PNG ou WebP.");
       return;
     }
-    if (f.size > 3 * 1024 * 1024) {
-      setErr("Image trop lourde (max 3MB).");
+    if (f.size > 5 * 1024 * 1024) {
+      setErr("Image trop lourde (max 5MB).");
       return;
     }
-    setUploading(true);
-    try {
-      const { resizeImageFile } = await import("@/lib/image");
-      const data = await resizeImageFile(f, 512);
-      setImageUrl(data);
-    } catch (e) {
-      setErr("Erreur lors du traitement de l'image.");
-    } finally {
-      setUploading(false);
-    }
+    setFile(f);
+    setErr(null);
   }
 
   function removeImage() {
     setImageUrl("");
+    setFile(null);
+  }
+
+  async function uploadImageIfNeeded(): Promise<string | null> {
+    if (!file) return imageUrl || null;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload-image", { method: "POST", body: form });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as any)?.error || "Upload image échoué");
+      return (data as any).url || null;
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function save(e: React.FormEvent) {
@@ -90,12 +105,14 @@ export function ProductForm({
     if (isNaN(tvaNumber)) tvaNumber = 0;
     if (tvaNumber > 1.0) tvaNumber = tvaNumber / 100;
 
+    const finalUrl = await uploadImageIfNeeded();
+
     const payload = {
       id: initial?.id,
       name: nom.trim(),
       priceTTC: Number(prix),
       taxRate: tvaNumber,
-      imageUrl: imageUrl || null,
+      imageUrl: finalUrl,
       sku: sku || null,
       active: true,
       pointOfSaleIds: Object.keys(checked).filter((k) => checked[k]),
@@ -166,11 +183,11 @@ export function ProductForm({
       </div>
 
       <div className="md:col-span-2">
-        <Label>Image</Label>
+        <Label>Image produit</Label>
         <div className="flex items-center gap-3">
           <div className="w-20 h-20 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-            {imageUrl ? (
-              <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
+            {(imageUrl || file) ? (
+              <img src={file ? URL.createObjectURL(file) : imageUrl} alt="preview" className="w-full h-full object-cover" />
             ) : (
               <img src={placeholderSvg} alt="placeholder" className="w-10 h-10" />
             )}
@@ -185,15 +202,15 @@ export function ProductForm({
             />
             <div className="flex gap-2">
               <Button type="button" onClick={() => document.getElementById("file-upload")?.click()} disabled={uploading}>
-                {uploading ? "Chargement..." : "Téléverser"}
+                {uploading ? "Chargement..." : "Choisir un fichier"}
               </Button>
-              {imageUrl && (
+              {(imageUrl || file) && (
                 <Button variant="destructive" type="button" onClick={removeImage}>
                   Supprimer
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">JPEG/PNG/WebP — max 3MB</p>
+            <p className="text-xs text-muted-foreground">JPEG/PNG/WebP — max 5MB</p>
           </div>
         </div>
       </div>
