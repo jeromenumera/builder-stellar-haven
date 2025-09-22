@@ -53,7 +53,7 @@ export default function Admin() {
     try {
       await deleteEvenement(id);
     } catch (error) {
-      alert("Erreur lors de la suppression de l'événement.");
+      alert("Erreur lors de la suppression de l'év��nement.");
     } finally {
       setDeleting(null);
     }
@@ -98,11 +98,9 @@ export default function Admin() {
               <Card className="p-2">
                 <ul className="divide-y">
                   {state.produits.map((p) => {
-                    // Use a fixed version parameter to bust cache but avoid constant reloading
-                    const version = "v2"; // Change this when DB is fixed
                     const thumb =
                       p.image_url && p.image_url.length > 0
-                        ? `${p.image_url}?${version}`
+                        ? p.image_url
                         : placeholderSvg;
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
