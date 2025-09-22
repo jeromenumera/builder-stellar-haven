@@ -53,7 +53,9 @@ export function ProductForm({
     setSku(initial?.sku ?? "");
     setImageUrl(initial?.image_url ?? "");
     setFile(null);
-    setChecked({});
+    // Pour l'édition, sélectionner le premier PDV associé au produit
+    const firstPdv = initial?.points_de_vente?.[0]?.id || "";
+    setSelectedPdv(firstPdv);
     setErr(null);
   }, [initial]);
 
