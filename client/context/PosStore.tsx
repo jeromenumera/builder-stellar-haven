@@ -212,12 +212,10 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loadProduitsByPOS = async (eventId: string, posId: string) => {
+  const loadProduitsByPOS = useCallback(async (eventId: string, posId: string) => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      console.log(`Loading products for event: ${eventId}, POS: ${posId}`);
       const produits = await fetchProduits(eventId, posId);
-      console.log(`Loaded ${produits.length} products for POS`);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load POS products:", error);
@@ -226,7 +224,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     } finally {
       dispatch({ type: "setLoading", key: "produits", loading: false });
     }
-  };
+  }, []);
 
   const loadEvenements = async () => {
     dispatch({ type: "setLoading", key: "evenements", loading: true });
