@@ -40,9 +40,6 @@ const AppContent = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-2">
-        <NetworkStatus onRetry={handleRetry} />
-      </div>
       {showInitialSelector && <InitialSelectionDialog />}
       <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0">
         <ErrorBoundary onRetry={handleRetry}>
