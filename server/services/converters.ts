@@ -8,6 +8,7 @@ export function convertProduitFromDb(dbProduit: any) {
     tva: Number.isFinite(tva) ? tva : 0,
     image_url: dbProduit.image_url || '',
     sku: dbProduit.sku || '',
+    points_de_vente: Array.isArray(dbProduit.points_de_vente) ? dbProduit.points_de_vente : [],
   };
 }
 
