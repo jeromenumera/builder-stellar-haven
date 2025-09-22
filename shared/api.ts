@@ -33,10 +33,19 @@ export interface LigneVente {
   tva_taux: number; // percentage
 }
 
+export interface PointDeVente {
+  id: string;
+  evenement_id: string;
+  nom: string;
+  type: "merch" | "bar" | "vestiaire" | "autre";
+  actif: boolean;
+}
+
 export interface Vente {
   id: string;
   horodatage: string; // ISO timestamp
   evenement_id: string;
+  point_de_vente_id?: string | null;
   mode_paiement: ModePaiement;
   total_ttc: number;
   total_ht: number;
