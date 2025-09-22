@@ -4,6 +4,8 @@ import { useEffect, useMemo } from "react";
 import { CartSummary } from "@/components/pos/CartSummary";
 import { PaymentButtons } from "@/components/pos/PaymentButtons";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { RefreshCw, Loader2 } from "lucide-react";
 
 export default function Vente() {
   const { state, loadProduitsByPOS } = usePos() as any;
