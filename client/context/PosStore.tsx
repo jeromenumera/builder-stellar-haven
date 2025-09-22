@@ -14,6 +14,7 @@ import {
   Vente,
   buildLigneVente,
   computeTotals,
+  PointDeVente,
 } from "@shared/api";
 import {
   fetchEvenements,
@@ -27,6 +28,7 @@ import {
   deleteEvenement as apiDeleteEvenement,
   saveVente as apiSaveVente,
   deleteVente as apiDeleteVente,
+  fetchPointsDeVente,
 } from "@/services/apiStorage";
 import { uid } from "@/services/id";
 
@@ -34,18 +36,23 @@ interface State {
   produits: Produit[];
   evenements: Evenement[];
   ventes: Vente[];
+  pointsDeVente: PointDeVente[];
   selectedEventId: string | null;
+  selectedPointDeVenteId: string | null;
   cart: Record<string, number>; // produit_id -> qty
   loading: {
     produits: boolean;
     evenements: boolean;
     ventes: boolean;
+    pointsDeVente: boolean;
   };
 }
 
 type Action =
   | { type: "init"; payload: Partial<State> }
   | { type: "selectEvent"; id: string | null }
+  | { type: "selectPointDeVente"; id: string | null }
+  | { type: "setPointsDeVente"; points: PointDeVente[] }
   | { type: "setProduits"; produits: Produit[] }
   | { type: "setEvenements"; evenements: Evenement[] }
   | { type: "setVentes"; ventes: Vente[] }
@@ -61,6 +68,7 @@ const PosContext = createContext<{
   removeFromCart: (id: string) => void;
   clearCart: () => void;
   selectEvent: (id: string | null) => void;
+  selectPointDeVente: (id: string | null) => void;
   saveProduit: (p: Produit) => Promise<void>;
   deleteProduit: (id: string) => Promise<void>;
   saveEvenement: (e: Evenement) => Promise<void>;
@@ -77,11 +85,14 @@ const initial: State = {
   evenements: [],
   ventes: [],
   selectedEventId: null,
+  selectedPointDeVenteId: null,
+  pointsDeVente: [],
   cart: {},
   loading: {
     produits: false,
     evenements: false,
     ventes: false,
+    pointsDeVente: false,
   },
 };
 
@@ -92,6 +103,14 @@ function reducer(state: State, action: Action): State {
     case "selectEvent":
       setSelectedEventId(action.id);
       return { ...state, selectedEventId: action.id };
+    case "selectPointDeVente":
+      try {
+        if (action.id) localStorage.setItem("pos_selected_pdv_id", action.id);
+        else localStorage.removeItem("pos_selected_pdv_id");
+      } catch {}
+      return { ...state, selectedPointDeVenteId: action.id };
+    case "setPointsDeVente":
+      return { ...state, pointsDeVente: action.points };
     case "setProduits":
       return { ...state, produits: action.produits };
     case "setEvenements":
@@ -132,16 +151,19 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   // Load initial data
   const loadInitialData = async () => {
     const selectedEventId = getSelectedEventId();
-    dispatch({ type: "init", payload: { selectedEventId } });
+    let selectedPointDeVenteId: string | null = null;
+    try { selectedPointDeVenteId = localStorage.getItem("pos_selected_pdv_id"); } catch {}
+    dispatch({ type: "init", payload: { selectedEventId, selectedPointDeVenteId } });
 
-    // Load all data in parallel
-    await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
+    await Promise.all([loadEvenements()]);
+    await loadPointsDeVente();
+    await Promise.all([loadProduits(), loadVentes()]);
   };
 
   const loadProduits = async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const produits = await fetchProduits();
+      const produits = await fetchProduits(state.selectedPointDeVenteId || undefined);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load products:", error);
@@ -165,7 +187,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadVentes = async () => {
     dispatch({ type: "setLoading", key: "ventes", loading: true });
     try {
-      const ventes = await fetchVentes();
+      const ventes = await fetchVentes(state.selectedEventId || undefined, state.selectedPointDeVenteId || undefined);
       dispatch({ type: "setVentes", ventes });
     } catch (error) {
       console.error("Failed to load sales:", error);
@@ -174,7 +196,23 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loadPointsDeVente = async () => {
+    dispatch({ type: "setLoading", key: "pointsDeVente", loading: true });
+    try {
+      const points = await fetchPointsDeVente(state.selectedEventId || undefined);
+      dispatch({ type: "setPointsDeVente", points });
+      if (!state.selectedPointDeVenteId && points.length > 0) {
+        dispatch({ type: "selectPointDeVente", id: points[0].id });
+      }
+    } catch (error) {
+      console.error("Failed to load points de vente:", error);
+    } finally {
+      dispatch({ type: "setLoading", key: "pointsDeVente", loading: false });
+    }
+  };
+
   const refreshData = async () => {
+    await loadPointsDeVente();
     await Promise.all([loadProduits(), loadEvenements(), loadVentes()]);
   };
 
@@ -189,6 +227,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => dispatch({ type: "clearCart" });
   const selectEvent = (id: string | null) =>
     dispatch({ type: "selectEvent", id });
+  const selectPointDeVente = (id: string | null) =>
+    dispatch({ type: "selectPointDeVente", id });
 
   const saveProduit = async (p: Produit) => {
     try {
@@ -240,6 +280,9 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     if (!state.selectedEventId) {
       return { ok: false, error: "Sélectionnez un événement avant la vente." };
     }
+    if (!state.selectedPointDeVenteId) {
+      return { ok: false, error: "Sélectionnez un point de vente avant la vente." };
+    }
     const items = Object.entries(state.cart);
     if (items.length === 0) {
       return { ok: false, error: "Panier vide." };
@@ -272,9 +315,10 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       const { total_ttc, total_ht, tva_totale } = computeTotals(lignes);
 
       const vente: Vente = {
-        id: uid("vente"), // temp ID
+        id: uid("vente"),
         horodatage: new Date().toISOString(),
         evenement_id: evenementId,
+        point_de_vente_id: state.selectedPointDeVenteId,
         mode_paiement: mode,
         total_ttc,
         total_ht,
@@ -323,6 +367,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       clearCart,
       selectEvent,
+      selectPointDeVente,
       saveProduit,
       deleteProduit,
       saveEvenement,
