@@ -103,7 +103,7 @@ export function Header() {
               </Badge>
             )}
             {state.selectedPointDeVenteId ? (
-              <Badge variant="secondary" className="text-xs font-medium max-w-32 truncate">
+              <Badge variant="secondary" className="text-xs font-medium truncate max-w-48 md:max-w-64">
                 🏪 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
               </Badge>
             ) : (
