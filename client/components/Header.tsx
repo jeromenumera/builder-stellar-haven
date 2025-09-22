@@ -56,11 +56,14 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 grid grid-cols-3 items-center">
-        <div className="font-extrabold text-xl tracking-tight">
-          SOS MEDITERRANEE
+    <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <div className="container mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
+        {/* Logo - responsive sizing */}
+        <div className="font-extrabold text-lg sm:text-xl tracking-tight text-primary">
+          SOS MEDITERRANÉE
         </div>
+
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center justify-center gap-2">
           <NavLink to="/vente" className={activeClass}>
             Vente
@@ -72,12 +75,27 @@ export function Header() {
             Administration
           </NavLink>
         </nav>
-        <div className="ml-auto flex items-center justify-end gap-3">
-          {/* Display selected event and POS names with badges */}
+
+        {/* Selection Status and Settings */}
+        <div className="flex items-center justify-end gap-2 sm:gap-3">
+          {/* Mobile: Show compact status */}
+          <div className="hidden xs:flex sm:hidden items-center gap-1">
+            {state.selectedEventId && state.selectedPointDeVenteId ? (
+              <Badge variant="default" className="text-xs px-2 py-1">
+                ✓ Configuré
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="text-xs px-2 py-1">
+                Config
+              </Badge>
+            )}
+          </div>
+
+          {/* Desktop: Show full status */}
           <div className="hidden sm:flex items-center gap-2">
             {state.selectedEventId ? (
-              <Badge variant="default" className="text-xs font-medium">
-                {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+              <Badge variant="default" className="text-xs font-medium max-w-32 truncate">
+                📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
               </Badge>
             ) : (
               <Badge variant="outline" className="text-xs">
@@ -85,8 +103,8 @@ export function Header() {
               </Badge>
             )}
             {state.selectedPointDeVenteId ? (
-              <Badge variant="secondary" className="text-xs font-medium">
-                {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
+              <Badge variant="secondary" className="text-xs font-medium max-w-32 truncate">
+                🏪 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
               </Badge>
             ) : (
               <Badge variant="outline" className="text-xs">
@@ -99,18 +117,21 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                size="icon"
-                className={`rounded-full transition-colors ${
+                size="sm"
+                className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full transition-colors ${
                   isOpen ? 'bg-primary text-primary-foreground' : ''
                 }`}
               >
-                <MapPin className="h-5 w-5" />
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="sr-only">
                   Sélection Événement/Point de vente
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-96 p-0">
+            <DropdownMenuContent
+              align="end"
+              className="w-[calc(100vw-2rem)] sm:w-96 max-w-md p-0 mr-2 sm:mr-0"
+            >
               <div className="p-4 space-y-4">
                 <DropdownMenuLabel className="p-0 text-base font-semibold">
                   Configuration
