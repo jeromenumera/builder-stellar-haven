@@ -7,9 +7,17 @@ export async function fetchProduits(eventId?: string, pointDeVenteId?: string): 
     const params = new URLSearchParams();
     if (eventId) params.set("evenement_id", eventId);
     if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
-    const url = `/api/produits${params.toString() ? `?${params.toString()}` : ""}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch products");
+    const qs = params.toString();
+    const rel = `/api/produits${qs ? `?${qs}` : ""}`;
+    const abs = `https://cash.sosmediterranee.ch${rel}`;
+
+    const tryFetch = async (u: string) => {
+      try { return await fetch(u, { credentials: "omit" }); } catch { return null as any; }
+    };
+
+    let response = await tryFetch(rel);
+    if (!response || !response.ok) response = await tryFetch(abs);
+    if (!response || !response.ok) throw new Error("Failed to fetch products");
     return await response.json();
   } catch (error) {
     console.error("Error fetching products:", error);
