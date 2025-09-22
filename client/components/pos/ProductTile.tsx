@@ -83,8 +83,15 @@ export function ProductTile({
               console.log(`✅ Image loaded successfully: ${imgSrc}`);
             }}
             onError={(e) => {
-              console.error(`❌ Image failed to load: ${imgSrc}`);
-              (e.currentTarget as HTMLImageElement).src = placeholderSvg;
+              const img = e.currentTarget as HTMLImageElement;
+              console.error(`❌ Image failed to load: ${imgSrc}`, {
+                url: img.src,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                complete: img.complete,
+                error: e
+              });
+              img.src = placeholderSvg;
             }}
           />
         </div>

@@ -53,7 +53,7 @@ export default function Admin() {
     try {
       await deleteEvenement(id);
     } catch (error) {
-      alert("Erreur lors de la suppression de l'év��nement.");
+      alert("Erreur lors de la suppression de l'événement.");
     } finally {
       setDeleting(null);
     }
@@ -112,8 +112,15 @@ export default function Admin() {
                             console.log(`✅ Admin image loaded: ${thumb}`);
                           }}
                           onError={(e) => {
-                            console.error(`❌ Admin image failed: ${thumb}`);
-                            (e.currentTarget as HTMLImageElement).src = placeholderSvg;
+                            const img = e.currentTarget as HTMLImageElement;
+                            console.error(`❌ Admin image failed: ${thumb}`, {
+                              url: img.src,
+                              naturalWidth: img.naturalWidth,
+                              naturalHeight: img.naturalHeight,
+                              complete: img.complete,
+                              error: e
+                            });
+                            img.src = placeholderSvg;
                           }}
                         />
                         <div className="flex-1">
