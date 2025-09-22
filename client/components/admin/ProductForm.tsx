@@ -138,7 +138,7 @@ export function ProductForm({
         setTva("8.1");
         setSku("");
         setImageUrl("");
-        setChecked({});
+        setSelectedPdv("");
       }
     } catch (e: any) {
       setErr(e.message || "Erreur inconnue");
