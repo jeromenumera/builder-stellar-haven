@@ -26,6 +26,7 @@ import {
 } from "./routes/points_de_vente";
 import { echo } from "./routes/echo";
 import { uploadImage, getImage } from "./routes/images";
+import { debugImages, testDbConnection } from "./routes/debug";
 
 import { ensurePdvSchema } from "./bootstrap";
 
