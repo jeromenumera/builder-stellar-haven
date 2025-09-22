@@ -18,7 +18,7 @@ const queryClient = new QueryClient();
 const AppShell = () => (
   <PosProvider>
     <Header />
-    <main className="min-h-[calc(100vh-4rem)]">
+    <main className="min-h-[calc(100vh-4rem)] pb-16 md:pb-0">
       <Routes>
         <Route path="/" element={<Navigate to="/vente" replace />} />
         <Route path="/vente" element={<Vente />} />
@@ -27,6 +27,7 @@ const AppShell = () => (
         <Route path="*" element={<NotFound />} />
       </Routes>
     </main>
+    <MobileNav />
   </PosProvider>
 );
 
