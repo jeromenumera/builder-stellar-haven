@@ -54,10 +54,7 @@ export const getProducts: RequestHandler = async (req, res) => {
 
     const params: any[] = [pdvId];
     let where = "ppv.point_de_vente_id = $1 AND p.actif = true";
-    if (eventId) {
-      where += " AND pdv.evenement_id = $2";
-      params.push(eventId);
-    }
+    // Remove event filtering for products - products should be available regardless of event
     // detect PDV table name (singular/plural)
     const t = await query(
       `SELECT to_regclass('public.point_de_vente') AS s, to_regclass('public.points_de_vente') AS p`,

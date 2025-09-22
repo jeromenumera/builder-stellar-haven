@@ -90,7 +90,7 @@ const PosContext = createContext<{
   removeItem: (id: string) => void;
   refreshData: () => Promise<void>;
   loadProduitsAdmin: () => Promise<void>;
-  loadProduitsByPOS: (eventId: string, posId: string) => Promise<void>;
+  loadProduitsByPDV: (posId: string) => Promise<void>;
 } | null>(null);
 
 const initial: State = {
@@ -214,10 +214,11 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const loadProduitsByPOS = useCallback(async (eventId: string, posId: string) => {
+  const loadProduitsByPDV = useCallback(async (posId: string) => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const produits = await fetchProduits(eventId, posId);
+      // Only filter by POS, not by event
+      const produits = await fetchProduits(undefined, posId);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load POS products:", error);
@@ -509,7 +510,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       updateVente,
       refreshData,
       loadProduitsAdmin,
-      loadProduitsByPOS,
+      loadProduitsByPDV,
     }),
     [state],
   );

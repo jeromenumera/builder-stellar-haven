@@ -8,18 +8,17 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Loader2 } from "lucide-react";
 
 export default function Vente() {
-  const { state, loadProduitsByPOS } = usePos() as any;
+  const { state, loadProduitsByPDV } = usePos() as any;
 
   const qtyById = state.cart;
 
   useEffect(() => {
-    const evId = state.selectedEventId;
     const posId = state.selectedPointDeVenteId;
 
-    if (evId && posId) {
-      loadProduitsByPOS(evId, posId);
+    if (posId) {
+      loadProduitsByPDV(posId);
     }
-  }, [state.selectedEventId, state.selectedPointDeVenteId, loadProduitsByPOS]);
+  }, [state.selectedPointDeVenteId, loadProduitsByPDV]);
 
   const { positiveProducts, negativeProducts } = useMemo(() => {
     const allProducts = state.produits.slice(0, 20);
@@ -64,13 +63,12 @@ export default function Vente() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const evId = state.selectedEventId;
                   const posId = state.selectedPointDeVenteId;
-                  if (evId && posId) {
-                    loadProduitsByPOS(evId, posId);
+                  if (posId) {
+                    loadProduitsByPDV(posId);
                   }
                 }}
-                disabled={!state.selectedEventId || !state.selectedPointDeVenteId || state.loading.produits}
+                disabled={!state.selectedPointDeVenteId || state.loading.produits}
                 className="flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
