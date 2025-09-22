@@ -110,9 +110,9 @@ export default function Vente() {
                 {/* Negative products section */}
                 {negativeProducts.length > 0 && (
                   <div className="mt-8">
-                    <h3 className="text-lg font-semibold text-amber-400 mb-4 border-b border-amber-400/30 pb-2">
-                      Retour
-                    </h3>
+                    <p className="text-lg font-semibold text-amber-400 mb-4 border-b border-amber-400/30 pb-2">
+                      Retour (Consignes)
+                    </p>
                     <div
                       className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
                       style={{ gridAutoRows: "140px" }}
