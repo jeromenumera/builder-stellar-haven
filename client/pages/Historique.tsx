@@ -28,10 +28,17 @@ export default function Historique() {
   const [saving, setSaving] = useState(false);
 
   const ventes = useMemo(() => {
-    return state.selectedEventId
-      ? state.ventes.filter((v) => v.evenement_id === state.selectedEventId)
-      : [];
-  }, [state.ventes, state.selectedEventId]);
+    if (!state.selectedEventId) return [];
+
+    return state.ventes.filter((v) => {
+      const matchEvent = v.evenement_id === state.selectedEventId;
+      const matchPdv = state.selectedPointDeVenteId
+        ? v.point_de_vente_id === state.selectedPointDeVenteId
+        : true; // Si aucun PDV sélectionné, afficher toutes les ventes de l'événement
+
+      return matchEvent && matchPdv;
+    });
+  }, [state.ventes, state.selectedEventId, state.selectedPointDeVenteId]);
 
   const onDelete = async (id: string) => {
     if (
