@@ -11,7 +11,7 @@ export function ProductForm({
   initial,
   onDone,
 }: {
-  initial: Product | null;
+  initial: Produit | null;
   onDone?: () => void;
 }) {
   const { state, saveProduit } = usePos() as any;
