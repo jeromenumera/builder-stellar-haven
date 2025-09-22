@@ -29,6 +29,9 @@ import {
   saveVente as apiSaveVente,
   deleteVente as apiDeleteVente,
   fetchPointsDeVente,
+  fetchPointsDeVente,
+  savePointDeVente as apiSavePointDeVente,
+  deletePointDeVente as apiDeletePointDeVente,
 } from "@/services/apiStorage";
 import { uid } from "@/services/id";
 
@@ -73,6 +76,8 @@ const PosContext = createContext<{
   deleteProduit: (id: string) => Promise<void>;
   saveEvenement: (e: Evenement) => Promise<void>;
   deleteEvenement: (id: string) => Promise<void>;
+  savePointDeVente: (pdv: Partial<PointDeVente> & { evenement_id: string; nom: string; type: PointDeVente["type"] }) => Promise<void>;
+  deletePointDeVente: (id: string) => Promise<void>;
   checkout: (mode: ModePaiement) => Promise<{ ok: boolean; error?: string }>;
   deleteVente: (id: string) => Promise<void>;
   updateVente: (v: Vente) => Promise<void>;
@@ -255,7 +260,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const saveEvenement = async (e: Evenement) => {
     try {
       const saved = await apiSaveEvenement(e);
-      await loadEvenements(); // Reload to get updated list
+      await loadEvenements();
+      await loadPointsDeVente();
     } catch (error) {
       console.error("Failed to save event:", error);
       throw error;
@@ -265,7 +271,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const deleteEvenement = async (id: string) => {
     try {
       await apiDeleteEvenement(id);
-      await loadEvenements(); // Reload to get updated list
+      await loadEvenements();
+      await loadPointsDeVente();
       if (state.selectedEventId === id)
         dispatch({ type: "selectEvent", id: null });
     } catch (error) {
@@ -349,6 +356,30 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const savePointDeVente = async (
+    pdv: Partial<PointDeVente> & { evenement_id: string; nom: string; type: PointDeVente["type"] },
+  ) => {
+    try {
+      await apiSavePointDeVente(pdv);
+      await loadPointsDeVente();
+      await loadProduits();
+    } catch (error) {
+      console.error("Failed to save point de vente:", error);
+      throw error;
+    }
+  };
+
+  const deletePointDeVente = async (id: string) => {
+    try {
+      await apiDeletePointDeVente(id);
+      await loadPointsDeVente();
+      if (state.selectedPointDeVenteId === id) dispatch({ type: "selectPointDeVente", id: null });
+    } catch (error) {
+      console.error("Failed to delete point de vente:", error);
+      throw error;
+    }
+  };
+
   const updateVente = async (updated: Vente) => {
     try {
       await apiSaveVente(updated); // Use same save function for updates
@@ -372,6 +403,8 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
       deleteProduit,
       saveEvenement,
       deleteEvenement,
+      savePointDeVente,
+      deletePointDeVente,
       checkout,
       deleteVente,
       updateVente,
