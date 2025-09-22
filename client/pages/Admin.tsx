@@ -25,7 +25,7 @@ export default function Admin() {
 
   useEffect(() => {
     loadProduitsAdmin();
-  }, [loadProduitsAdmin, state.selectedEventId]);
+  }, [state.selectedEventId]);
 
   const editingProduct =
     state.produits.find((p) => p.id === editingProductId) || null;
