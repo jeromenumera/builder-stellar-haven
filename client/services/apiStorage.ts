@@ -4,12 +4,10 @@ import { Evenement, Produit, Vente } from "@shared/api";
 
 export async function fetchProduits(
   eventId?: string,
-  pointDeVenteId?: string,
 ): Promise<Produit[]> {
   try {
     const params = new URLSearchParams();
     if (eventId) params.set("evenement_id", eventId);
-    if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
     const qs = params.toString();
     const rel = `/api/produits${qs ? `?${qs}` : ""}`;
     const abs = `https://cash.sosmediterranee.ch${rel}`;
