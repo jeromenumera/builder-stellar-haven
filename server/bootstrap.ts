@@ -12,24 +12,19 @@ export async function ensurePdvSchema() {
       END$$;`,
     );
   } catch {}
+
+  // Create produit_evenement join table
   await query(
-    `CREATE TABLE IF NOT EXISTS point_de_vente (
-      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-      evenement_id uuid NOT NULL REFERENCES evenements(id) ON DELETE CASCADE,
-      nom text NOT NULL,
-      actif boolean NOT NULL DEFAULT true,
-      created_at timestamptz NOT NULL DEFAULT now(),
-      updated_at timestamptz NOT NULL DEFAULT now()
-    );`,
-  );
-  await query(
-    `CREATE TABLE IF NOT EXISTS produit_point_de_vente (
+    `CREATE TABLE IF NOT EXISTS produit_evenement (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       produit_id uuid NOT NULL REFERENCES produits(id) ON DELETE CASCADE,
-      point_de_vente_id uuid NOT NULL REFERENCES point_de_vente(id) ON DELETE CASCADE,
-      UNIQUE (produit_id, point_de_vente_id)
+      evenement_id uuid NOT NULL REFERENCES evenements(id) ON DELETE CASCADE,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      UNIQUE (produit_id, evenement_id)
     );`,
   );
+
+  // Create images table if not exists
   await query(
     `CREATE TABLE IF NOT EXISTS images (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -38,8 +33,22 @@ export async function ensurePdvSchema() {
       created_at timestamptz NOT NULL DEFAULT now()
     );`,
   );
-  await query(
-    `ALTER TABLE ventes
-       ADD COLUMN IF NOT EXISTS point_de_vente_id uuid REFERENCES point_de_vente(id);`,
-  );
+
+  // Drop old PDV-related tables if they exist
+  try {
+    // First, remove the point_de_vente_id foreign key from ventes if it exists
+    await query(
+      `ALTER TABLE ventes DROP CONSTRAINT IF EXISTS ventes_point_de_vente_id_fkey;`,
+    );
+  } catch {}
+
+  try {
+    // Drop produit_point_de_vente if it exists
+    await query(`DROP TABLE IF EXISTS produit_point_de_vente;`);
+  } catch {}
+
+  try {
+    // Drop point_de_vente if it exists
+    await query(`DROP TABLE IF EXISTS point_de_vente;`);
+  } catch {}
 }
