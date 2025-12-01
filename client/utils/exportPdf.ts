@@ -1,4 +1,4 @@
-import { Evenement, KPIResume, Produit, Vente, computeKPI, PointDeVente } from "@shared/api";
+import { Evenement, KPIResume, Produit, Vente, computeKPI } from "@shared/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
