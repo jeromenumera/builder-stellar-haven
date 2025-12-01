@@ -13,23 +13,18 @@ import { MapPin, Check, X } from "lucide-react";
 import { useState } from "react";
 
 export function Header() {
-  const { state, selectEvent, selectPointDeVente } = usePos();
+  const { state, selectEvent } = usePos();
   const [isOpen, setIsOpen] = useState(false);
   const [draftEventId, setDraftEventId] = useState<string | null>(null);
-  const [draftPdvId, setDraftPdvId] = useState<string | null>(null);
 
   const activeClass = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`;
-
-  const selectedValue = state.selectedEventId ?? "";
-  const selectedPdv = state.selectedPointDeVenteId ?? "";
 
   // Initialize draft values when dropdown opens
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (open) {
       setDraftEventId(state.selectedEventId);
-      setDraftPdvId(state.selectedPointDeVenteId);
     }
   };
 
@@ -38,20 +33,12 @@ export function Header() {
     if (draftEventId !== state.selectedEventId) {
       selectEvent(draftEventId);
     }
-    if (draftPdvId !== state.selectedPointDeVenteId) {
-      if (Object.keys(state.cart).length > 0 && draftPdvId !== state.selectedPointDeVenteId) {
-        const ok = confirm("Changer de stand va vider le panier, continuer ?");
-        if (!ok) return;
-      }
-      selectPointDeVente(draftPdvId);
-    }
     setIsOpen(false);
   };
 
   // Cancel selection
   const handleCancel = () => {
     setDraftEventId(state.selectedEventId);
-    setDraftPdvId(state.selectedPointDeVenteId);
     setIsOpen(false);
   };
 
@@ -80,7 +67,7 @@ export function Header() {
         <div className="flex items-center justify-end gap-2 sm:gap-3">
           {/* Mobile: Show compact status */}
           <div className="hidden xs:flex sm:hidden items-center gap-1">
-            {state.selectedEventId && state.selectedPointDeVenteId ? (
+            {state.selectedEventId ? (
               <Badge variant="default" className="text-xs px-2 py-1">
                 ✓ Configuré
               </Badge>
@@ -94,21 +81,12 @@ export function Header() {
           {/* Desktop: Show full status */}
           <div className="hidden sm:flex items-center gap-2">
             {state.selectedEventId ? (
-              <Badge variant="default" className="text-xs font-medium truncate max-w-48 md:max-w-64">
+              <Badge variant="default" className="text-xs font-medium truncate max-w-64">
                 📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
               </Badge>
             ) : (
               <Badge variant="outline" className="text-xs">
                 Aucun événement
-              </Badge>
-            )}
-            {state.selectedPointDeVenteId ? (
-              <Badge variant="secondary" className="text-xs font-medium truncate max-w-48 md:max-w-64">
-                🏪 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="text-xs">
-                Aucun PDV
               </Badge>
             )}
           </div>
@@ -124,7 +102,7 @@ export function Header() {
               >
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="sr-only">
-                  Sélection Événement/Point de vente
+                  Sélection Événement
                 </span>
               </Button>
             </DropdownMenuTrigger>
@@ -163,28 +141,6 @@ export function Header() {
 
                 <DropdownMenuSeparator />
 
-                {/* POS Selection */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Point de vente</label>
-                  <select
-                    className="h-10 w-full rounded-md border bg-background px-3 text-sm"
-                    value={draftPdvId ?? ""}
-                    onChange={(e) => setDraftPdvId(e.target.value || null)}
-                  >
-                    <option value="">Sélectionner un point de vente...</option>
-                    {state.pointsDeVente.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.nom}
-                      </option>
-                    ))}
-                  </select>
-                  {draftPdvId && (
-                    <div className="text-xs text-muted-foreground">
-                      ✓ {state.pointsDeVente.find(p => p.id === draftPdvId)?.nom}
-                    </div>
-                  )}
-                </div>
-
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-2">
                   <Button
@@ -200,7 +156,7 @@ export function Header() {
                     size="sm"
                     onClick={handleApplySelection}
                     className="flex-1"
-                    disabled={draftEventId === state.selectedEventId && draftPdvId === state.selectedPointDeVenteId}
+                    disabled={draftEventId === state.selectedEventId}
                   >
                     <Check className="h-4 w-4 mr-1" />
                     Appliquer
@@ -212,7 +168,7 @@ export function Header() {
                   <div className="flex items-center justify-between">
                     <span>Statut actuel:</span>
                     <div className="flex gap-1">
-                      {state.selectedEventId && state.selectedPointDeVenteId ? (
+                      {state.selectedEventId ? (
                         <Badge variant="default" className="text-xs">Configuré</Badge>
                       ) : (
                         <Badge variant="destructive" className="text-xs">Incomplet</Badge>
