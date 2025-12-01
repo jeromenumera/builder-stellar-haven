@@ -236,56 +236,6 @@ export async function deleteVente(id: string): Promise<void> {
   }
 }
 
-export async function fetchPointsDeVente(
-  evenementId?: string,
-): Promise<PointDeVente[]> {
-  try {
-    const url = evenementId
-      ? `/api/points-de-vente?evenement_id=${encodeURIComponent(evenementId)}`
-      : "/api/points-de-vente";
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch points de vente");
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching points de vente:", error);
-    return [];
-  }
-}
-
-export async function savePointDeVente(
-  pdv: Partial<PointDeVente> & { evenement_id: string; nom: string },
-): Promise<PointDeVente> {
-  const isNew = !pdv.id;
-  const rel = isNew ? "/api/points-de-vente" : `/api/points-de-vente/${pdv.id}`;
-  const abs = `https://cash.sosmediterranee.ch${rel}`;
-  const method = isNew ? "POST" : "PUT";
-
-  const tryFetch = async (u: string) => {
-    try { return await fetch(u, { method, headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(pdv), credentials: "omit" }); } catch { return null as any; }
-  };
-
-  let response = await tryFetch(rel);
-  if (!response || !response.ok) response = await tryFetch(abs);
-
-  if (!response || !response.ok) {
-    let detail = "";
-    try {
-      const data = await response.json();
-      detail = data?.error || JSON.stringify(data);
-    } catch {}
-    throw new Error(
-      detail || `Failed to save point de vente (${response.status})`,
-    );
-  }
-  return response.json();
-}
-
-export async function deletePointDeVente(id: string): Promise<void> {
-  const response = await fetch(`/api/points-de-vente/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Failed to delete point de vente");
-}
 
 // Local storage fallback for selected event ID
 const LS_SELECTED_EVENT = "pos_selected_event_id";
