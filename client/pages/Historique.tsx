@@ -194,20 +194,13 @@ function Historique() {
       </div>
 
       {/* Filter Status */}
-      {(state.selectedEventId || state.selectedPointDeVenteId) && (
+      {state.selectedEventId && (
         <Card className="p-4">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Filtres actifs:</span>
-            {state.selectedEventId && (
-              <Badge variant="default">
-                📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
-              </Badge>
-            )}
-            {state.selectedPointDeVenteId && (
-              <Badge variant="secondary">
-                🏪 {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
-              </Badge>
-            )}
+            <Badge variant="default">
+              📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+            </Badge>
           </div>
         </Card>
       )}
