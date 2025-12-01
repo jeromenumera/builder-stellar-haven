@@ -162,12 +162,10 @@ export async function deleteEvenement(id: string): Promise<void> {
 
 export async function fetchVentes(
   evenementId?: string,
-  pointDeVenteId?: string,
 ): Promise<Vente[]> {
   try {
     const params = new URLSearchParams();
     if (evenementId) params.set("evenement_id", evenementId);
-    if (pointDeVenteId) params.set("point_de_vente_id", pointDeVenteId);
     const url = params.toString()
       ? `/api/ventes?${params.toString()}`
       : "/api/ventes";
