@@ -12,7 +12,7 @@ export interface Produit {
   tva: number; // VAT rate as percentage, e.g. 2.5 or 7.7
   image_url: string;
   sku?: string | null;
-  points_de_vente?: PointDeVente[]; // Available in admin mode
+  evenements?: Evenement[]; // Available in admin mode - events this product is assigned to
 }
 
 export interface Evenement {
