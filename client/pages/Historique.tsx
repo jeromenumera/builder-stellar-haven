@@ -103,11 +103,6 @@ function Historique() {
       filtered = filtered.filter(v => v.evenement_id === state.selectedEventId);
     }
 
-    // Then filter by POS if selected
-    if (state.selectedPointDeVenteId) {
-      filtered = filtered.filter(v => v.point_de_vente_id === state.selectedPointDeVenteId);
-    }
-
     // Sort by most recent first
     filtered.sort((a, b) => new Date(b.horodatage).getTime() - new Date(a.horodatage).getTime());
 
@@ -116,7 +111,7 @@ function Historique() {
       totalCount: allVentes.length,
       filteredCount: filtered.length
     };
-  }, [state.ventes, state.selectedEventId, state.selectedPointDeVenteId]);
+  }, [state.ventes, state.selectedEventId]);
 
   // Optimized callbacks
   const handleRefresh = useCallback(async () => {
