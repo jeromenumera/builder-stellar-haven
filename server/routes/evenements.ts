@@ -4,7 +4,9 @@ import { convertEvenementFromDb } from "../services/converters";
 
 export const getEvents: RequestHandler = async (_req, res) => {
   try {
-    const { rows } = await query(`SELECT * FROM evenements ORDER BY date_debut DESC`);
+    const { rows } = await query(
+      `SELECT * FROM evenements ORDER BY date_debut DESC`,
+    );
     const events = rows.map(convertEvenementFromDb);
     res.json(events);
   } catch (error: any) {
@@ -18,7 +20,11 @@ export const createEvent: RequestHandler = async (req, res) => {
     const normalize = (input: any) => {
       let b: any = input;
       if (typeof b === "string") {
-        try { b = JSON.parse(b); } catch { b = {}; }
+        try {
+          b = JSON.parse(b);
+        } catch {
+          b = {};
+        }
       }
       if (b && typeof b === "object" && typeof b.body === "string") {
         try {
@@ -26,15 +32,26 @@ export const createEvent: RequestHandler = async (req, res) => {
           if (inner && typeof inner === "object") b = inner;
         } catch {}
       }
-      if (b && typeof b === "object" && (Buffer.isBuffer?.(b) || b instanceof Uint8Array)) {
+      if (
+        b &&
+        typeof b === "object" &&
+        (Buffer.isBuffer?.(b) || b instanceof Uint8Array)
+      ) {
         try {
-          const s = Buffer.isBuffer?.(b) ? (b as Buffer).toString("utf8") : new TextDecoder().decode(b as Uint8Array);
+          const s = Buffer.isBuffer?.(b)
+            ? (b as Buffer).toString("utf8")
+            : new TextDecoder().decode(b as Uint8Array);
           b = JSON.parse(s);
         } catch {}
       }
       if (b && typeof b === "object" && !Array.isArray(b)) {
         const keys = Object.keys(b);
-        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string")) {
+        if (
+          keys.length > 0 &&
+          keys.every(
+            (k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string",
+          )
+        ) {
           try {
             const s = keys
               .map((k) => parseInt(k, 10))
@@ -62,18 +79,16 @@ export const createEvent: RequestHandler = async (req, res) => {
         : "actif");
 
     if (!nom || !date_debut) {
-      return res
-        .status(400)
-        .json({
-          error: "Missing required fields: nom, date_debut",
-          received: body,
-        });
+      return res.status(400).json({
+        error: "Missing required fields: nom, date_debut",
+        received: body,
+      });
     }
 
     const { rows } = await query(
       `INSERT INTO evenements (nom, date_debut, date_fin, lieu, statut)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [nom, date_debut, date_fin, lieu, statut]
+      [nom, date_debut, date_fin, lieu, statut],
     );
 
     const event = convertEvenementFromDb(rows[0]);
@@ -90,7 +105,11 @@ export const updateEvent: RequestHandler = async (req, res) => {
     const normalize = (input: any) => {
       let b: any = input;
       if (typeof b === "string") {
-        try { b = JSON.parse(b); } catch { b = {}; }
+        try {
+          b = JSON.parse(b);
+        } catch {
+          b = {};
+        }
       }
       if (b && typeof b === "object" && typeof b.body === "string") {
         try {
@@ -98,15 +117,26 @@ export const updateEvent: RequestHandler = async (req, res) => {
           if (inner && typeof inner === "object") b = inner;
         } catch {}
       }
-      if (b && typeof b === "object" && (Buffer.isBuffer?.(b) || b instanceof Uint8Array)) {
+      if (
+        b &&
+        typeof b === "object" &&
+        (Buffer.isBuffer?.(b) || b instanceof Uint8Array)
+      ) {
         try {
-          const s = Buffer.isBuffer?.(b) ? (b as Buffer).toString("utf8") : new TextDecoder().decode(b as Uint8Array);
+          const s = Buffer.isBuffer?.(b)
+            ? (b as Buffer).toString("utf8")
+            : new TextDecoder().decode(b as Uint8Array);
           b = JSON.parse(s);
         } catch {}
       }
       if (b && typeof b === "object" && !Array.isArray(b)) {
         const keys = Object.keys(b);
-        if (keys.length > 0 && keys.every((k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string")) {
+        if (
+          keys.length > 0 &&
+          keys.every(
+            (k) => /^\d+$/.test(k) && typeof (b as any)[k] === "string",
+          )
+        ) {
           try {
             const s = keys
               .map((k) => parseInt(k, 10))
@@ -136,7 +166,7 @@ export const updateEvent: RequestHandler = async (req, res) => {
     const { rows } = await query(
       `UPDATE evenements SET nom=$2, date_debut=$3, date_fin=$4, lieu=$5, statut=COALESCE($6, statut)
        WHERE id=$1 RETURNING *`,
-      [id, nom, date_debut, date_fin, lieu, statut]
+      [id, nom, date_debut, date_fin, lieu, statut],
     );
 
     const event = convertEvenementFromDb(rows[0]);
@@ -156,14 +186,17 @@ export const deleteEvent: RequestHandler = async (req, res) => {
       // Delete all lignes_ventes for sales associated with this event
       await client.query(
         `DELETE FROM lignes_ventes WHERE vente_id IN (SELECT id FROM ventes WHERE evenement_id=$1)`,
-        [id]
+        [id],
       );
 
       // Delete all ventes associated with this event
       await client.query(`DELETE FROM ventes WHERE evenement_id=$1`, [id]);
 
       // Delete product-event associations
-      await client.query(`DELETE FROM produit_evenement WHERE evenement_id=$1`, [id]);
+      await client.query(
+        `DELETE FROM produit_evenement WHERE evenement_id=$1`,
+        [id],
+      );
 
       // Delete the event
       await client.query(`DELETE FROM evenements WHERE id=$1`, [id]);

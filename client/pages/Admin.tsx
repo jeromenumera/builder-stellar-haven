@@ -84,9 +84,10 @@ export default function Admin() {
                       p.image_url && p.image_url.length > 0
                         ? p.image_url
                         : placeholderSvg;
-                    const eventsList = p.evenements && Array.isArray(p.evenements)
-                      ? p.evenements.map(e => e.nom).join(', ')
-                      : 'Aucun';
+                    const eventsList =
+                      p.evenements && Array.isArray(p.evenements)
+                        ? p.evenements.map((e) => e.nom).join(", ")
+                        : "Aucun";
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
                         <img
@@ -103,7 +104,7 @@ export default function Admin() {
                               naturalWidth: img.naturalWidth,
                               naturalHeight: img.naturalHeight,
                               complete: img.complete,
-                              error: e
+                              error: e,
                             });
                             img.src = placeholderSvg;
                           }}
@@ -111,7 +112,8 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">
-                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}% · Événements: {eventsList}
+                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}% ·
+                            Événements: {eventsList}
                           </div>
                         </div>
                         <Button

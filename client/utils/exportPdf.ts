@@ -4,12 +4,12 @@ import autoTable from "jspdf-autotable";
 
 // Helper function to clean text for PDF
 function cleanText(text: string): string {
-  if (!text) return '';
+  if (!text) return "";
   return text
-    .replace(/[^\x20-\x7E\u00C0-\u017F\u0100-\u024F]/g, '') // Keep only printable ASCII + Latin characters
-    .replace(/∅/g, '') // Remove empty set symbol
-    .replace(/=/g, ' - ') // Replace = with dash
-    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/[^\x20-\x7E\u00C0-\u017F\u0100-\u024F]/g, "") // Keep only printable ASCII + Latin characters
+    .replace(/∅/g, "") // Remove empty set symbol
+    .replace(/=/g, " - ") // Replace = with dash
+    .replace(/\s+/g, " ") // Normalize whitespace
     .trim();
 }
 
@@ -39,9 +39,9 @@ export function exportPDF(
 
   // Header Section with background
   doc.setFillColor(...lightGray);
-  doc.rect(0, 0, pageWidth, 120, 'F');
+  doc.rect(0, 0, pageWidth, 120, "F");
   doc.setFillColor(...primaryColor);
-  doc.rect(0, 0, pageWidth, 8, 'F');
+  doc.rect(0, 0, pageWidth, 8, "F");
 
   // Organization name
   doc.setTextColor(...primaryColor);
@@ -67,9 +67,12 @@ export function exportPDF(
   cursorY += 20;
 
   if (evt) {
-    const dateDebut = new Date(evt.date_debut).toLocaleDateString('fr-FR');
-    const dateFin = evt.date_fin ? new Date(evt.date_fin).toLocaleDateString('fr-FR') : dateDebut;
-    const dateRange = dateDebut === dateFin ? dateDebut : `${dateDebut} - ${dateFin}`;
+    const dateDebut = new Date(evt.date_debut).toLocaleDateString("fr-FR");
+    const dateFin = evt.date_fin
+      ? new Date(evt.date_fin).toLocaleDateString("fr-FR")
+      : dateDebut;
+    const dateRange =
+      dateDebut === dateFin ? dateDebut : `${dateDebut} - ${dateFin}`;
     doc.text(cleanText(`${dateRange} - ${evt.lieu}`), marginX, cursorY);
   } else {
     doc.text("Tous événements", marginX, cursorY);
@@ -79,7 +82,11 @@ export function exportPDF(
   cursorY += 20;
   doc.setFontSize(10);
   doc.setTextColor(150);
-  doc.text(`Généré le ${now.toLocaleDateString('fr-FR')} à ${now.toLocaleTimeString('fr-FR')}`, marginX, cursorY);
+  doc.text(
+    `Généré le ${now.toLocaleDateString("fr-FR")} à ${now.toLocaleTimeString("fr-FR")}`,
+    marginX,
+    cursorY,
+  );
 
   const kpi: KPIResume = computeKPI(ventes, produitsById);
   cursorY += 40;
@@ -97,9 +104,21 @@ export function exportPDF(
   const cardSpacing = 10;
 
   const kpiCards = [
-    { label: "Chiffre d'affaires", value: `${kpi.ca_total.toFixed(2)} CHF`, color: accentColor },
-    { label: "Nombre de ventes", value: kpi.nombre_ventes.toString(), color: primaryColor },
-    { label: "Ticket moyen", value: `${kpi.ticket_moyen.toFixed(2)} CHF`, color: secondaryColor }
+    {
+      label: "Chiffre d'affaires",
+      value: `${kpi.ca_total.toFixed(2)} CHF`,
+      color: accentColor,
+    },
+    {
+      label: "Nombre de ventes",
+      value: kpi.nombre_ventes.toString(),
+      color: primaryColor,
+    },
+    {
+      label: "Ticket moyen",
+      value: `${kpi.ticket_moyen.toFixed(2)} CHF`,
+      color: secondaryColor,
+    },
   ];
 
   kpiCards.forEach((card, index) => {
@@ -107,10 +126,10 @@ export function exportPDF(
 
     // Card background
     doc.setFillColor(255, 255, 255);
-    doc.roundedRect(x, cursorY, cardWidth, cardHeight, 5, 5, 'F');
+    doc.roundedRect(x, cursorY, cardWidth, cardHeight, 5, 5, "F");
     doc.setDrawColor(...card.color);
     doc.setLineWidth(2);
-    doc.roundedRect(x, cursorY, cardWidth, cardHeight, 5, 5, 'S');
+    doc.roundedRect(x, cursorY, cardWidth, cardHeight, 5, 5, "S");
 
     // Card content
     doc.setFont("helvetica", "normal");
@@ -134,36 +153,36 @@ export function exportPDF(
       [
         "Carte bancaire",
         `${kpi.par_mode_paiement.carte.toFixed(2)}`,
-        `${((kpi.par_mode_paiement.carte / kpi.ca_total) * 100).toFixed(1)}%`
+        `${((kpi.par_mode_paiement.carte / kpi.ca_total) * 100).toFixed(1)}%`,
       ],
       [
         "Especes",
         `${kpi.par_mode_paiement.cash.toFixed(2)}`,
-        `${((kpi.par_mode_paiement.cash / kpi.ca_total) * 100).toFixed(1)}%`
+        `${((kpi.par_mode_paiement.cash / kpi.ca_total) * 100).toFixed(1)}%`,
       ],
     ],
     styles: {
       fontSize: 11,
       cellPadding: 8,
       lineColor: [220, 220, 220],
-      lineWidth: 0.5
+      lineWidth: 0.5,
     },
     headStyles: {
       fillColor: [...primaryColor],
       textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 12
+      fontStyle: "bold",
+      fontSize: 12,
     },
     alternateRowStyles: {
-      fillColor: [...lightGray]
+      fillColor: [...lightGray],
     },
     columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { halign: 'right', fontStyle: 'bold' },
-      2: { halign: 'center' }
+      0: { cellWidth: "auto" },
+      1: { halign: "right", fontStyle: "bold" },
+      2: { halign: "center" },
     },
-    theme: 'grid',
-    margin: { left: marginX, right: marginX }
+    theme: "grid",
+    margin: { left: marginX, right: marginX },
   });
 
   // Products section
@@ -176,42 +195,46 @@ export function exportPDF(
       cleanText(x.produit?.nom || "Produit inconnu"),
       x.quantite.toString(),
       `${(x.ca / x.quantite).toFixed(2)} CHF`,
-      `${x.ca.toFixed(2)}`
+      `${x.ca.toFixed(2)}`,
     ]),
     styles: {
       fontSize: 10,
       cellPadding: 6,
       lineColor: [220, 220, 220],
-      lineWidth: 0.5
+      lineWidth: 0.5,
     },
     headStyles: {
       fillColor: [...accentColor],
       textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 11
+      fontStyle: "bold",
+      fontSize: 11,
     },
     alternateRowStyles: {
-      fillColor: [...lightGray]
+      fillColor: [...lightGray],
     },
     columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { halign: 'center' },
-      2: { halign: 'right' },
-      3: { halign: 'right', fontStyle: 'bold' }
+      0: { cellWidth: "auto" },
+      1: { halign: "center" },
+      2: { halign: "right" },
+      3: { halign: "right", fontStyle: "bold" },
     },
-    theme: 'grid',
-    margin: { left: marginX, right: marginX }
+    theme: "grid",
+    margin: { left: marginX, right: marginX },
   });
 
   // Footer
   const footerY = pageHeight - 40;
   doc.setFillColor(...primaryColor);
-  doc.rect(0, footerY, pageWidth, 40, 'F');
+  doc.rect(0, footerY, pageWidth, 40, "F");
 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text(cleanText("SOS MÉDITERRANÉE - Rapport automatise"), marginX, footerY + 25);
+  doc.text(
+    cleanText("SOS MÉDITERRANÉE - Rapport automatise"),
+    marginX,
+    footerY + 25,
+  );
 
   const pageNum = `Page 1`;
   const pageNumWidth = doc.getTextWidth(pageNum);

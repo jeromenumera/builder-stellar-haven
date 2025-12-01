@@ -6,8 +6,8 @@ export function convertProduitFromDb(dbProduit: any) {
     nom: dbProduit.nom,
     prix_ttc: Number.isFinite(prix) ? prix : 0,
     tva: Number.isFinite(tva) ? tva : 0,
-    image_url: dbProduit.image_url || '',
-    sku: dbProduit.sku || '',
+    image_url: dbProduit.image_url || "",
+    sku: dbProduit.sku || "",
     evenements: Array.isArray(dbProduit.evenements) ? dbProduit.evenements : [],
   };
 }
@@ -28,7 +28,9 @@ export function convertVenteFromDb(dbVente: any, lignes: any[] = []) {
     id: String(dbVente.id),
     horodatage: dbVente.horodatage,
     evenement_id: String(dbVente.evenement_id),
-    point_de_vente_id: dbVente.point_de_vente_id ? String(dbVente.point_de_vente_id) : null,
+    point_de_vente_id: dbVente.point_de_vente_id
+      ? String(dbVente.point_de_vente_id)
+      : null,
     mode_paiement: dbVente.mode_paiement,
     total_ttc: parseFloat(dbVente.total_ttc),
     total_ht: parseFloat(dbVente.total_ht),

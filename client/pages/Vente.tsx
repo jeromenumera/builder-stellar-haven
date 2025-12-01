@@ -22,8 +22,8 @@ export default function Vente() {
 
   const { positiveProducts, negativeProducts } = useMemo(() => {
     const allProducts = state.produits.slice(0, 20);
-    const positive = allProducts.filter(p => p.prix_ttc >= 0);
-    const negative = allProducts.filter(p => p.prix_ttc < 0);
+    const positive = allProducts.filter((p) => p.prix_ttc >= 0);
+    const negative = allProducts.filter((p) => p.prix_ttc < 0);
     return { positiveProducts: positive, negativeProducts: negative };
   }, [state.produits]);
 
@@ -53,7 +53,11 @@ export default function Vente() {
                   </h2>
                   {state.selectedEventId && (
                     <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                      {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+                      {
+                        state.evenements.find(
+                          (e) => e.id === state.selectedEventId,
+                        )?.nom
+                      }
                     </p>
                   )}
                 </div>
@@ -81,12 +85,15 @@ export default function Vente() {
 
               {/* Products Grid - Optimized for touch */}
               <div className="h-[calc(100%-5rem)] overflow-auto -mx-1">
-                {state.loading.produits && positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+                {state.loading.produits &&
+                positiveProducts.length === 0 &&
+                negativeProducts.length === 0 ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-6 h-6 animate-spin mr-2" />
                     Chargement des produits...
                   </div>
-                ) : positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+                ) : positiveProducts.length === 0 &&
+                  negativeProducts.length === 0 ? (
                   <div className="flex items-center justify-center py-12 text-center">
                     <div className="space-y-2">
                       <div className="text-lg">🛍️</div>
@@ -101,7 +108,11 @@ export default function Vente() {
                     {positiveProducts.length > 0 && (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                         {positiveProducts.map((p) => (
-                          <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                          <ProductTile
+                            key={p.id}
+                            produit={p}
+                            qty={qtyById[p.id] || 0}
+                          />
                         ))}
                       </div>
                     )}
@@ -114,7 +125,11 @@ export default function Vente() {
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                           {negativeProducts.map((p) => (
-                            <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                            <ProductTile
+                              key={p.id}
+                              produit={p}
+                              qty={qtyById[p.id] || 0}
+                            />
                           ))}
                         </div>
                       </div>
@@ -157,10 +172,10 @@ export default function Vente() {
             <section className="flex-1 order-1 md:order-2">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">
-                  Produits {state.selectedEventId ?
-                    `(${state.evenements.find(e => e.id === state.selectedEventId)?.nom || 'Événement'})` :
-                    ''
-                  }
+                  Produits{" "}
+                  {state.selectedEventId
+                    ? `(${state.evenements.find((e) => e.id === state.selectedEventId)?.nom || "Événement"})`
+                    : ""}
                 </h2>
                 <div className="flex items-center gap-2">
                   {state.loading.produits && (
@@ -189,12 +204,15 @@ export default function Vente() {
                   overflow: "auto",
                 }}
               >
-                {state.loading.produits && positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+                {state.loading.produits &&
+                positiveProducts.length === 0 &&
+                negativeProducts.length === 0 ? (
                   <div className="flex items-center justify-center py-8 text-muted-foreground">
                     <Loader2 className="w-6 h-6 animate-spin mr-2" />
                     Chargement des produits...
                   </div>
-                ) : positiveProducts.length === 0 && negativeProducts.length === 0 ? (
+                ) : positiveProducts.length === 0 &&
+                  negativeProducts.length === 0 ? (
                   <div className="flex items-center justify-center py-8 text-muted-foreground">
                     Aucun produit disponible pour cet événement
                   </div>
@@ -207,7 +225,11 @@ export default function Vente() {
                         style={{ gridAutoRows: "140px" }}
                       >
                         {positiveProducts.map((p) => (
-                          <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                          <ProductTile
+                            key={p.id}
+                            produit={p}
+                            qty={qtyById[p.id] || 0}
+                          />
                         ))}
                       </div>
                     )}
@@ -223,7 +245,11 @@ export default function Vente() {
                           style={{ gridAutoRows: "140px" }}
                         >
                           {negativeProducts.map((p) => (
-                            <ProductTile key={p.id} produit={p} qty={qtyById[p.id] || 0} />
+                            <ProductTile
+                              key={p.id}
+                              produit={p}
+                              qty={qtyById[p.id] || 0}
+                            />
                           ))}
                         </div>
                       </div>

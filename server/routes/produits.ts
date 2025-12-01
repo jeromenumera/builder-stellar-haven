@@ -249,7 +249,9 @@ export const deleteProduct: RequestHandler = async (req, res) => {
 
 export const upsertProductOverride: RequestHandler = async (req, res) => {
   try {
-    res.status(404).json({ error: "Product price overrides are no longer supported" });
+    res
+      .status(404)
+      .json({ error: "Product price overrides are no longer supported" });
   } catch (error: any) {
     console.error("Error in product override:", error);
     res.status(500).json({ error: error.message });

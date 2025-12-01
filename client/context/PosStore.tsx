@@ -153,9 +153,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadProduits = async () => {
     dispatch({ type: "setLoading", key: "produits", loading: true });
     try {
-      const produits = await fetchProduits(
-        state.selectedEventId || undefined,
-      );
+      const produits = await fetchProduits(state.selectedEventId || undefined);
       dispatch({ type: "setProduits", produits });
     } catch (error) {
       console.error("Failed to load products:", error);
@@ -206,9 +204,7 @@ export function PosProvider({ children }: { children: React.ReactNode }) {
   const loadVentes = async () => {
     dispatch({ type: "setLoading", key: "ventes", loading: true });
     try {
-      const ventes = await fetchVentes(
-        state.selectedEventId || undefined,
-      );
+      const ventes = await fetchVentes(state.selectedEventId || undefined);
       dispatch({ type: "setVentes", ventes });
     } catch (error) {
       console.error("Failed to load sales:", error);

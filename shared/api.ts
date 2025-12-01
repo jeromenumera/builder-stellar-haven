@@ -101,7 +101,10 @@ export function computeTotals(lignes: LigneVente[]): {
 } {
   const total_ttc = round2(lignes.reduce((s, l) => s + l.sous_total_ttc, 0));
   const total_ht = round2(
-    lignes.reduce((s, l) => s + computeHTfromTTC(l.sous_total_ttc, l.tva_taux), 0),
+    lignes.reduce(
+      (s, l) => s + computeHTfromTTC(l.sous_total_ttc, l.tva_taux),
+      0,
+    ),
   );
   const tva_totale = round2(total_ttc - total_ht);
   return { total_ttc, total_ht, tva_totale };
@@ -139,7 +142,13 @@ export function computeKPI(
     ca: vals.ca,
   }));
 
-  return { ca_total, nombre_ventes, ticket_moyen, par_mode_paiement, par_produit };
+  return {
+    ca_total,
+    nombre_ventes,
+    ticket_moyen,
+    par_mode_paiement,
+    par_produit,
+  };
 }
 
 // keep DemoResponse for legacy demo route

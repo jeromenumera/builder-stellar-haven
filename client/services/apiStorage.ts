@@ -2,9 +2,7 @@ import { Evenement, Produit, Vente } from "@shared/api";
 
 // API client functions for Supabase backend
 
-export async function fetchProduits(
-  eventId?: string,
-): Promise<Produit[]> {
+export async function fetchProduits(eventId?: string): Promise<Produit[]> {
   try {
     const params = new URLSearchParams();
     if (eventId) params.set("evenement_id", eventId);
@@ -21,9 +19,9 @@ export async function fetchProduits(
           credentials: "omit",
           signal: controller.signal,
           headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
         });
 
         clearTimeout(timeoutId);
@@ -129,7 +127,19 @@ export async function saveEvenement(evenement: Evenement): Promise<Evenement> {
     const payload = isNew ? { ...evenement, id: undefined } : evenement;
 
     const tryFetch = async (u: string) => {
-      try { return await fetch(u, { method, headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload), credentials: "omit" }); } catch { return null as any; }
+      try {
+        return await fetch(u, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+          credentials: "omit",
+        });
+      } catch {
+        return null as any;
+      }
     };
 
     let response = await tryFetch(rel);
@@ -160,9 +170,7 @@ export async function deleteEvenement(id: string): Promise<void> {
   }
 }
 
-export async function fetchVentes(
-  evenementId?: string,
-): Promise<Vente[]> {
+export async function fetchVentes(evenementId?: string): Promise<Vente[]> {
   try {
     const params = new URLSearchParams();
     if (evenementId) params.set("evenement_id", evenementId);
@@ -231,7 +239,6 @@ export async function deleteVente(id: string): Promise<void> {
     throw error;
   }
 }
-
 
 // Local storage fallback for selected event ID
 const LS_SELECTED_EVENT = "pos_selected_event_id";

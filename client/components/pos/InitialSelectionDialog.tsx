@@ -32,9 +32,7 @@ export function InitialSelectionDialog() {
     <Dialog open={open}>
       <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>
-            Sélectionner l'événement
-          </DialogTitle>
+          <DialogTitle>Sélectionner l'événement</DialogTitle>
           <DialogDescription>
             Choisis l'événement pour continuer.
           </DialogDescription>

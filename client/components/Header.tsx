@@ -81,8 +81,15 @@ export function Header() {
           {/* Desktop: Show full status */}
           <div className="hidden sm:flex items-center gap-2">
             {state.selectedEventId ? (
-              <Badge variant="default" className="text-xs font-medium truncate max-w-64">
-                📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+              <Badge
+                variant="default"
+                className="text-xs font-medium truncate max-w-64"
+              >
+                📅{" "}
+                {
+                  state.evenements.find((e) => e.id === state.selectedEventId)
+                    ?.nom
+                }
               </Badge>
             ) : (
               <Badge variant="outline" className="text-xs">
@@ -97,13 +104,11 @@ export function Header() {
                 variant="outline"
                 size="sm"
                 className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full transition-colors ${
-                  isOpen ? 'bg-primary text-primary-foreground' : ''
+                  isOpen ? "bg-primary text-primary-foreground" : ""
                 }`}
               >
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="sr-only">
-                  Sélection Événement
-                </span>
+                <span className="sr-only">Sélection Événement</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -134,7 +139,8 @@ export function Header() {
                   </select>
                   {draftEventId && (
                     <div className="text-xs text-muted-foreground">
-                      ✓ {state.evenements.find(e => e.id === draftEventId)?.nom}
+                      ✓{" "}
+                      {state.evenements.find((e) => e.id === draftEventId)?.nom}
                     </div>
                   )}
                 </div>
@@ -169,9 +175,13 @@ export function Header() {
                     <span>Statut actuel:</span>
                     <div className="flex gap-1">
                       {state.selectedEventId ? (
-                        <Badge variant="default" className="text-xs">Configuré</Badge>
+                        <Badge variant="default" className="text-xs">
+                          Configuré
+                        </Badge>
                       ) : (
-                        <Badge variant="destructive" className="text-xs">Incomplet</Badge>
+                        <Badge variant="destructive" className="text-xs">
+                          Incomplet
+                        </Badge>
                       )}
                     </div>
                   </div>

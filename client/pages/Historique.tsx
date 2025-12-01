@@ -23,67 +23,78 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { computeTotals, Vente } from "@shared/api";
 
 // Memoized row component for better performance
-const VenteRow = memo(({
-  vente,
-  produits,
-  onEdit,
-  onDelete,
-  isDeleting
-}: {
-  vente: Vente;
-  produits: any[];
-  onEdit: (v: any) => void;
-  onDelete: (id: string) => void;
-  isDeleting: boolean;
-}) => (
-  <TableRow>
-    <TableCell className="font-mono text-sm">
-      {new Date(vente.horodatage).toLocaleTimeString('fr-FR')}
-    </TableCell>
-    <TableCell className="font-semibold text-green-600">
-      {vente.total_ttc.toFixed(2)} CHF
-    </TableCell>
-    <TableCell>
-      <Badge variant={vente.mode_paiement === 'carte' ? 'default' : 'secondary'}>
-        {vente.mode_paiement === 'carte' ? '💳 Carte' : '💰 Espèces'}
-      </Badge>
-    </TableCell>
-    <TableCell>
-      <ul className="text-sm space-y-1">
-        {vente.lignes.map((l) => (
-          <li key={l.id} className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">
-              {l.quantite}×
-            </Badge>
-            <span>{produits.find((p) => p.id === l.produit_id)?.nom || l.produit_id}</span>
-          </li>
-        ))}
-      </ul>
-    </TableCell>
-    <TableCell className="text-right">
-      <div className="flex gap-2 justify-end">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onEdit(vente)}
-          disabled={isDeleting}
+const VenteRow = memo(
+  ({
+    vente,
+    produits,
+    onEdit,
+    onDelete,
+    isDeleting,
+  }: {
+    vente: Vente;
+    produits: any[];
+    onEdit: (v: any) => void;
+    onDelete: (id: string) => void;
+    isDeleting: boolean;
+  }) => (
+    <TableRow>
+      <TableCell className="font-mono text-sm">
+        {new Date(vente.horodatage).toLocaleTimeString("fr-FR")}
+      </TableCell>
+      <TableCell className="font-semibold text-green-600">
+        {vente.total_ttc.toFixed(2)} CHF
+      </TableCell>
+      <TableCell>
+        <Badge
+          variant={vente.mode_paiement === "carte" ? "default" : "secondary"}
         >
-          Modifier
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onDelete(vente.id)}
-          disabled={isDeleting}
-        >
-          {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Supprimer"}
-        </Button>
-      </div>
-    </TableCell>
-  </TableRow>
-));
+          {vente.mode_paiement === "carte" ? "💳 Carte" : "💰 Espèces"}
+        </Badge>
+      </TableCell>
+      <TableCell>
+        <ul className="text-sm space-y-1">
+          {vente.lignes.map((l) => (
+            <li key={l.id} className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {l.quantite}×
+              </Badge>
+              <span>
+                {produits.find((p) => p.id === l.produit_id)?.nom ||
+                  l.produit_id}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex gap-2 justify-end">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onEdit(vente)}
+            disabled={isDeleting}
+          >
+            Modifier
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => onDelete(vente.id)}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Supprimer"
+            )}
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  ),
+);
 
-VenteRow.displayName = 'VenteRow';
+VenteRow.displayName = "VenteRow";
 
 function Historique() {
   const { state, deleteVente, updateVente, refreshData } = usePos();
@@ -100,16 +111,21 @@ function Historique() {
 
     // Filter by event first (most selective)
     if (state.selectedEventId) {
-      filtered = filtered.filter(v => v.evenement_id === state.selectedEventId);
+      filtered = filtered.filter(
+        (v) => v.evenement_id === state.selectedEventId,
+      );
     }
 
     // Sort by most recent first
-    filtered.sort((a, b) => new Date(b.horodatage).getTime() - new Date(a.horodatage).getTime());
+    filtered.sort(
+      (a, b) =>
+        new Date(b.horodatage).getTime() - new Date(a.horodatage).getTime(),
+    );
 
     return {
       ventes: filtered,
       totalCount: allVentes.length,
-      filteredCount: filtered.length
+      filteredCount: filtered.length,
     };
   }, [state.ventes, state.selectedEventId]);
 
@@ -119,28 +135,31 @@ function Historique() {
     try {
       await refreshData();
     } catch (error) {
-      console.error('Erreur lors du rafraîchissement:', error);
+      console.error("Erreur lors du rafraîchissement:", error);
     } finally {
       setIsRefreshing(false);
     }
   }, [refreshData]);
 
-  const onDelete = useCallback(async (id: string) => {
-    if (
-      !confirm(
-        "Confirmer la suppression de cette vente ? Cette action est irréversible.",
+  const onDelete = useCallback(
+    async (id: string) => {
+      if (
+        !confirm(
+          "Confirmer la suppression de cette vente ? Cette action est irréversible.",
+        )
       )
-    )
-      return;
-    setDeleting(id);
-    try {
-      await deleteVente(id);
-    } catch (error) {
-      alert("Erreur lors de la suppression de la vente.");
-    } finally {
-      setDeleting(null);
-    }
-  }, [deleteVente]);
+        return;
+      setDeleting(id);
+      try {
+        await deleteVente(id);
+      } catch (error) {
+        alert("Erreur lors de la suppression de la vente.");
+      } finally {
+        setDeleting(null);
+      }
+    },
+    [deleteVente],
+  );
 
   const openEdit = useCallback((v: any) => {
     setDraft(JSON.parse(JSON.stringify(v)));
@@ -174,7 +193,10 @@ function Historique() {
         <div className="space-y-1">
           <h1 className="text-2xl font-bold">Historique des ventes</h1>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <span>{filteredCount} vente{filteredCount !== 1 ? 's' : ''} affichée{filteredCount !== 1 ? 's' : ''}</span>
+            <span>
+              {filteredCount} vente{filteredCount !== 1 ? "s" : ""} affichée
+              {filteredCount !== 1 ? "s" : ""}
+            </span>
             {filteredCount !== totalCount && (
               <span>({totalCount} au total)</span>
             )}
@@ -185,7 +207,9 @@ function Historique() {
               disabled={isRefreshing}
               className="h-8 px-2"
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+              />
               <span className="ml-1">Actualiser</span>
             </Button>
           </div>
@@ -199,7 +223,11 @@ function Historique() {
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">Filtres actifs:</span>
             <Badge variant="default">
-              📅 {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
+              📅{" "}
+              {
+                state.evenements.find((e) => e.id === state.selectedEventId)
+                  ?.nom
+              }
             </Badge>
           </div>
         </Card>

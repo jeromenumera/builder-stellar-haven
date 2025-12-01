@@ -5,8 +5,12 @@ import { exportPDF } from "@/utils/exportPdf";
 
 export function ExportActions() {
   const { state } = usePos();
-  const produitsById = Object.fromEntries(state.produits.map((p) => [p.id, p] as const));
-  const evenementsById = Object.fromEntries(state.evenements.map((e) => [e.id, e] as const));
+  const produitsById = Object.fromEntries(
+    state.produits.map((p) => [p.id, p] as const),
+  );
+  const evenementsById = Object.fromEntries(
+    state.evenements.map((e) => [e.id, e] as const),
+  );
 
   const ventesForScope = state.selectedEventId
     ? state.ventes.filter((v) => v.evenement_id === state.selectedEventId)
