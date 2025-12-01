@@ -1,4 +1,4 @@
-import { Evenement, Produit, Vente, PointDeVente } from "@shared/api";
+import { Evenement, Produit, Vente } from "@shared/api";
 
 // API client functions for Supabase backend
 
