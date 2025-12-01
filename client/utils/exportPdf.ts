@@ -17,9 +17,7 @@ export function exportPDF(
   ventes: Vente[],
   evenementsById: Record<string, Evenement>,
   produitsById: Record<string, Produit>,
-  pointsById: Record<string, PointDeVente>,
   selectedEventId: string | null,
-  selectedPointDeVenteId: string | null,
   filename = "rapport-ventes.pdf",
 ) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
