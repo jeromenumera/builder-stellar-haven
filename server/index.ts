@@ -18,12 +18,6 @@ import {
   deleteEvent,
 } from "./routes/evenements";
 import { getSales, createSale, updateSale, deleteSale } from "./routes/ventes";
-import {
-  getPointsDeVente,
-  createPointDeVente,
-  updatePointDeVente,
-  deletePointDeVente,
-} from "./routes/points_de_vente";
 import { echo } from "./routes/echo";
 import { uploadImage, getImage } from "./routes/images";
 import { debugImages, testDbConnection } from "./routes/debug";
