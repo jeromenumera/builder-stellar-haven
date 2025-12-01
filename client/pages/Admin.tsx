@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { EventForm } from "@/components/admin/EventForm";
-import { PointDeVenteForm } from "@/components/admin/PointDeVenteForm";
 import { categoryIconDataUrl } from "@/lib/avatar";
 import placeholderSvg from "@/assets/placeholder.svg";
 import { RefreshCw } from "lucide-react";
@@ -15,13 +14,11 @@ export default function Admin() {
     state,
     deleteProduit,
     deleteEvenement,
-    deletePointDeVente,
     selectEvent,
     loadProduitsAdmin,
   } = usePos();
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  const [editingPointId, setEditingPointId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
@@ -32,8 +29,6 @@ export default function Admin() {
     state.produits.find((p) => p.id === editingProductId) || null;
   const editingEvent =
     state.evenements.find((e) => e.id === editingEventId) || null;
-  const editingPoint =
-    state.pointsDeVente.find((p) => p.id === editingPointId) || null;
 
   const handleDeleteProduct = async (id: string) => {
     if (!confirm("Confirmer la suppression de ce produit ?")) return;
@@ -59,18 +54,6 @@ export default function Admin() {
     }
   };
 
-  const handleDeletePoint = async (id: string) => {
-    if (!confirm("Confirmer la suppression de ce point de vente ?")) return;
-    setDeleting(id);
-    try {
-      await deletePointDeVente(id);
-    } catch (error) {
-      alert("Erreur lors de la suppression du point de vente.");
-    } finally {
-      setDeleting(null);
-    }
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Administration</h1>
@@ -78,7 +61,6 @@ export default function Admin() {
         <TabsList>
           <TabsTrigger value="produits">Produits</TabsTrigger>
           <TabsTrigger value="evenements">Événements</TabsTrigger>
-          <TabsTrigger value="points">Points de vente</TabsTrigger>
         </TabsList>
         <TabsContent value="produits" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -102,6 +84,9 @@ export default function Admin() {
                       p.image_url && p.image_url.length > 0
                         ? p.image_url
                         : placeholderSvg;
+                    const eventsList = p.evenements && Array.isArray(p.evenements)
+                      ? p.evenements.map(e => e.nom).join(', ')
+                      : 'Aucun';
                     return (
                       <li key={p.id} className="flex items-center gap-2 p-2">
                         <img
@@ -126,11 +111,7 @@ export default function Admin() {
                         <div className="flex-1">
                           <div className="font-medium">{p.nom}</div>
                           <div className="text-xs text-muted-foreground">
-                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}% · PDV: {
-                              p.points_de_vente && p.points_de_vente.length > 0
-                                ? p.points_de_vente.map(pdv => pdv.nom).join(', ')
-                                : 'Aucun'
-                            }
+                            {p.prix_ttc.toFixed(2)} CHF · TVA {p.tva}% · Événements: {eventsList}
                           </div>
                         </div>
                         <Button
@@ -166,60 +147,6 @@ export default function Admin() {
                   setEditingProductId(null);
                   loadProduitsAdmin();
                 }}
-              />
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="points" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Liste (max 20)</h2>
-              <Card className="p-2">
-                <ul className="divide-y">
-                  {state.pointsDeVente.slice(0, 20).map((p) => {
-                    const evt = state.evenements.find(
-                      (e) => e.id === p.evenement_id,
-                    );
-                    return (
-                      <li key={p.id} className="flex items-center gap-2 p-2">
-                        <div className="flex-1">
-                          <div className="font-medium">{p.nom}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {evt ? evt.nom : p.evenement_id} ·{" "}
-                            {p.actif ? "Actif" : "Inactif"}
-                          </div>
-                        </div>
-                        <Button
-                          variant="secondary"
-                          onClick={() => setEditingPointId(p.id)}
-                        >
-                          Éditer
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => handleDeletePoint(p.id)}
-                          disabled={deleting === p.id}
-                        >
-                          {deleting === p.id ? "..." : "Supprimer"}
-                        </Button>
-                      </li>
-                    );
-                  })}
-                  {state.pointsDeVente.length === 0 && (
-                    <li className="p-4 text-muted-foreground">
-                      Aucun point de vente
-                    </li>
-                  )}
-                </ul>
-              </Card>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">
-                {editingPoint ? "Éditer" : "Nouveau point de vente"}
-              </h2>
-              <PointDeVenteForm
-                initial={editingPoint}
-                onDone={() => setEditingPointId(null)}
               />
             </div>
           </div>
