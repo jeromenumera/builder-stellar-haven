@@ -36,7 +36,6 @@ export function exportPDF(
 
   const now = new Date();
   const evt = selectedEventId ? evenementsById[selectedEventId] : null;
-  const pdv = selectedPointDeVenteId ? pointsById[selectedPointDeVenteId] : null;
 
   // Header Section with background
   doc.setFillColor(...lightGray);
@@ -51,9 +50,7 @@ export function exportPDF(
   doc.text(cleanText("SOS MÉDITERRANÉE"), marginX, cursorY + 35);
 
   // Report title
-  const title = evt && pdv
-    ? `Rapport de ventes - ${cleanText(evt.nom)}`
-    : evt
+  const title = evt
     ? `Rapport de ventes - ${cleanText(evt.nom)}`
     : "Rapport de ventes";
 
