@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { usePos } from "@/context/PosStore";
 import { Produit } from "@shared/api";
 import placeholderSvg from "@/assets/placeholder.svg";
@@ -25,17 +25,10 @@ export function ProductForm({
   const [sku, setSku] = useState<string>(initial?.sku ?? "");
   const [imageUrl, setImageUrl] = useState<string>(initial?.image_url ?? "");
   const [file, setFile] = useState<File | null>(null);
-  const [selectedPdv, setSelectedPdv] = useState<string>("");
+  const [selectedEventIds, setSelectedEventIds] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-
-  const pdvList = useMemo(() => {
-    const evId = state.selectedEventId;
-    return state.pointsDeVente.filter(
-      (p) => p.evenement_id === evId && p.actif,
-    );
-  }, [state.pointsDeVente, state.selectedEventId]);
 
   useEffect(() => {
     setNom(initial?.nom ?? "");
@@ -44,12 +37,14 @@ export function ProductForm({
     setSku(initial?.sku ?? "");
     setImageUrl(initial?.image_url ?? "");
     setFile(null);
-    // Pour l'édition, sélectionner le premier PDV associé au produit
-    const firstPdv = initial?.points_de_vente?.[0]?.id || "";
-    setSelectedPdv(firstPdv);
+    // Initialize selected events from product's associated events
+    if (initial?.evenements && Array.isArray(initial.evenements)) {
+      setSelectedEventIds(new Set(initial.evenements.map((e) => e.id)));
+    } else {
+      setSelectedEventIds(new Set());
+    }
     setErr(null);
   }, [initial]);
-
 
   async function onFileChange(f?: File) {
     if (!f) return;
@@ -90,16 +85,25 @@ export function ProductForm({
     }
   }
 
+  function toggleEvent(eventId: string) {
+    const newSet = new Set(selectedEventIds);
+    if (newSet.has(eventId)) {
+      newSet.delete(eventId);
+    } else {
+      newSet.add(eventId);
+    }
+    setSelectedEventIds(newSet);
+  }
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
 
-    const eventId = state.selectedEventId;
     if (!nom.trim()) return setErr("Le nom est requis.");
     if (prix.trim() === "" || isNaN(Number(prix)))
       return setErr("Prix TTC invalide.");
-    if (!eventId)
-      return setErr("Sélectionne un événement dans la barre du haut.");
+    if (selectedEventIds.size === 0)
+      return setErr("Sélectionnez au moins un événement.");
 
     let tvaNumber = Number(tva);
     if (isNaN(tvaNumber)) tvaNumber = 0;
@@ -115,8 +119,7 @@ export function ProductForm({
       image_url: finalUrl,
       sku: sku || null,
       actif: true,
-      evenement_id: eventId,
-      pointOfSaleIds: selectedPdv ? [selectedPdv] : [],
+      eventIds: Array.from(selectedEventIds),
     };
 
     setSaving(true);
@@ -129,7 +132,7 @@ export function ProductForm({
         setTva("8.1");
         setSku("");
         setImageUrl("");
-        setSelectedPdv("");
+        setSelectedEventIds(new Set());
       }
     } catch (e: any) {
       setErr(e.message || "Erreur inconnue");
@@ -172,24 +175,28 @@ export function ProductForm({
       </div>
 
       <div>
-        <Label>Point de vente</Label>
-        <div className="mt-2">
-          <Select value={selectedPdv} onValueChange={setSelectedPdv}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un point de vente" />
-            </SelectTrigger>
-            <SelectContent>
-              {pdvList.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.nom}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {pdvList.length === 0 && (
-            <div className="text-xs text-muted-foreground mt-2">
-              Aucun point de vente actif pour l'événement courant.
+        <Label>Événements</Label>
+        <div className="mt-2 space-y-2 p-3 border rounded-md max-h-48 overflow-y-auto">
+          {state.evenements.length === 0 ? (
+            <div className="text-xs text-muted-foreground">
+              Aucun événement disponible.
             </div>
+          ) : (
+            state.evenements.map((event: any) => (
+              <div key={event.id} className="flex items-center gap-2">
+                <Checkbox
+                  id={`event-${event.id}`}
+                  checked={selectedEventIds.has(event.id)}
+                  onCheckedChange={() => toggleEvent(event.id)}
+                />
+                <label
+                  htmlFor={`event-${event.id}`}
+                  className="text-sm font-medium cursor-pointer flex-1"
+                >
+                  {event.nom}
+                </label>
+              </div>
+            ))
           )}
         </div>
       </div>
