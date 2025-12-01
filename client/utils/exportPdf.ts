@@ -75,11 +75,6 @@ export function exportPDF(
     doc.text("Tous événements", marginX, cursorY);
   }
 
-  if (pdv) {
-    cursorY += 15;
-    doc.text(cleanText(`Point de vente: ${pdv.nom}`), marginX, cursorY);
-  }
-
   // Generation timestamp
   cursorY += 20;
   doc.setFontSize(10);
