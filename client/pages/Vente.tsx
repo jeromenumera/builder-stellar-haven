@@ -8,17 +8,17 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Loader2 } from "lucide-react";
 
 export default function Vente() {
-  const { state, loadProduitsByPDV } = usePos() as any;
+  const { state, loadProduitsByEvent } = usePos() as any;
 
   const qtyById = state.cart;
 
   useEffect(() => {
-    const posId = state.selectedPointDeVenteId;
+    const eventId = state.selectedEventId;
 
-    if (posId) {
-      loadProduitsByPDV(posId);
+    if (eventId) {
+      loadProduitsByEvent(eventId);
     }
-  }, [state.selectedPointDeVenteId, loadProduitsByPDV]);
+  }, [state.selectedEventId, loadProduitsByEvent]);
 
   const { positiveProducts, negativeProducts } = useMemo(() => {
     const allProducts = state.produits.slice(0, 20);
@@ -51,9 +51,9 @@ export default function Vente() {
                   <h2 className="text-base sm:text-lg font-semibold truncate">
                     Produits
                   </h2>
-                  {state.selectedPointDeVenteId && (
+                  {state.selectedEventId && (
                     <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                      {state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom}
+                      {state.evenements.find(e => e.id === state.selectedEventId)?.nom}
                     </p>
                   )}
                 </div>
@@ -65,12 +65,12 @@ export default function Vente() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const posId = state.selectedPointDeVenteId;
-                      if (posId) {
-                        loadProduitsByPDV(posId);
+                      const eventId = state.selectedEventId;
+                      if (eventId) {
+                        loadProduitsByEvent(eventId);
                       }
                     }}
-                    disabled={!state.selectedPointDeVenteId || state.loading.produits}
+                    disabled={!state.selectedEventId || state.loading.produits}
                     className="h-8 px-2 sm:h-9 sm:px-3"
                   >
                     <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -157,8 +157,8 @@ export default function Vente() {
             <section className="flex-1 order-1 md:order-2">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">
-                  Produits {state.selectedPointDeVenteId ?
-                    `(${state.pointsDeVente.find(p => p.id === state.selectedPointDeVenteId)?.nom || 'Point de vente'})` :
+                  Produits {state.selectedEventId ?
+                    `(${state.evenements.find(e => e.id === state.selectedEventId)?.nom || 'Événement'})` :
                     ''
                   }
                 </h2>
@@ -170,12 +170,12 @@ export default function Vente() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const posId = state.selectedPointDeVenteId;
-                      if (posId) {
-                        loadProduitsByPDV(posId);
+                      const eventId = state.selectedEventId;
+                      if (eventId) {
+                        loadProduitsByEvent(eventId);
                       }
                     }}
-                    disabled={!state.selectedPointDeVenteId || state.loading.produits}
+                    disabled={!state.selectedEventId || state.loading.produits}
                     className="flex items-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
@@ -196,7 +196,7 @@ export default function Vente() {
                   </div>
                 ) : positiveProducts.length === 0 && negativeProducts.length === 0 ? (
                   <div className="flex items-center justify-center py-8 text-muted-foreground">
-                    Aucun produit disponible pour ce point de vente
+                    Aucun produit disponible pour cet événement
                   </div>
                 ) : (
                   <>
