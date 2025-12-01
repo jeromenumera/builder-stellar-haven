@@ -57,7 +57,7 @@ export async function fetchProduits(
 }
 
 export async function saveProduit(
-  produit: Produit & { pointOfSaleIds?: string[] },
+  produit: Produit & { eventIds?: string[] },
 ): Promise<Produit> {
   try {
     const isNew = !produit.id || produit.id.startsWith("prod_");
@@ -72,7 +72,7 @@ export async function saveProduit(
       tva: produit.tva,
       image_url: produit.image_url,
       sku: produit.sku,
-      pointOfSaleIds: produit.pointOfSaleIds || [],
+      eventIds: produit.eventIds || [],
     };
 
     const response = await fetch(url, {
